@@ -1,18 +1,25 @@
 #!/usr/bin/env python3
 
-import os, sys, zipfile, tempfile, json
-from urllib.request import urlopen
+import os, sys, zipfile, tempfile, shutil
+from urllib.request import urlopen, Request, urlretrieve
+from clint.textui import progress
 
-#TODO Have user enter pwndfu, enter ipsw path, extract files, use ipwndfu module to decrypt with gid key.
+#TODO Have user enter pwndfu, enter ipsw path, extract files, import modules from ipwndfu to decrypt with gid key.
+
+def downloadIPSW(device, version):
+        # Adding "/buildid" returns the buildid when we search with iOS version
+        url = 'https://api.ipsw.me/v3/' + device + '/' + version + '/buildid' # Hot fix by my friend 32-bites in PyKeys
+        req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        data = urlopen(req).read()
+        buildid = data.decode() # Not sure if we need to decode this.
+        print(buildid)
+
+        realurl = 'https://api.ipsw.me/v4/ipsw/download/' + device + '/' + buildid
+        print(realurl)
+
+        #TODO Download the ipsw :/ Apparently I'm too dumb right now to get this working lol
 
 #TODO Extract files that have kbags.
-
-def downloadIPSW(version):
-        header = {'Accept': 'application/json'}
-        url = 'https://api.ipsw.me/v4/ipsw/' + version
-        request = urlopen(url)
-        data = json.load(request)
-        print(data)
 
 def extractIPSW(file):
         if zipfile.is_zipfile(file) == True:
@@ -20,6 +27,7 @@ def extractIPSW(file):
                 print("We are using %s as the temp dir" % tmp)
                 with zipfile.ZipFile(file, 'r') as ipsw:
                         ipsw.extractall(tmp)
+
         else:
                 print("%s is not a zip archive" % file)
 
@@ -49,7 +57,7 @@ if __name__ == '__main__':
                 sys.exit("We are expecting two arguments but a max of 3!")
 
         if '-d' in argv:
-                downloadIPSW(argv[2]) # ./grabkeys.py -d version
+                downloadIPSW(argv[2], argv[3]) # ./grabkeys.py -d device version
 
         elif '-s' in argv:
                 splitKbag(argv[2]) # ./grabkeys.py -s KBAG
