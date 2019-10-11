@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+import sys
+
+# My modules
+import api
+import utils
+
+
+def usage(name):
+    print(f'Usage: {name} <args> <stuff>')
+    print('-d\t\tDownload an ipsw for decrypting')
+    print('-s\t\tSplit KBAG key')
+    print('-x\t\tExtract IPSW')
+
+
+if __name__ == '__main__':
+    argv = sys.argv
+    if len(argv) == 1:
+        usage(argv[0])
+
+    if len(argv) > 4:
+        sys.exit('We are expecting two arguments but a max of 3!')
+
+    if '-d' in argv:
+        api.downloadIPSW(argv[2], argv[3])  # ./grabkeys.py -d device version
+
+    elif '-s' in argv:
+        utils.splitKbag(argv[2])  # ./grabkeys.py -s KBAG
+
+    elif '-x' in argv:
+        utils.extractIPSW(argv[2])  # ./grabkeys.py -x IPSW
