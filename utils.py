@@ -1,5 +1,6 @@
 import tempfile
 import zipfile
+import sys
 
 
 def extractIPSW(file):

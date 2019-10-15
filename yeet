@@ -9,10 +9,11 @@ import utils
 
 def usage(name):
     print(f'Usage: {name} <args> <stuff>')
-    print('-b\t\tGet buildid from version')
-    print('-d\t\tDownload an ipsw')
-    print('-s\t\tSplit KBAG key')
-    print('-x\t\tExtract IPSW')
+    print('\t-b\t\tGet buildid from version')
+    print('\t-d\t\tDownload an ipsw')
+    print('\t-k\t\tGrab Keys')
+    print('\t-s\t\tSplit KBAG key')
+    print('\t-x\t\tExtract IPSW')
 
 
 if __name__ == '__main__':
@@ -24,7 +25,10 @@ if __name__ == '__main__':
         sys.exit('We are expecting two arguments but a max of 3!')
 
     if '-b' in argv:
-        api.versionToBuildid(argv[2], argv[3])  # ./yeet -d device version
+        print(api.versionToBuildid(argv[2], argv[3]))  # ./yeet -b device version
+
+    elif '-k' in argv:
+        api.grabKeys(argv[2], argv[3])  # ./yeet -k device version
 
     elif '-d' in argv:
         api.downloadIPSW(argv[2], argv[3])  # ./yeet -d device version
