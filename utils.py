@@ -1,7 +1,12 @@
 import tempfile
 import zipfile
 import sys
+from urllib.parse import urlsplit
 
+def splitIPSWUrlToName(url):
+    split = urlsplit(url)
+    filename = split.path.split('/')[-1]
+    return filename
 
 def extractIPSW(file):
     if zipfile.is_zipfile(file):
