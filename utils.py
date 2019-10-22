@@ -1,12 +1,34 @@
 import tempfile
 import zipfile
 import sys
+import json
+import os
 from urllib.parse import urlsplit
+
+import api
+
+
+# Hopefully this fixes the issue where if an iOS has two different buildid's, it should just download the first?
+def versionToBuildid(device, iOS):
+    api.linksForDevice(device)  # Get the json file
+    with open(f'{device}.json', 'r') as file:
+        data = json.load(file)
+        i = 0
+        iOSFromJsonFile = data['firmwares'][i]['version']
+        while iOSFromJsonFile != iOS:
+            i += 1
+            iOSFromJsonFile = data['firmwares'][i]['version']
+
+        buildid = data['firmwares'][i]['buildid']
+        os.remove(f'{device}.json')
+        return buildid
+
 
 def splitIPSWUrlToName(url):
     split = urlsplit(url)
     filename = split.path.split('/')[-1]
     return filename
+
 
 def extractIPSW(file):
     if zipfile.is_zipfile(file):

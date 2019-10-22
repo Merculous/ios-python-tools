@@ -24,16 +24,8 @@ def linksForDevice(device):
         json.dump(data, write_file, indent=4)
 
 
-def versionToBuildid(device, version):
-    url = f'https://api.ipsw.me/v3/{device}/{version}/buildid'
-    req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    data = urlopen(req).read()  # Throws an exception if there are more than one buildid's for an iOS, need json.
-    buildid = data.decode()  # Must be decoded
-    return buildid
-
-
-def downloadIPSW(device, buildid):
-    buildid = versionToBuildid(device, buildid)  # First time using my own function in another function :D
+def downloadIPSW(device, version):
+    buildid = utils.versionToBuildid(device, version)  # First time using my own function in another function :D
     linksForDevice(device)  # Get the json file
     with open(f'{device}.json', 'r') as file:
         data = json.load(file)
@@ -61,8 +53,8 @@ def downloadIPSW(device, buildid):
         sys.exit(f'Got {buildidFromJsonFile}, instead of {buildid}')
 
 
-def grabKeys(device, buildid):
-    buildid = versionToBuildid(device, buildid)
+def grabKeys(device, version):
+    buildid = utils.versionToBuildid(device, version)
     url = f'https://api.ipsw.me/v4/keys/ipsw/{device}/{buildid}'
     json_data = urlopen(url).read()
     data = json.loads(json_data)
