@@ -9,7 +9,7 @@ import api
 
 
 # Hopefully this fixes the issue where if an iOS has two different buildid's, it should just download the first?
-def versionToBuildid(device, iOS):
+def iOSToBuildid(device, iOS):
     api.linksForDevice(device)  # Get the json file
     with open(f'{device}.json', 'r') as file:
         data = json.load(file)

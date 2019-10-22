@@ -26,7 +26,7 @@ if __name__ == '__main__':
         sys.exit('We are expecting two arguments but a max of 3!')
 
     if '-b' in argv:
-        print(utils.versionToBuildid(argv[2], argv[3]))  # ./yeet -b device iOS
+        print(utils.iOSToBuildid(argv[2], argv[3]))  # ./yeet -b device iOS
 
     elif '-d' in argv:
         api.downloadIPSW(argv[2], argv[3])  # ./yeet -d device version

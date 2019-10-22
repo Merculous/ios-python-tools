@@ -1,7 +1,7 @@
 import json
 import sys
 import os
-from urllib.request import urlopen, Request, urlretrieve
+from urllib.request import urlopen, urlretrieve
 
 import utils
 
@@ -25,7 +25,7 @@ def linksForDevice(device):
 
 
 def downloadIPSW(device, version):
-    buildid = utils.versionToBuildid(device, version)  # First time using my own function in another function :D
+    buildid = utils.iOSToBuildid(device, version)  # First time using my own function in another function :D
     linksForDevice(device)  # Get the json file
     with open(f'{device}.json', 'r') as file:
         data = json.load(file)
@@ -54,7 +54,7 @@ def downloadIPSW(device, version):
 
 
 def grabKeys(device, version):
-    buildid = utils.versionToBuildid(device, version)
+    buildid = utils.iOSToBuildid(device, version)
     url = f'https://api.ipsw.me/v4/keys/ipsw/{device}/{buildid}'
     json_data = urlopen(url).read()
     data = json.loads(json_data)
