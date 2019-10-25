@@ -32,6 +32,7 @@ def downloadIPSW(device, version):
         print(f'Buildid: {buildidFromJsonFile}')
         print(f'Filename: {filename}')
         urlretrieve(url, filename, utils.progress)
+        print('\n')
         file.close()
         os.remove(f'{device}.json')
 

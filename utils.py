@@ -25,7 +25,8 @@ def progress(count, block_size, total_size):  # Check README for credit
     progress_size = int(count * block_size)
     speed = int(progress_size / (1024 * duration))
     percent = int(count * block_size * 100 / total_size)
-    sys.stdout.write(f'\r{percent}%, {floor(progress_size / (1024 * 1024))} MB, {speed} KB/s, {floor(duration)} seconds passed')
+    sys.stdout.write(
+        f'\r{percent}%, {floor(progress_size / (1024 * 1024))} MB, {speed} KB/s, {floor(duration)} seconds passed')
     sys.stdout.flush()
 
 
