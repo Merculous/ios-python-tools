@@ -3,12 +3,39 @@ import zipfile
 import sys
 import json
 import os
+import time
+from math import floor
 from urllib.parse import urlsplit
+from urllib.request import urlopen
 
 import api
 
 
-# Hopefully this fixes the issue where if an iOS has two different buildid's, it should just download the first?
+# This will help with parsing every file within an ipsw that has keys. Should print every file and their keys.
+def keyHelper():
+    pass
+
+
+def progress(count, block_size, total_size):  # Check README for credit
+    global start_time
+    if count == 0:
+        start_time = time.time()
+        return
+    duration = time.time() - start_time
+    progress_size = int(count * block_size)
+    speed = int(progress_size / (1024 * duration))
+    percent = int(count * block_size * 100 / total_size)
+    sys.stdout.write(f'\r{percent}%, {floor(progress_size / (1024 * 1024))} MB, {speed} KB/s, {floor(duration)} seconds passed')
+    sys.stdout.flush()
+
+
+def downloadJSONData(url, filename):
+    json_data = urlopen(url).read()
+    data = json.loads(json_data)
+    with open(f'{filename}.json', 'w') as write_file:
+        json.dump(data, write_file, indent=4)
+
+
 def iOSToBuildid(device, iOS):
     api.linksForDevice(device)  # Get the json file
     with open(f'{device}.json', 'r') as file:
@@ -24,8 +51,8 @@ def iOSToBuildid(device, iOS):
         return buildid
 
 
-def splitIPSWUrlToName(url):
-    split = urlsplit(url)
+def splitToFileName(path):
+    split = urlsplit(path)
     filename = split.path.split('/')[-1]
     return filename
 

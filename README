@@ -3,5 +3,6 @@ This project was inspired by Matteyeux with his ios-tools repo, this will be a s
 Also, a huge thank you to the people over at jetbrains for making PyCharm. Great IDE!
 
 Credits:
-    Matteyeux: inspiration, some techniques from ios-tools
-    Noah/32Bites: some techniques from PyKeys
+     Matteyeux: inspiration, some techniques from ios-tools
+     Noah/32Bites: some techniques from PyKeys
+     IPSW download progress: https://blog.shichao.io/2012/10/04/progress_speed_indicator_for_urlretrieve_in_python.html

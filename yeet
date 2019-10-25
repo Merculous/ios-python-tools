@@ -7,6 +7,8 @@ import api
 import utils
 
 
+# TODO GID decryption via API KBAG output
+
 def usage(name):
     print(f'Usage: {name} <args> <stuff>')
     print('\t-b\t\tGet buildid from an iOS')
@@ -15,6 +17,7 @@ def usage(name):
     print('\t-k\t\tGrab Keys')
     print('\t-s\t\tSplit KBAG key')
     print('\t-x\t\tExtract IPSW')
+    print('\t--baseband\tGet baseband version from an iOS')
 
 
 if __name__ == '__main__':
@@ -42,3 +45,6 @@ if __name__ == '__main__':
 
     elif '-x' in argv:
         utils.extractIPSW(argv[2])  # ./yeet -x IPSW
+
+    elif '--baseband' in argv:
+        print(api.getBasebandVersion(argv[2], argv[3])) # ./yeet --baseband device version
