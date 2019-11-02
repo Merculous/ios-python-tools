@@ -11,11 +11,6 @@ from urllib.request import urlopen
 import api
 
 
-# This will help with parsing every file within an ipsw that has keys. Should print every file and their keys.
-def keyHelper():
-    pass
-
-
 def progress(count, block_size, total_size):  # Check README for credit
     global start_time
     if count == 0:
@@ -38,7 +33,7 @@ def downloadJSONData(url, filename):
 
 
 def iOSToBuildid(device, iOS):
-    api.linksForDevice(device)  # Get the json file
+    api.linksForDevice(device)
     with open(f'{device}.json', 'r') as file:
         data = json.load(file)
         i = 0

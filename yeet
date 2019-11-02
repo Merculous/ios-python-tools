@@ -2,7 +2,6 @@
 
 import sys
 
-# My modules
 import api
 import utils
 
@@ -13,7 +12,6 @@ def usage(name):
     print(f'Usage: {name} <args> <stuff>')
     print('\t-b\t\tGet buildid from an iOS')
     print('\t-d\t\tDownload an ipsw')
-    print('\t-g\t\tGet all ipsw links for a given device')
     print('\t-k\t\tGrab Keys')
     print('\t-s\t\tSplit KBAG key')
     print('\t-x\t\tExtract IPSW')
@@ -34,9 +32,6 @@ if __name__ == '__main__':
     elif '-d' in argv:
         api.downloadIPSW(argv[2], argv[3])  # ./yeet -d device version
 
-    elif '-g' in argv:
-        api.linksForDevice(argv[2]) # ./yeet -g device
-
     elif '-k' in argv:
         api.grabKeys(argv[2], argv[3])  # ./yeet -k device version
 
@@ -47,4 +42,4 @@ if __name__ == '__main__':
         utils.extractIPSW(argv[2])  # ./yeet -x IPSW
 
     elif '--baseband' in argv:
-        print(api.getBasebandVersion(argv[2], argv[3])) # ./yeet --baseband device version
+        print(api.getBasebandVersion(argv[2], argv[3]))  # ./yeet --baseband device version

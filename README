@@ -1,8 +1,11 @@
 This project was inspired by Matteyeux with his ios-tools repo, this will be a similar project but for my own practice. Also, in native Python 3 code :D
 
+Due to compatibility, ensure Python 3.6 or newer is installed.
+
 Also, a huge thank you to the people over at jetbrains for making PyCharm. Great IDE!
 
 Credits:
      Matteyeux: inspiration, some techniques from ios-tools
      Noah/32Bites: some techniques from PyKeys
      IPSW download progress: https://blog.shichao.io/2012/10/04/progress_speed_indicator_for_urlretrieve_in_python.html
+     mcg29: Helping me originally with parsing keys. Turns out it was an easy fix and mcg29's 1337 Python code was in vain (sorry :/) - Twitter: @mcg29_

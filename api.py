@@ -49,8 +49,15 @@ def grabKeys(device, version):
             i += 1
             buildidFromJsonFile = data['buildid']
 
+        for stuff in data['keys']:
+            print('Image: ' + stuff['image'])
+            print('Filename: ' + stuff['filename'])
+            print('KBAG: ' + stuff['kbag'])
+            print('IV: ' + stuff['iv'])
+            print('Key: ' + stuff['key'] + '\n')
+
         file.close()
-        # os.remove('keys.json')
+        os.remove('keys.json')
 
 
 def getBasebandVersion(device, version):
