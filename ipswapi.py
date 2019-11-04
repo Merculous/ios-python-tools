@@ -14,7 +14,7 @@ def linksForDevice(device):
 
 def downloadIPSW(device, version):
     buildid = utils.iOSToBuildid(device, version)
-    linksForDevice(device)  # Get the json file
+    linksForDevice(device)
     with open(f'{device}.json', 'r') as file:
         data = json.load(file)
         i = 0
@@ -69,3 +69,23 @@ def getBasebandVersion(device, version):
         baseband = data['baseband']
         file.close()
         return baseband
+
+
+def signed(device, version):
+    buildid = utils.iOSToBuildid(device, version)
+    linksForDevice(device)
+    with open(f'{device}.json', 'r') as file:
+        data = json.load(file)
+        i = 0
+        buildidFromJsonFile = data['firmwares'][i]['buildid']
+        while buildidFromJsonFile != buildid:
+            i += 1
+            buildidFromJsonFile = data['firmwares'][i]['buildid']
+
+        ios = data['firmwares'][i]['version']
+
+        if data['firmwares'][i]['signed']:
+            print(f'iOS {ios} ({buildid}) IS signed!')
+
+        else:
+            print(f'iOS {ios} ({buildid}) IS NOT signed!')

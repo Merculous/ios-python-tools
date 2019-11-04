@@ -2,8 +2,9 @@
 
 import sys
 
-import api
+import ipswapi
 import utils
+import iphonewiki
 
 
 # TODO GID decryption via API KBAG output
@@ -13,9 +14,10 @@ def usage(name):
     print('\t-b\t\tGet buildid from an iOS')
     print('\t-d\t\tDownload an ipsw')
     print('\t-k\t\tGrab Keys')
-    print('\t-s\t\tSplit KBAG key')
+    print('\t-s\t\tCheck if an iOS is signed')
     print('\t-x\t\tExtract IPSW')
     print('\t--baseband\tGet baseband version from an iOS')
+    print('\t--split\t\tSplit KBAG key')
 
 
 if __name__ == '__main__':
@@ -30,16 +32,19 @@ if __name__ == '__main__':
         print(utils.iOSToBuildid(argv[2], argv[3]))  # ./yeet -b device iOS
 
     elif '-d' in argv:
-        api.downloadIPSW(argv[2], argv[3])  # ./yeet -d device version
+        ipswapi.downloadIPSW(argv[2], argv[3])  # ./yeet -d device version
 
     elif '-k' in argv:
-        api.grabKeys(argv[2], argv[3])  # ./yeet -k device version
+        ipswapi.grabKeys(argv[2], argv[3])  # ./yeet -k device version
 
     elif '-s' in argv:
-        utils.splitKbag(argv[2])  # ./yeet -s KBAG
+        ipswapi.signed(argv[2], argv[3])
 
     elif '-x' in argv:
         utils.extractIPSW(argv[2])  # ./yeet -x IPSW
 
     elif '--baseband' in argv:
-        print(api.getBasebandVersion(argv[2], argv[3]))  # ./yeet --baseband device version
+        print(ipswapi.getBasebandVersion(argv[2], argv[3]))  # ./yeet --baseband device version
+
+    elif '--split' in argv:
+        utils.splitKbag(argv[2]) # ./yeet --split kbag

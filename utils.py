@@ -8,7 +8,7 @@ from math import floor
 from urllib.parse import urlsplit
 from urllib.request import urlopen
 
-import api
+import ipswapi
 
 
 def progress(count, block_size, total_size):  # Check README for credit
@@ -33,7 +33,7 @@ def downloadJSONData(url, filename):
 
 
 def iOSToBuildid(device, iOS):
-    api.linksForDevice(device)
+    ipswapi.linksForDevice(device)
     with open(f'{device}.json', 'r') as file:
         data = json.load(file)
         i = 0
