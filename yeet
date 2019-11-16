@@ -11,12 +11,14 @@ import iphonewiki
 
 def usage(name):
     print(f'Usage: {name} <args> <stuff>')
-    print('\t-b\t\tGet buildid from an iOS')
+    print('\t-b\t\tGet the buildid on an iOS')
+    print('\t-c\t\tGet codename of an iOS')
     print('\t-d\t\tDownload an ipsw')
     print('\t-k\t\tGrab Keys')
-    print('\t-s\t\tCheck if an iOS is signed')
-    print('\t-x\t\tExtract IPSW')
-    print('\t--baseband\tGet baseband version from an iOS')
+    print('\t-s\t\tPrint all signed versions of a device')
+    #print('\t-x\t\tExtract IPSW')
+    #print('\t--baseband\tGet baseband version from an iOS')
+    #print('\t--shsh\t\tGrab shsh blobs for a device')
     print('\t--split\t\tSplit KBAG key')
 
 
@@ -31,20 +33,27 @@ if __name__ == '__main__':
     if '-b' in argv:
         print(utils.iOSToBuildid(argv[2], argv[3]))  # ./yeet -b device iOS
 
+    elif '-c' in argv:
+        print(iphonewiki.getCodename(argv[2], argv[3]))  # ./yeet -k device version
+
     elif '-d' in argv:
         ipswapi.downloadIPSW(argv[2], argv[3])  # ./yeet -d device version
 
     elif '-k' in argv:
-        ipswapi.grabKeys(argv[2], argv[3])  # ./yeet -k device version
+        iphonewiki.grabKeys(argv[2], argv[3])  # ./yeet -k device version
 
     elif '-s' in argv:
-        ipswapi.signed(argv[2], argv[3])
+        ipswapi.signed(argv[2])  # ./yeet -s device
 
-    elif '-x' in argv:
-        utils.extractIPSW(argv[2])  # ./yeet -x IPSW
+    #elif '-x' in argv:
+        #utils.extractIPSW(argv[2])  # ./yeet -x IPSW
 
-    elif '--baseband' in argv:
-        print(ipswapi.getBasebandVersion(argv[2], argv[3]))  # ./yeet --baseband device version
+    #elif '--baseband' in argv:
+        #print(iphonewiki.getBasebandVersion(argv[2], argv[3]))  # ./yeet --baseband device version
+
+    #elif '--shsh' in argv:
+        #utils.saveblobs(argv[2])  # ./yeet --shsh device
 
     elif '--split' in argv:
-        utils.splitKbag(argv[2]) # ./yeet --split kbag
+        utils.splitKbag(argv[2])  # ./yeet --split kbag
+

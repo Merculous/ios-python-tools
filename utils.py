@@ -6,12 +6,46 @@ import os
 import time
 from math import floor
 from urllib.parse import urlsplit
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
 
 import ipswapi
 
+"""
+def tss_request_manifest(board, build, ecid, cpid=None, bdid=None):
+    url = 'http://api.ineal.me/tss/manifest/%s/%s' % (board, build)
+    r = requests.get(url, headers={'User-Agent': USER_AGENT})
+    return r.text.replace('<string>$ECID$</string>', '<integer>%s</integer>' % (ecid))
 
-def progress(count, block_size, total_size):  # Check README for credit
+def request_blobs_from_apple(board, build, ecid, cpid=None, bdid=None):
+    url = 'http://gs.apple.com/TSS/controller?action=2'
+    r = requests.post(url, headers={'User-Agent': USER_AGENT}, data=tss_request_manifest(board, build, ecid, cpid, bdid))
+"""
+
+
+def grabManifest():
+    pass
+
+
+def saveblobs(device):
+    ipswapi.linksForDevice(device)
+    with open(f'{device}.json') as file:
+        data = json.load(file)
+        for stuff in data['firmwares']:
+            ios = stuff['version']
+            sig = stuff['signed']
+            lolarray = [ios, sig]
+            if lolarray[1]:
+                print(f'Saving blobs for iOS: {ios}')
+                # url = 'http://gs.apple.com/TSS/controller?action=2'
+                # req = Request(url, data=tss_request_manifest(board, build, ecid, cpid, bdid))
+            else:
+                continue
+
+    file.close()
+    os.remove(f'{device}.json')
+
+
+def progress(count, block_size, total_size):  # Check README for credit (not mine)
     global start_time
     if count == 0:
         start_time = time.time()
@@ -43,8 +77,10 @@ def iOSToBuildid(device, iOS):
             iOSFromJsonFile = data['firmwares'][i]['version']
 
         buildid = data['firmwares'][i]['buildid']
-        os.remove(f'{device}.json')
-        return buildid
+
+    file.close()
+    os.remove(f'{device}.json')
+    return buildid
 
 
 def splitToFileName(path):
