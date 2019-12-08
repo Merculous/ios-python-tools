@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
@@ -9,17 +8,7 @@ import utils
 
 """
 
-keysUrl = f'https://www.theiphonewiki.com/wiki/{codename}_{buildid}_({device})'
-
-https://www.theiphonewiki.com/w/index.php?title={codename}_{buildid}_({device})&action=edit&redlink=1 If redlink=1,
-the page does not exist (for anyone who has access to edit/make pages)
-
-https://www.theiphonewiki.com/w/index.php?title={codename}_{buildid}_({device})&action=edit We need this to parse 
-keys. Same layout as the key-template.txt file.
-
-------------------------------------------------------------------------------------------------------------------------
-
-Syntax:
+Syntax for uploading keys (will be added soon):
 
 If the device is not an iPhone or a cellular iPad, delete the Baseband parameter.
 
@@ -38,32 +27,12 @@ For DownloadURL, do not place anything other than URLs to free firmwares hosted 
 """
 
 
-def updateTemplate(template):
-    pass
-
-
-def checkIfExists(url):
-    pass
-
-
-def grabKeys(device, version):
+def parseWiki(device, version):
     buildid = utils.iOSToBuildid(device, version)
     codename = getCodename(device, version)
     wikiUrl = f'https://www.theiphonewiki.com/w/index.php?title={codename}_{buildid}_({device})&action=edit'
-    data = urlopen(wikiUrl).read().decode('utf-8')  # decode('utf-8') is needed to turn type bytes to str for keys
-    keys = data.split('{{keys')[1].split('}}')[0]
-    print(keys)
-
-
-def getBasebandVersion(device, version):
-    buildid = utils.iOSToBuildid(device, version)
-    url = f'https://api.ipsw.me/v4/keys/ipsw/{device}/{buildid}'
-    utils.downloadJSONData(url, 'keys')
-    with open('keys.json', 'r') as file:
-        data = json.load(file)
-        baseband = data['baseband']
-        file.close()
-        return baseband
+    request = urlopen(wikiUrl).read().decode('utf-8')
+    return request.split('{{keys')[1].split('}}')[0].replace('|', '')
 
 
 def getCodename(device, version):
@@ -84,9 +53,16 @@ def getCodename(device, version):
         yeet = soup.find_all('a', text=f'{version}')
         for codename in yeet:
             lolList = codename['title'].split()
-            if lolList[1] == buildid and lolList[2] == f'({device})':
+            deviceWiki = f'({device})'
+            if lolList[1] == buildid and lolList[2] == deviceWiki:
                 file.close()
                 os.remove(f'{device}.json')
                 return lolList[0]
             else:
                 continue
+
+
+def getBasebandVersion(device, version):
+    data = parseWiki(device, version).splitlines()
+    return data[5].replace('Baseband            =', '').strip()
+

@@ -1,59 +1,54 @@
 #!/usr/bin/env python3
 
 import sys
+import argparse
 
 import ipswapi
 import utils
 import iphonewiki
 
-
-# TODO GID decryption via API KBAG output
-
-def usage(name):
-    print(f'Usage: {name} <args> <stuff>')
-    print('\t-b\t\tGet the buildid on an iOS')
-    print('\t-c\t\tGet codename of an iOS')
-    print('\t-d\t\tDownload an ipsw')
-    print('\t-k\t\tGrab Keys')
-    print('\t-s\t\tPrint all signed versions of a device')
-    #print('\t-x\t\tExtract IPSW')
-    #print('\t--baseband\tGet baseband version from an iOS')
-    #print('\t--shsh\t\tGrab shsh blobs for a device')
-    print('\t--split\t\tSplit KBAG key')
-
-
 if __name__ == '__main__':
     argv = sys.argv
-    if len(argv) == 1:
-        usage(argv[0])
 
-    if len(argv) > 4:
-        sys.exit('We are expecting two arguments but a max of 3!')
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-b", help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("-c", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("-d", help="Download an ipsw", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("-k", help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    # parser.add_argument("-m", help="Download a build manifest from an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("-s", help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
+    parser.add_argument("--baseband", help="Get the baseband version of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", nargs=2, metavar=('ECID', 'DEVICE'))
+    parser.add_argument("--split", help="Split a GID decrypted key", nargs=1, metavar='KEY')
 
-    if '-b' in argv:
-        print(utils.iOSToBuildid(argv[2], argv[3]))  # ./yeet -b device iOS
+    args = parser.parse_args()
 
-    elif '-c' in argv:
-        print(iphonewiki.getCodename(argv[2], argv[3]))  # ./yeet -k device version
+    if args.b:
+        print(utils.iOSToBuildid(argv[2], argv[3]))  # ./yeet -b device version
 
-    elif '-d' in argv:
+    elif args.c:
+        print(iphonewiki.getCodename(argv[2], argv[3]))  # ./yeet -c device version
+
+    elif args.d:
         ipswapi.downloadIPSW(argv[2], argv[3])  # ./yeet -d device version
 
-    elif '-k' in argv:
-        iphonewiki.grabKeys(argv[2], argv[3])  # ./yeet -k device version
+    elif args.k:
+        print(iphonewiki.parseWiki(argv[2], argv[3]))  # ./yeet -d device version
 
-    elif '-s' in argv:
+    elif args.s:
         ipswapi.signed(argv[2])  # ./yeet -s device
 
-    #elif '-x' in argv:
-        #utils.extractIPSW(argv[2])  # ./yeet -x IPSW
+    # elif args.m:
+        # ipswapi.downloadBuildManifest(argv[2], argv[3])  # ./yeet -d device version
 
-    #elif '--baseband' in argv:
-        #print(iphonewiki.getBasebandVersion(argv[2], argv[3]))  # ./yeet --baseband device version
+    elif args.baseband:
+        print(iphonewiki.getBasebandVersion(argv[2], argv[3]))  # ./yeet -d device version
 
-    #elif '--shsh' in argv:
-        #utils.saveblobs(argv[2])  # ./yeet --shsh device
+    elif args.shsh:
+        utils.saveblobs(argv[2], argv[3])  # ./yeet --shsh ecid device
 
-    elif '--split' in argv:
+    elif args.split:
         utils.splitKbag(argv[2])  # ./yeet --split kbag
 
+    else:
+        sys.exit(parser.print_help())

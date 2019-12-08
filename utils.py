@@ -26,7 +26,7 @@ def grabManifest():
     pass
 
 
-def saveblobs(device):
+def saveblobs(ecid, device):
     ipswapi.linksForDevice(device)
     with open(f'{device}.json') as file:
         data = json.load(file)
