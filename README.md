@@ -1,12 +1,12 @@
 This project was inspired by Matteyeux with his ios-tools repo, this will be a similar project but for my own practice. Also, in native Python 3 code :D
 
-##Note 
+## Note 
 	Due to compatibility, ensure Python 3.6 or newer is installed. Basially this is just due some things being changed like format strings and etc.
 	
-##Installing
+## Installing
 	pip install -r requirements.txt
 
-##Credits
+## Credits
 	JetBrains: For making such a great Python IDE!
 	Matteyeux: inspiration, some techniques from ios-tools
 	Noah/32Bites: some techniques from PyKeys
