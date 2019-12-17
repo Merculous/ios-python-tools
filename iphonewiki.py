@@ -1,28 +1,18 @@
 import json
 import os
 from urllib.request import urlopen
+
 from bs4 import BeautifulSoup
 
 import ipswapi
 import utils
 
+
 """
 
-Syntax for uploading keys (will be added soon):
+Handles data on the iphonewiki page.
 
-If the device is not an iPhone or a cellular iPad, delete the Baseband parameter.
-
-If the device is an Apple TV (iOS versions), set Version to the marketing version with the internal version in parenthesis.
-
-For each *, *IV, and *Key section, put the file name on the first line. If the item is the Root FS or a ramdisk,
-remove the .dmg file extension. If that firmware item does not exist in that firmware, delete its parameter section.
-If the firmware item is not encrypted, set *IV to "Not Encrypted" and delete the *Key parameter. If the key/iv is not known,
-then the KBAG should be added.
-
-For devices such as iPhone 6s that have two sets of files such as N71AP and N71mAP, then a second file can be added underneath
-with a "2" at the end of the name. For example, you can have AppleLogo and AppleLogo2 blocks.
-
-For DownloadURL, do not place anything other than URLs to free firmwares hosted on Apple Inc.'s servers. For beta firmwares, delete the parameter.
+Grabs keys and baseband version.
 
 """
 
@@ -62,7 +52,26 @@ def getCodename(device, version):
                 continue
 
 
+def getKeys(device, version):
+    data = parseWiki(device, version).strip()
+
+    # Split off the extra info at the top
+
+    """
+
+    Version             = 3.0
+    Build               = 7A341
+    Device              = iPhone2,1
+    Codename            = Kirkwood
+    Baseband            = 04.26.08
+    DownloadURL         = https://secure-appldnld.apple.com.edgesuite.net/content.info.apple.com/iPhone/061-6582.20090617.LlI87/iPhone2,1_3.0_7A341_Restore.ipsw 
+
+    """
+
+
+    # Add .dmg to the end of the dmg filenames
+
+
 def getBasebandVersion(device, version):
     data = parseWiki(device, version).splitlines()
     return data[5].replace('Baseband            =', '').strip()
-

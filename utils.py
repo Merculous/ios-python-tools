@@ -1,48 +1,47 @@
-import tempfile
-import zipfile
 import sys
 import json
 import os
 import time
+import xml.etree.ElementTree as ET
 from math import floor
 from urllib.parse import urlsplit
-from urllib.request import urlopen, Request
+from urllib.request import urlopen
+from io import BytesIO
+from zipfile import ZipFile
+
+from remotezip import RemoteZip
 
 import ipswapi
 
 """
-def tss_request_manifest(board, build, ecid, cpid=None, bdid=None):
-    url = 'http://api.ineal.me/tss/manifest/%s/%s' % (board, build)
-    r = requests.get(url, headers={'User-Agent': USER_AGENT})
-    return r.text.replace('<string>$ECID$</string>', '<integer>%s</integer>' % (ecid))
 
-def request_blobs_from_apple(board, build, ecid, cpid=None, bdid=None):
-    url = 'http://gs.apple.com/TSS/controller?action=2'
-    r = requests.post(url, headers={'User-Agent': USER_AGENT}, data=tss_request_manifest(board, build, ecid, cpid, bdid))
+All of the helper functions or just a module to store other functions
+that don't have a particular module that its similar to.
+
+Basically just 'tools'.
+
 """
 
 
-def grabManifest():
-    pass
+def saveblobs(device, ecid):
+    signed = ipswapi.signed(device)
+    url = 'http://gs.apple.com/TSS/controller?action=2'
+    for version, buildid in signed:
+        downloadBuildManifest(device, version)
 
+        # Parse xml data I guess and add the stuff below
 
-def saveblobs(ecid, device):
-    ipswapi.linksForDevice(device)
-    with open(f'{device}.json') as file:
-        data = json.load(file)
-        for stuff in data['firmwares']:
-            ios = stuff['version']
-            sig = stuff['signed']
-            lolarray = [ios, sig]
-            if lolarray[1]:
-                print(f'Saving blobs for iOS: {ios}')
-                # url = 'http://gs.apple.com/TSS/controller?action=2'
-                # req = Request(url, data=tss_request_manifest(board, build, ecid, cpid, bdid))
-            else:
-                continue
+        #with open(f'BuildManifest_{device}_{version}_{buildid}.plist', 'r') as manifest:
+            #tree = ET.parse(manifest)
+            #root = tree.getroot()[0][0]  # BuildIdentities
 
-    file.close()
-    os.remove(f'{device}.json')
+        #manifest.close()
+
+    # plist -> dict -> BuildIdentities -> array -> dict -> add the stuff below
+    # <key>ApECID</key>
+    # <string>ecid</string>
+
+# Maybe convert progress into my own custom file downloader that auto grabs the data such as filesize, duration, etc.
 
 
 def progress(count, block_size, total_size):  # Check README for credit (not mine)
@@ -62,8 +61,10 @@ def progress(count, block_size, total_size):  # Check README for credit (not min
 def downloadJSONData(url, filename):
     json_data = urlopen(url).read()
     data = json.loads(json_data)
-    with open(f'{filename}.json', 'w') as write_file:
-        json.dump(data, write_file, indent=4)
+    with open(f'{filename}.json', 'w') as file:
+        json.dump(data, file, indent=4)
+
+    file.close()
 
 
 def iOSToBuildid(device, iOS):
@@ -89,24 +90,37 @@ def splitToFileName(path):
     return filename
 
 
-def extractIPSW(file):
-    if zipfile.is_zipfile(file):
-        tmp = tempfile.mkdtemp()  # Make temp dir
-        print(f'We are using {tmp} as the temp dir')
-        with zipfile.ZipFile(file, 'r') as ipsw:
-            ipsw.extractall(tmp)
+def splitKbag(kbag):
+    if len(kbag) != 96:
+        sys.exit(f'String provided is not 96 bytes! The length read was {len(kbag)}.')
     else:
-        print(f'{file} is not a zip archive')
+        iv = kbag[:32]
+        key = kbag[-64:]
+        return iv, key
 
+def downloadBuildManifest(device, version):
+    buildid = iOSToBuildid(device, version)
+    ipswapi.linksForDevice(device)
 
-def splitKbag(str):
-    size = len(str)
-    if size != 96:
-        print(f'Length: {size}')
-        sys.exit('String provided is not 96 bytes!')
-    else:
-        # TODO I know for sure this can be made better. Maybe?
-        iv = str[:32]
-        key = str[-64:]
-        print(f'IV: {iv}')
-        print(f'Key: {key}')
+    with open(f'{device}.json', 'r') as file:
+        data = json.load(file)
+        i = 0
+        buildidFromJsonFile = data['firmwares'][i]['buildid']
+        while buildidFromJsonFile != buildid:
+            i += 1
+            buildidFromJsonFile = data['firmwares'][i]['buildid']
+
+        url = data['firmwares'][i]['url']
+        manifest = 'BuildManifest.plist'
+
+        # Start the process of reading and extracting a file from a url
+
+        print(f'Downloading manifest for {version}, {buildid}')
+        zip = RemoteZip(url)
+        zip.extract(manifest)
+        print('Done downloading!')
+        os.rename(manifest, f'BuildManifest_{device}_{version}_{buildid}.plist')  # This can be done better
+        zip.close()
+
+    file.close()
+    os.remove(f'{device}.json')

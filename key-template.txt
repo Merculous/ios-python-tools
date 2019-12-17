@@ -1,0 +1,176 @@
+{{keys
+ | Version              =
+ | Build                =
+ | Device               =
+ | Codename             =
+ | Baseband             =
+ | DownloadURL          =
+
+ | RootFS               =
+ | RootFSKey            = Unknown
+
+ | UpdateRamdisk        =
+ | UpdateRamdiskIV      = Unknown
+ | UpdateRamdiskKey     = Unknown
+ | UpdateRamdiskKBAG    =
+
+ | RestoreRamdisk       =
+ | RestoreRamdiskIV     = Unknown
+ | RestoreRamdiskKey    = Unknown
+ | RestoreRamdiskKBAG   =
+
+ | ADCPetra             =
+ | ADCPetraIV           = Unknown
+ | ADCPetraKey          = Unknown
+ | ADCPetraKBAG         =
+
+ | ARMFW                =
+ | ARMFWIV              = Unknown
+ | ARMFWKey             = Unknown
+ | ARMFWKBAG            =
+
+ | ANE                  =
+ | ANEIV                = Unknown
+ | ANEKey               = Unknown
+ | ANEKBAG              =
+
+ | AppleAVE             =
+ | AppleAVEIV           = Unknown
+ | AppleAVEKey          = Unknown
+ | AppleAVEKBAG         =
+
+ | AOPFirmware          =
+ | AOPFirmwareIV        = Unknown
+ | AOPFirmwareKey       = Unknown
+ | AOPFirmwareKBAG      =
+
+ | AppleLogo            =
+ | AppleLogoIV          = Unknown
+ | AppleLogoKey         = Unknown
+ | AppleLogoKBAG        =
+
+ | AppleMaggie          =
+ | AppleMaggieIV        = Unknown
+ | AppleMaggieKey       = Unknown
+ | AppleMaggieKBAG      =
+
+ | BatteryCharging0     =
+ | BatteryCharging0IV   = Unknown
+ | BatteryCharging0Key  = Unknown
+ | BatteryCharging0KBAG =
+
+ | BatteryCharging1     =
+ | BatteryCharging1IV   = Unknown
+ | BatteryCharging1Key  = Unknown
+ | BatteryCharging1KBAG =
+
+ | BatteryFull          =
+ | BatteryFullIV        = Unknown
+ | BatteryFullKey       = Unknown
+ | BatteryFullKBAG      =
+
+ | BatteryLow0          =
+ | BatteryLow0IV        = Unknown
+ | BatteryLow0Key       = Unknown
+ | BatteryLow0KBAG      =
+
+ | BatteryLow1          =
+ | BatteryLow1IV        = Unknown
+ | BatteryLow1Key       = Unknown
+ | BatteryLow1KBAG      =
+
+ | CallanFirmware       =
+ | CallanFirmwareIV     = Unknown
+ | CallanFirmwareKey    = Unknown
+ | CallanFirmwareKBAG   =
+
+ | Dali                 =
+ | DaliIV               = Unknown
+ | DaliKey              = Unknown
+ | DaliKBAG             =
+
+ | DeviceTree           =
+ | DeviceTreeIV         = Unknown
+ | DeviceTreeKey        = Unknown
+ | DeviceTreeKBAG       =
+
+ | GlyphCharging        =
+ | GlyphChargingIV      = Unknown
+ | GlyphChargingKey     = Unknown
+ | GlyphChargingKBAG    =
+
+ | GlyphPlugin          =
+ | GlyphPluginIV        = Unknown
+ | GlyphPluginKey       = Unknown
+ | GlyphPluginKBAG      =
+
+ | Homer                =
+ | HomerIV              = Unknown
+ | HomerKey             = Unknown
+ | HomerKBAG            =
+
+ | iBEC                 =
+ | iBECIV               = Unknown
+ | iBECKey              = Unknown
+ | iBECKBAG             =
+
+ | iBoot                =
+ | iBootIV              = Unknown
+ | iBootKey             = Unknown
+ | iBootKBAG            =
+
+ | iBSS                 =
+ | iBSSIV               = Unknown
+ | iBSSKey              = Unknown
+ | iBSSKBAG             =
+
+ | Kernelcache          =
+ | KernelcacheIV        = Unknown
+ | KernelcacheKey       = Unknown
+ | KernelcacheKBAG      =
+
+ | LiquidDetect         =
+ | LiquidDetectIV       = Unknown
+ | LiquidDetectKey      = Unknown
+ | LiquidDetectKBAG     =
+
+ | LLB                  =
+ | LLBIV                = Unknown
+ | LLBKey               = Unknown
+ | LLBKBAG              =
+
+ | LowPowerMode         =
+ | LowPowerModeIV       = Unknown
+ | LowPowerModeKey      = Unknown
+ | LowPowerModeKBAG     =
+
+ | Multitouch           =
+ | MultitouchIV         = Unknown
+ | MultitouchKey        = Unknown
+ | MultitouchKBAG       =
+
+ | NeedService          =
+ | NeedServiceIV        = Unknown
+ | NeedServiceKey       = Unknown
+ | NeedServiceKBAG      =
+
+ | RecoveryMode         =
+ | RecoveryModeIV       = Unknown
+ | RecoveryModeKey      = Unknown
+ | RecoveryModeKBAG     =
+
+ | SEPFirmware          =
+ | SEPFirmwareIV        = Unknown
+ | SEPFirmwareKey       = Unknown
+ | SEPFirmwareKBAG      =
+
+ | SmartIOFirmware      =
+ | SmartIOFirmwareIV    = Unknown
+ | SmartIOFirmwareKey   = Unknown
+ | SmartIOFirmwareKBAG  =
+
+ | WirelessPower        =
+ | WirelessPowerIV      = Unknown
+ | WirelessPowerKey     = Unknown
+ | WirelessPowerKBAG    =
+}}

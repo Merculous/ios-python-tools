@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 
-import sys
-import argparse
+"""
 
+This is basically what the frontend is, if that's even correct terminology.
+
+Handles arguments and passes them to the functions.
+
+"""
+
+import argparse
+import sys
+
+import iphonewiki
 import ipswapi
 import utils
-import iphonewiki
 
 if __name__ == '__main__':
     argv = sys.argv
@@ -15,10 +23,10 @@ if __name__ == '__main__':
     parser.add_argument("-c", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("-d", help="Download an ipsw", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("-k", help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    # parser.add_argument("-m", help="Download a build manifest from an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("-m", help="Download a build manifest from an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("-s", help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
     parser.add_argument("--baseband", help="Get the baseband version of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", nargs=2, metavar=('ECID', 'DEVICE'))
+    parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", nargs=2, metavar=('DEVICE', 'ECID'))
     parser.add_argument("--split", help="Split a GID decrypted key", nargs=1, metavar='KEY')
 
     args = parser.parse_args()
@@ -33,22 +41,25 @@ if __name__ == '__main__':
         ipswapi.downloadIPSW(argv[2], argv[3])  # ./yeet -d device version
 
     elif args.k:
-        print(iphonewiki.parseWiki(argv[2], argv[3]))  # ./yeet -d device version
+        print(iphonewiki.getKeys(argv[2], argv[3]))  # ./yeet -d device version
 
     elif args.s:
-        ipswapi.signed(argv[2])  # ./yeet -s device
+        signed = ipswapi.signed(argv[2])  # ./yeet -s device
+        for version, buildid in signed:
+            print(f'{version} ({buildid}) is signed!')
 
-    # elif args.m:
-        # ipswapi.downloadBuildManifest(argv[2], argv[3])  # ./yeet -d device version
+    elif args.m:
+        utils.downloadBuildManifest(argv[2], argv[3])  # ./yeet -d device version
 
     elif args.baseband:
         print(iphonewiki.getBasebandVersion(argv[2], argv[3]))  # ./yeet -d device version
 
     elif args.shsh:
-        utils.saveblobs(argv[2], argv[3])  # ./yeet --shsh ecid device
+        utils.saveblobs(argv[2], argv[3])  # ./yeet --shsh device ecid
 
     elif args.split:
-        utils.splitKbag(argv[2])  # ./yeet --split kbag
+        kbag = utils.splitKbag(str(argv[2]))  # ./yeet --split kbag
+        print(f'IV: {kbag[0]} KEY: {kbag[1]}')
 
     else:
         sys.exit(parser.print_help())
