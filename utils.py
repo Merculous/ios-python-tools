@@ -118,8 +118,8 @@ def downloadBuildManifest(device, version):
         print(f'Downloading manifest for {version}, {buildid}')
         zip = RemoteZip(url)
         zip.extract(manifest)
-        print('Done downloading!')
         os.rename(manifest, f'BuildManifest_{device}_{version}_{buildid}.plist')  # This can be done better
+        print('Done downloading!')
         zip.close()
 
     file.close()
