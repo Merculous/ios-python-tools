@@ -12,7 +12,7 @@ Due to compatibility, ensure Python 3.6 or newer is installed. Basially this is 
 	-m, --manifest device iOS | download a build manifest from an iOS
 	-s, --signed device | print the signed versions for a device
 	--shsh device ecid | (coming soon)
-	--split key | Splits a GID decrytped key 
+	--split key | Splits a GID decrypted key 
 	
 ## Prerequisites
 	pip install -r requirements.txt
