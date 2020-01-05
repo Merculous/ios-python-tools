@@ -2,3 +2,6 @@
 __pycache__
 venv
 .vscode
+shsh
+*.plist
+*.code-workspace

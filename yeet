@@ -9,57 +9,65 @@ Handles arguments and passes them to the functions.
 """
 
 import argparse
+import os
 import sys
 
 import iphonewiki
 import ipswapi
+import template
+import tss
 import utils
 
 if __name__ == '__main__':
     argv = sys.argv
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-b", help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("-c", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("-d", help="Download an ipsw", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("-k", help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("-m", help="Download a build manifest from an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("-s", help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
-    parser.add_argument("--baseband", help="Get the baseband version of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("-b", "--buildid", help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("-B", "--baseband", help="Get the baseband version of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("-c", "--codename", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("-d", "--download", help="Download an ipsw", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("-k", "--keys", help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("-m", "--manifest", help="Download a build manifest from an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("-s", "--signed", help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
     parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", nargs=2, metavar=('DEVICE', 'ECID'))
     parser.add_argument("--split", help="Split a GID decrypted key", nargs=1, metavar='KEY')
+    
+    parser.add_argument("--test", help="Template shit", nargs=2, metavar=('DEVICE', 'iOS'))
 
     args = parser.parse_args()
 
-    if args.b:
+    if args.buildid:
         print(utils.iOSToBuildid(argv[2], argv[3]))  # ./yeet -b device version
 
-    elif args.c:
+    elif args.baseband:
+        print(iphonewiki.getBasebandVersion(argv[2], argv[3]))  # ./yeet -B device version
+
+    elif args.codename:
         print(iphonewiki.getCodename(argv[2], argv[3]))  # ./yeet -c device version
 
-    elif args.d:
+    elif args.download:
         ipswapi.downloadIPSW(argv[2], argv[3])  # ./yeet -d device version
 
-    elif args.k:
-        print(iphonewiki.getKeys(argv[2], argv[3]))  # ./yeet -d device version
+    elif args.keys:
+        print(iphonewiki.getKeysRaw(argv[2], argv[3]))  # ./yeet -k device version
 
-    elif args.s:
+    elif args.signed:
         signed = ipswapi.signed(argv[2])  # ./yeet -s device
         for version, buildid in signed:
             print(f'{version} ({buildid}) is signed!')
 
-    elif args.m:
-        utils.downloadBuildManifest(argv[2], argv[3])  # ./yeet -d device version
-
-    elif args.baseband:
-        print(iphonewiki.getBasebandVersion(argv[2], argv[3]))  # ./yeet -d device version
+    elif args.manifest:
+        utils.downloadBuildManifest(argv[2], argv[3])  # ./yeet -m device version
 
     elif args.shsh:
-        utils.saveblobs(argv[2], argv[3])  # ./yeet --shsh device ecid
+        tss.saveblobs(argv[2], argv[3])  # ./yeet --shsh device ecid
 
     elif args.split:
         kbag = utils.splitKbag(str(argv[2]))  # ./yeet --split kbag
         print(f'IV: {kbag[0]} KEY: {kbag[1]}')
+
+    elif args.test:
+        template.parseKeyData(argv[2], argv[3]) # ./yeet --test device version
 
     else:
         sys.exit(parser.print_help())
