@@ -4,22 +4,22 @@ This project was inspired by Matteyeux with his ios-tools repo, this will be a s
 Due to compatibility, ensure Python 3.6 or newer is installed. Basially this is just due some things being changed like format strings and etc.
 
 ## Commands
-	-b, --buildid device iOS  | convert an iOS to its buildid
-	-B, --baseband device iOS | get baseband version of an iOS
-	-c, --codename device iOS | get codename of an iOS
-	-d, --download device iOS | download an ipsw
-	-k, --keys device iOS | get keys for an iOS
-	-m, --manifest device iOS | download a build manifest from an iOS
-	-s, --signed device | print the signed versions for a device
-	--shsh device ecid | (coming soon)
-	--split key | Splits a GID decrypted key 
+	--buildid device iOS  | convert an iOS to its buildid
+	--baseband device iOS | get baseband version of an iOS
+	--codename device iOS | get codename of an iOS
+	--download device iOS | download an ipsw
+	--keys device iOS     | get keys for an iOS
+	--manifest device iOS | download a build manifest from an iOS
+	--signed device       | print the signed versions for a device
+	--shsh                | (replace your own device with mine in tss.py)
+	--split key           | Splits a GID decrypted key 
 	
 ## Prerequisites
 	pip install -r requirements.txt
 	
 ## Planned
-	foreman: key grabbing
-	template: template parsing (remove from iphonewiki.py)
+	foreman: key grabbing/uploading
+	template: auto key uploading
 
 ## Credits
 	Visual Studio Code: Holy! I love this IDE! (better than Pycharm...)
