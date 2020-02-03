@@ -86,7 +86,6 @@ def saveBlobsWithTSSChecker():
         model = device[0]
         ecid = device[1][0]
         version = device[1][1][0][0]
-        buildid = device[1][1][0][1]
         shsh_path = '/Users/yort/.shsh'
         
         a7_dfu_nonces = [

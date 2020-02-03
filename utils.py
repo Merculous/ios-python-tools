@@ -40,9 +40,8 @@ def downloadJSONData(url, filename):
     request = urlopen(url).read()
     convert = json.loads(request)
     with open(f'{filename}.json', 'w') as file:
-        data = json.dump(convert, file, indent=4)
+        json.dump(convert, file, indent=4)
     file.close()
-    return data
 
 
 def iOSToBuildid(device, iOS):

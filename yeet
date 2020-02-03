@@ -22,7 +22,7 @@ import utils
 def main():
     argv = sys.argv
 
-    parser = argparse.ArgumentParser(usage=f'{sys.argv[0]} <option> <args>')
+    parser = argparse.ArgumentParser(usage=f'{argv[0]} <option> <args>')
     parser.add_argument("--buildid", help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--baseband", help="Get the baseband version of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--codename", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
@@ -33,8 +33,6 @@ def main():
     parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", action='store_true')
     parser.add_argument("--split", help="Split a GID decrypted key", nargs=1, metavar='KEY')
     
-    #parser.add_argument("--test", help="Template shit", nargs=2, metavar=('DEVICE', 'iOS'))
-
     args = parser.parse_args()
 
     if args.buildid:
@@ -65,9 +63,6 @@ def main():
 
     elif args.split:
         print(utils.splitKbag(str(argv[2])))  # ./yeet --split kbag
-
-    #elif args.test:
-        #pass
 
     else:
         sys.exit(parser.print_help(sys.stderr))
