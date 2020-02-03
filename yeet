@@ -9,8 +9,8 @@ Handles arguments and passes them to the functions.
 """
 
 import argparse
-import os
 import sys
+import os
 
 import iphonewiki
 import ipswapi
@@ -18,21 +18,22 @@ import template
 import tss
 import utils
 
-if __name__ == '__main__':
+
+def main():
     argv = sys.argv
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--buildid", help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("-B", "--baseband", help="Get the baseband version of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("-c", "--codename", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("-d", "--download", help="Download an ipsw", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("-k", "--keys", help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("-m", "--manifest", help="Download a build manifest from an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("-s", "--signed", help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
-    parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", nargs=2, metavar=('DEVICE', 'ECID'))
+    parser = argparse.ArgumentParser(usage=f'{sys.argv[0]} <option> <args>')
+    parser.add_argument("--buildid", help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("--baseband", help="Get the baseband version of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("--codename", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("--download", help="Download an ipsw", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("--keys", help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("--manifest", help="Download a build manifest from an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("--signed", help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
+    parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", action='store_true')
     parser.add_argument("--split", help="Split a GID decrypted key", nargs=1, metavar='KEY')
     
-    parser.add_argument("--test", help="Template shit", nargs=2, metavar=('DEVICE', 'iOS'))
+    #parser.add_argument("--test", help="Template shit", nargs=2, metavar=('DEVICE', 'iOS'))
 
     args = parser.parse_args()
 
@@ -40,7 +41,7 @@ if __name__ == '__main__':
         print(utils.iOSToBuildid(argv[2], argv[3]))  # ./yeet -b device version
 
     elif args.baseband:
-        print(iphonewiki.getBasebandVersion(argv[2], argv[3]))  # ./yeet -B device version
+        pass
 
     elif args.codename:
         print(iphonewiki.getCodename(argv[2], argv[3]))  # ./yeet -c device version
@@ -49,7 +50,7 @@ if __name__ == '__main__':
         ipswapi.downloadIPSW(argv[2], argv[3])  # ./yeet -d device version
 
     elif args.keys:
-        print(iphonewiki.getKeysRaw(argv[2], argv[3]))  # ./yeet -k device version
+        iphonewiki.getWikiKeys(argv[2], argv[3])  # ./yeet -k device version
 
     elif args.signed:
         signed = ipswapi.signed(argv[2])  # ./yeet -s device
@@ -60,14 +61,19 @@ if __name__ == '__main__':
         utils.downloadBuildManifest(argv[2], argv[3])  # ./yeet -m device version
 
     elif args.shsh:
-        tss.saveblobs(argv[2], argv[3])  # ./yeet --shsh device ecid
+        tss.saveBlobsWithTSSChecker()  # ./yeet --shsh 
 
     elif args.split:
-        kbag = utils.splitKbag(str(argv[2]))  # ./yeet --split kbag
-        print(f'IV: {kbag[0]} KEY: {kbag[1]}')
+        print(utils.splitKbag(str(argv[2])))  # ./yeet --split kbag
 
-    elif args.test:
-        template.parseKeyData(argv[2], argv[3]) # ./yeet --test device version
+    #elif args.test:
+        #pass
 
     else:
-        sys.exit(parser.print_help())
+        sys.exit(parser.print_help(sys.stderr))
+
+
+if __name__ == '__main__':
+    main()
+    utils.clean()
+

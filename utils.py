@@ -4,7 +4,7 @@ import sys
 import time
 from math import floor
 from urllib.parse import urlsplit
-from urllib.request import Request, urlopen, urlretrieve
+from urllib.request import urlopen
 
 from remotezip import RemoteZip
 
@@ -37,11 +37,12 @@ def progress(count, block_size, total_size):  # Check README for credit (not min
 
 
 def downloadJSONData(url, filename):
-    json_data = urlopen(url).read()
-    data = json.loads(json_data)
+    request = urlopen(url).read()
+    convert = json.loads(request)
     with open(f'{filename}.json', 'w') as file:
-        json.dump(data, file, indent=4)
+        data = json.dump(convert, file, indent=4)
     file.close()
+    return data
 
 
 def iOSToBuildid(device, iOS):
@@ -57,7 +58,6 @@ def iOSToBuildid(device, iOS):
         buildid = data['firmwares'][i]['buildid']
 
     file.close()
-    os.remove(f'{device}.json')
     return buildid
 
 
@@ -69,12 +69,11 @@ def splitToFileName(path):
 
 def splitKbag(kbag):
     if len(kbag) != 96:
-        sys.exit(
-            f'String provided is not 96 bytes! The length read was {len(kbag)}.')
+        sys.exit('String provided is not 96 bytes! The length read was:', len(kbag))
     else:
         iv = kbag[:32]
         key = kbag[-64:]
-        return iv, key
+        return f'IV: {iv} Key: {key}'
 
 
 def downloadBuildManifest(device, version):
@@ -98,10 +97,16 @@ def downloadBuildManifest(device, version):
         zip = RemoteZip(url)
         zip.extract(manifest)
         # This can be done better
-        os.rename(
-            manifest, f'BuildManifest_{device}_{version}_{buildid}.plist')
+        os.rename(manifest, f'BuildManifest_{device}_{version}_{buildid}.plist')
         print('Done downloading!')
         zip.close()
 
     file.close()
-    os.remove(f'{device}.json')
+
+
+
+def clean():
+    for file in os.listdir(os.getcwd()):
+        if file.endswith('json'):
+            os.remove(file)
+

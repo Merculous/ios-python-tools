@@ -9,22 +9,24 @@ import utils
 
 
 """
-
 Handles data on the iphonewiki page.
 
 Grabs keys and baseband version.
-
 """
 
 
-def parseWiki(device, version):
+def getWikiKeys(device, version):
     buildid = utils.iOSToBuildid(device, version)
     codename = getCodename(device, version)
     wikiUrl = f'https://www.theiphonewiki.com/w/index.php?title={codename}_{buildid}_({device})&action=edit'
     request = urlopen(wikiUrl).read().decode('utf-8')
-    return request.split('{{keys')[1].split('}}')[0].replace('|', '')
+    data = request.split('{{keys')[1].split('}}')[0].replace('|', '').splitlines()
+    del data[0:8] # Remove the top info we don't need
+    for keys in data:
+        print(keys)
+  
 
-
+# TODO I can just parse build manifest to get this    
 def getCodename(device, version):
     buildid = utils.iOSToBuildid(device, version)
     ipswapi.linksForDevice(device)
@@ -40,7 +42,7 @@ def getCodename(device, version):
         url = f'https://www.theiphonewiki.com/wiki/Firmware_Keys/{strip}'
         stuff = urlopen(url).read().decode('utf-8')
         soup = BeautifulSoup(stuff, features='html.parser')
-        yeet = soup.find_all('a', text=f'{version}')
+        yeet = soup.find_all('a', text=version)
         for codename in yeet:
             lolList = codename['title'].split()
             deviceWiki = f'({device})'
@@ -51,27 +53,8 @@ def getCodename(device, version):
             else:
                 continue
 
-
-def getKeys(device, version):
-    data = parseWiki(device, version).strip()
-
-    # Split off the extra info at the top
-
-    """
-
-    Version             = 3.0
-    Build               = 7A341
-    Device              = iPhone2,1
-    Codename            = Kirkwood
-    Baseband            = 04.26.08
-    DownloadURL         = https://secure-appldnld.apple.com.edgesuite.net/content.info.apple.com/iPhone/061-6582.20090617.LlI87/iPhone2,1_3.0_7A341_Restore.ipsw 
-
-    """
-
-
-    # Add .dmg to the end of the dmg filenames
-
+# TODO I can just parse build manifest to get this    
 
 def getBasebandVersion(device, version):
-    data = parseWiki(device, version).splitlines()
-    return data[5].replace('Baseband            =', '').strip()
+    pass
+

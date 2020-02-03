@@ -16,7 +16,7 @@ Handles data from ipsw.me api
 
 def linksForDevice(device):
     url = f'https://api.ipsw.me/v4/device/{device}?type=ipsw'
-    utils.downloadJSONData(url, device)
+    return utils.downloadJSONData(url, device)
 
 
 def downloadIPSW(device, version):
@@ -41,11 +41,10 @@ def downloadIPSW(device, version):
         urlretrieve(url, filename, utils.progress)
         print('\n')
         file.close()
-        os.remove(f'{device}.json')
 
 
 def signed(device):
-    signedArray = []
+    signedVersions = []
     linksForDevice(device)
     with open(f'{device}.json', 'r') as file:
         data = json.load(file)
@@ -54,9 +53,9 @@ def signed(device):
             buildid = stuff['buildid']
             signed = stuff['signed']
             if signed:
-                version = [ios, buildid]  # Thanks to mcg29 for making this return the values :D
-                signedArray.append(version)
+                version = [ios, buildid]
+                signedVersions.append(version)
 
     file.close()
-    os.remove(f'{device}.json')
-    return signedArray
+    return signedVersions
+
