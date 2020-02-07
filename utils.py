@@ -8,8 +8,6 @@ from urllib.request import urlopen
 
 from remotezip import RemoteZip
 
-import ipswapi
-
 """
 
 All of the helper functions or just a module to store other functions
@@ -31,8 +29,7 @@ def progress(count, block_size, total_size):  # Check README for credit (not min
     progress_size = int(count * block_size)
     speed = int(progress_size / (1024 * duration))
     percent = int(count * block_size * 100 / total_size)
-    sys.stdout.write(
-        f'\r{percent}%, {floor(progress_size / (1024 * 1024))} MB, {speed} KB/s, {floor(duration)} seconds passed')
+    sys.stdout.write(f'\r{percent}%, {floor(progress_size / (1024 * 1024))} MB, {speed} KB/s, {floor(duration)} seconds passed')
     sys.stdout.flush()
 
 
@@ -42,22 +39,6 @@ def downloadJSONData(url, filename):
     with open(f'{filename}.json', 'w') as file:
         json.dump(convert, file, indent=4)
     file.close()
-
-
-def iOSToBuildid(device, iOS):
-    ipswapi.linksForDevice(device)
-    with open(f'{device}.json', 'r') as file:
-        data = json.load(file)
-        i = 0
-        iOSFromJsonFile = data['firmwares'][i]['version']
-        while iOSFromJsonFile != iOS:
-            i += 1
-            iOSFromJsonFile = data['firmwares'][i]['version']
-
-        buildid = data['firmwares'][i]['buildid']
-
-    file.close()
-    return buildid
 
 
 def splitToFileName(path):
@@ -75,37 +56,7 @@ def splitKbag(kbag):
         return f'IV: {iv} Key: {key}'
 
 
-def downloadBuildManifest(device, version):
-    buildid = iOSToBuildid(device, version)
-    ipswapi.linksForDevice(device)
-
-    with open(f'{device}.json', 'r') as file:
-        data = json.load(file)
-        i = 0
-        buildidFromJsonFile = data['firmwares'][i]['buildid']
-        while buildidFromJsonFile != buildid:
-            i += 1
-            buildidFromJsonFile = data['firmwares'][i]['buildid']
-
-        url = data['firmwares'][i]['url']
-        manifest = 'BuildManifest.plist'
-
-        # Start the process of reading and extracting a file from a url
-
-        print(f'Downloading manifest for {version}, {buildid}')
-        zip = RemoteZip(url)
-        zip.extract(manifest)
-        # This can be done better
-        os.rename(manifest, f'BuildManifest_{device}_{version}_{buildid}.plist')
-        print('Done downloading!')
-        zip.close()
-
-    file.close()
-
-
-
 def clean():
     for file in os.listdir(os.getcwd()):
         if file.endswith('json'):
             os.remove(file)
-

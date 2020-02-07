@@ -1,7 +1,8 @@
-import re
 import json
+import re
 
 import iphonewiki
+
 
 """
 
@@ -30,3 +31,6 @@ For DownloadURL, do not place anything other than URLs to free firmwares hosted 
 
 """
 
+class Template:
+    def __init__(self):
+        super().__init__()
