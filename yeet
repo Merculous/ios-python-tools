@@ -40,19 +40,21 @@ def main():
         print(opts.iOSToBuildid(argv[2], argv[3]))
 
     elif args.baseband:
+        #opts = Manifest(argv[2], argv[3])
+        #opts.getBasebandVersion()
         pass
 
     elif args.codename:
-        pass
+        opts = Manifest(argv[2], argv[3])
+        print(opts.getCodename())
 
     elif args.download:
         opts = APIParser(argv[2], argv[3]) # ./yeet -d device version
         opts.downloadIPSW(argv[2], argv[3])
 
     elif args.keys:
-        #opts = iPhoneWiki(argv[2], argv[3])  # ./yeet -k device version
-        #opts.getWikiKeys(argv[2], argv[3])
-        pass
+        opts = iPhoneWiki(argv[2], argv[3])  # ./yeet -k device version
+        opts.getWikiKeys(argv[2], argv[3])
 
     elif args.signed:
         opts = APIParser(argv[2], None) # ./yeet -s device version

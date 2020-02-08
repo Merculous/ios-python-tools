@@ -27,3 +27,4 @@ Due to compatibility, ensure Python 3.6 or newer is installed. Basially this is 
 	Noah/32Bites @TheNoahParty: some techniques from PyKeys
 	IPSW download progress: https://blog.shichao.io/2012/10/04/progress_speed_indicator_for_urlretrieve_in_python.html (have plans to make my own function that will replace this)
 	mcg29 @mcg29_: Helping with this project
+	Regex expression used in getCodename(): https://stackoverflow.com/questions/3662142/how-to-remove-tags-from-a-string-in-python-using-regular-expressions-not-in-ht
