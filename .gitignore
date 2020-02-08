@@ -6,3 +6,4 @@ shsh
 *.plist
 *.code-workspace
 nonces.txt
+*.json
