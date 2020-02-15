@@ -12,6 +12,7 @@ import argparse
 import os
 import sys
 
+from img3 import Img3
 from iphonewiki import iPhoneWiki
 from ipswapi import APIParser
 from manifest import Manifest
@@ -32,52 +33,74 @@ def main():
     parser.add_argument("--signed", help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
     parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", action='store_true')
     parser.add_argument("--split", help="Split a GID decrypted key", nargs=1, metavar='KEY')
-    
+
+    parser.add_argument("--test", help="Print img3 magic position", nargs=1, metavar='FILE')
+
     args = parser.parse_args()
 
     if args.buildid:
-        opts = APIParser(argv[2], argv[3]) # ./yeet -b device version
-        print(opts.iOSToBuildid(argv[2], argv[3]))
+        api = APIParser(argv[2], argv[3])
+        print(api.iOSToBuildid())  # ./yeet --buildid device version
 
     elif args.baseband:
-        #opts = Manifest(argv[2], argv[3])
-        #opts.getBasebandVersion()
+        # manifest = Manifest(argv[2], argv[3])
+        # manifest.getBasebandVersion()  # ./yeet --baseband device version
         pass
 
     elif args.codename:
-        opts = Manifest(argv[2], argv[3])
-        print(opts.getCodename())
+        manifest = Manifest(argv[2], argv[3])
+        print(manifest.getCodename())
 
     elif args.download:
-        opts = APIParser(argv[2], argv[3]) # ./yeet -d device version
-        opts.downloadIPSW(argv[2], argv[3])
+        api = APIParser(argv[2], argv[3])
+        api.downloadIPSW()  # ./yeet --download device version
 
     elif args.keys:
-        opts = iPhoneWiki(argv[2], argv[3])  # ./yeet -k device version
-        opts.getWikiKeys(argv[2], argv[3])
+        wiki = iPhoneWiki(argv[2], argv[3])
+        wiki.getWikiKeys()  # ./yeet --keys device version
 
     elif args.signed:
-        opts = APIParser(argv[2], None) # ./yeet -s device version
-        stuff = opts.signed(argv[2])
-        for signed in stuff:
-            print(f'iOS: {signed[0]} ({signed[1]})')
+        api = APIParser(argv[2], None)  # ./yeet --signed device
+        data = api.signed()
+        for stuff in data:
+            print(f'iOS: {stuff[0]} ({stuff[1]}) ({stuff[2]})')
 
     elif args.manifest:
-        opts = Manifest(argv[2], argv[3])  # ./yeet -m device version
-        opts.downloadBuildManifest(argv[2], argv[3])
+        manifest = Manifest(argv[2], argv[3])  # ./yeet --manifest device version
+        manifest.downloadBuildManifest()
 
     elif args.shsh:
-        #opts = TSS(argv[2], argv[3], None)  # ./yeet --shsh 
-        #opts.saveBlobsWithTSSChecker()
-        pass
+        # TODO Fix this. It's somewhat cleaner, but this is still bad. May have to use list because dict don't allow duplicate key values
+        devices = {
+            'iPhone3,1': '806884279284',
+            'iPhone3,3': '2902611023180',
+            # 'iPhone4,1': ('2271501886349', '2622681783562'),
+            'iPhone5,1': '3312880722830',
+            'iPhone5,2': '2760926895370',
+            'iPhone5,3': '2781026528712',
+            'iPhone6,1': '784041742804',
+            'iPhone7,2': '360803830744102',
+            'iPhone9,4': '5683998923293478',
+            'iPhone11,6': '5072064894468154'
+        }
+
+        for device, ecid in devices.items():
+            data = TSS(device, ecid)
+            data.saveBlobsWithTSSChecker()
 
     elif args.split:
         print(splitKbag(str(argv[2])))  # ./yeet --split kbag
+
+    elif args.test:
+        # img3 = Img3(argv[2])
+        # img3.printTagMagic()
+        pass
 
     else:
         sys.exit(parser.print_help(sys.stderr))
 
     clean()
+
 
 if __name__ == '__main__':
     main()
