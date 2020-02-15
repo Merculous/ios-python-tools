@@ -31,6 +31,7 @@ For DownloadURL, do not place anything other than URLs to free firmwares hosted 
 
 """
 
-class Template:
+
+class Template(object):
     def __init__(self):
         super().__init__()
