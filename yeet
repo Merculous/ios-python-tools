@@ -12,12 +12,16 @@ import argparse
 import os
 import sys
 
-from img3 import Img3
+from img3 import img3
+#from img4 import img4
 from iphonewiki import iPhoneWiki
 from ipswapi import APIParser
 from manifest import Manifest
+from template import Template
 from tss import TSS
 from utils import clean, splitKbag
+
+#from pymobiledevice import syslog
 
 
 def main():
@@ -26,6 +30,7 @@ def main():
     parser = argparse.ArgumentParser(usage=f'{argv[0]} <option> <args>')
     parser.add_argument("--buildid", help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--baseband", help="Get the baseband version of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("--clean", help="If there are any leftover json files, this will get rid of them", action='store_true')
     parser.add_argument("--codename", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--download", help="Download an ipsw", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--keys", help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
@@ -33,8 +38,8 @@ def main():
     parser.add_argument("--signed", help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
     parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", action='store_true')
     parser.add_argument("--split", help="Split a GID decrypted key", nargs=1, metavar='KEY')
-
-    parser.add_argument("--test", help="Print img3 magic position", nargs=1, metavar='FILE')
+    parser.add_argument("--tags", help="Print the tags and their hex positions of an img3 file", nargs=1, metavar='FILE')
+    parser.add_argument("--template", help="Template parsing", action='store_true')
 
     args = parser.parse_args()
 
@@ -46,6 +51,9 @@ def main():
         # manifest = Manifest(argv[2], argv[3])
         # manifest.getBasebandVersion()  # ./yeet --baseband device version
         pass
+
+    elif args.clean:
+        clean()
 
     elif args.codename:
         manifest = Manifest(argv[2], argv[3])
@@ -91,15 +99,15 @@ def main():
     elif args.split:
         print(splitKbag(str(argv[2])))  # ./yeet --split kbag
 
-    elif args.test:
-        # img3 = Img3(argv[2])
-        # img3.printTagMagic()
+    elif args.tags:
+        image = img3(argv[2])
+        image.printTags()
+
+    elif args.template:
         pass
 
     else:
         sys.exit(parser.print_help(sys.stderr))
-
-    clean()
 
 
 if __name__ == '__main__':
