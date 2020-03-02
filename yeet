@@ -78,23 +78,7 @@ def main():
         manifest.downloadBuildManifest()
 
     elif args.shsh:
-        # TODO Fix this. It's somewhat cleaner, but this is still bad. May have to use list because dict don't allow duplicate key values
-        devices = {
-            'iPhone3,1': '806884279284',
-            'iPhone3,3': '2902611023180',
-            # 'iPhone4,1': ('2271501886349', '2622681783562'),
-            'iPhone5,1': '3312880722830',
-            'iPhone5,2': '2760926895370',
-            'iPhone5,3': '2781026528712',
-            'iPhone6,1': '784041742804',
-            'iPhone7,2': '360803830744102',
-            'iPhone9,4': '5683998923293478',
-            'iPhone11,6': '5072064894468154'
-        }
-
-        for device, ecid in devices.items():
-            data = TSS(device, ecid)
-            data.saveBlobsWithTSSChecker()
+        pass
 
     elif args.split:
         print(splitKbag(str(argv[2])))  # ./yeet --split kbag
