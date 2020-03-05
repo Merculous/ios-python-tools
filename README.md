@@ -9,14 +9,14 @@ Due to compatibility, ensure Python 3.6 or newer is installed. Basially this is 
     --buildid device iOS  | convert an iOS to its buildid
     --clean               | if there are any leftover json files, this will get rid of them
     --codename device iOS | get codename of an iOS
-    --copy path           | Copy a file or folder from a connected device using afc
+    --copy path           | copy a file or folder from a connected device using afc
     --download device iOS | download an ipsw
     --keys device iOS     | get keys for an iOS
     --manifest device iOS | download a build manifest from an iOS
     --recovery            | makes a connected device enter recovery mode
     --signed device       | print the signed versions for a device
-    --split key           | Splits a GID decrypted key
-    --tags                | Print the tags and their hex positions of an img3 file
+    --split key           | splits a GID decrypted key
+    --tags                | print the tags and their hex positions of an img3 file
 
 ## Prerequisites
 
