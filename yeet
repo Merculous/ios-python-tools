@@ -13,15 +13,15 @@ import os
 import sys
 
 from img3 import img3
-#from img4 import img4
+from img4 import img4
 from iphonewiki import iPhoneWiki
+from ipsw import IPSW
 from ipswapi import APIParser
 from manifest import Manifest
 from template import Template
 from tss import TSS
+from usb import USB
 from utils import clean, splitKbag
-
-#from pymobiledevice import syslog
 
 
 def main():
@@ -29,17 +29,27 @@ def main():
 
     parser = argparse.ArgumentParser(usage=f'{argv[0]} <option> <args>')
     parser.add_argument("--buildid", help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("--bundle", help="Creates a bundle with the provided patches to allow xpwn's ipsw binary to use the bundle", nargs=1, metavar='IPSW')
     parser.add_argument("--baseband", help="Get the baseband version of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--clean", help="If there are any leftover json files, this will get rid of them", action='store_true')
     parser.add_argument("--codename", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("--connect", help="Pymobiledevice testing", action='store_true')
+    parser.add_argument("--copy", help="Copy a file or folder from a connected device using afc", nargs=1, metavar='PATH')
     parser.add_argument("--download", help="Download an ipsw", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("--dra", help="Creates an untethered downgrade ipsw with Dora2-iOS's fork of iloader by xerub", nargs=1, metavar='IPSW')
     parser.add_argument("--keys", help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("--manifest", help="Download a build manifest from an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
+    parser.add_argument("--kpwn", help="Creates an untethered downgrade ipsw for any bootrom 3GS", nargs=1, metavar='IPSW')
+    parser.add_argument("--odysseus", help="Creates an ipsw which one you could use to dump a shsh blob", nargs=1, metavar='IPSW')
+    parser.add_argument("--pwnage", help="Creates an untethered jailbroken ipsw for any bootrom 3GS", nargs=1, metavar='IPSW')
+    parser.add_argument("--reboot", help="Restarts a connected device", action='store_true')
+    parser.add_argument("--recovery", help="Makes a device enter recovery mode", action='store_true')
     parser.add_argument("--signed", help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
     parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", action='store_true')
     parser.add_argument("--split", help="Split a GID decrypted key", nargs=1, metavar='KEY')
     parser.add_argument("--tags", help="Print the tags and their hex positions of an img3 file", nargs=1, metavar='FILE')
     parser.add_argument("--template", help="Template parsing", action='store_true')
+
+    parser.add_argument("--test", action='store_true')
 
     args = parser.parse_args()
 
@@ -59,6 +69,13 @@ def main():
         manifest = Manifest(argv[2], argv[3])
         print(manifest.getCodename())
 
+    elif args.connect:
+        pass
+
+    elif args.copy:
+        device = USB()
+        device.copyFromDevice(argv[2])
+
     elif args.download:
         api = APIParser(argv[2], argv[3])
         api.downloadIPSW()  # ./yeet --download device version
@@ -67,15 +84,24 @@ def main():
         wiki = iPhoneWiki(argv[2], argv[3])
         wiki.getWikiKeys()  # ./yeet --keys device version
 
+    elif args.kpwn:
+        ipsw = IPSW(argv[2])
+        ipsw.create24KpwnIPSW()
+
+    elif args.reboot:
+        # device = USB()
+        # device.deviceReboot()
+        pass
+
+    elif args.recovery:
+        device = USB()
+        device.deviceEnterRecovery()
+
     elif args.signed:
         api = APIParser(argv[2], None)  # ./yeet --signed device
         data = api.signed()
         for stuff in data:
             print(f'iOS: {stuff[0]} ({stuff[1]}) ({stuff[2]})')
-
-    elif args.manifest:
-        manifest = Manifest(argv[2], argv[3])  # ./yeet --manifest device version
-        manifest.downloadBuildManifest()
 
     elif args.shsh:
         pass
@@ -85,10 +111,14 @@ def main():
 
     elif args.tags:
         image = img3(argv[2])
-        image.printTags()
+        image.parseImage()
 
     elif args.template:
         pass
+
+    elif args.test:
+        device = USB()
+        device.getInfo()
 
     else:
         sys.exit(parser.print_help(sys.stderr))

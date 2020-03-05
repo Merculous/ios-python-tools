@@ -77,8 +77,7 @@ class APIParser(object):
                 buildid = stuff['buildid']
                 status = stuff['signed']
                 versions = [ios, buildid, 'ipsw']
-                if status:  # If
-
+                if status:  # If signed
                     signedVersions.append(versions)
         file.close()
 
@@ -89,28 +88,15 @@ class APIParser(object):
             data = json.load(f)
             for stuff in data['firmwares']:
                 ios = stuff['version']
-                # print(ios[0:3])
                 if ios[0:3] == "9.9":  # Beginning with iOS 10, now versions also include 9.9 at the beginning, example, 9.9.10.3.3. Skip these.
                     pass
                 else:
                     buildid = stuff['buildid']
                     status = stuff['signed']
                     currentOTA = [ios, buildid, 'ota']
-
-                    if status:  # If signed
-                        for build in signedVersions:
-                            # print(build)
-                            # We may just need to parse the whole list itself, instead of the contents.
-                            alreadySigned = build[0]  # prints ios from ipsw
-                            OTAsigned = currentOTA[0]  # prints ios from ota
-                            if OTAsigned == alreadySigned:  # If the iOS versions are the same FIXME
-                                #print("No need to add OTA:", OTAsigned)
-                                break
-                            else:
-                                # CurrentOTA = 9.3.5, ..., 'ota' is not because of 'ota', we need to check if the ios and buildid list is already there
-                                if currentOTA not in signedVersions:  # If the iOS, buildid, type is not in signedVersions FIXME
-                                    signedVersions.append(currentOTA)  # Add the current ios, buildid, as OTA
-                                    # print("adding" + str(currentOTA))  # 9.3.5 ota is being print here
+                    if status:
+                        if currentOTA not in signedVersions:
+                            signedVersions.append(currentOTA)
 
         f.close()
 

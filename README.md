@@ -14,14 +14,16 @@ Due to compatibility, ensure Python 3.6 or newer is installed. Basially this is 
     --keys device iOS     | get keys for an iOS
     --manifest device iOS | download a build manifest from an iOS
     --signed device       | print the signed versions for a device
-    --shsh                | (replace your own device with mine in tss.py)
+    --shsh                | (removing for now)
     --split key           | Splits a GID decrypted key
     --tags                | Print the tags and their hex positions of an img3 file
-    --template            | In the works...
+    --template            | In the works... (not working)
 
 ## Prerequisites
 
     pip install -r requirements.txt
+
+    pip install git+https://github.com/Merculous/pymobiledevice.git (tested with iPhone 5S on 10.3.3)
 
 ## Planned
 

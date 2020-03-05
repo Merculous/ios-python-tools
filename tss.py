@@ -4,6 +4,7 @@ import subprocess
 from urllib.request import Request, urlopen, urlretrieve
 
 from ipswapi import APIParser
+from usb import USB
 
 
 class TSS(object):
