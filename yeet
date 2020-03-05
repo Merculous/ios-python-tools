@@ -33,7 +33,6 @@ def main():
     parser.add_argument("--baseband", help="Get the baseband version of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--clean", help="If there are any leftover json files, this will get rid of them", action='store_true')
     parser.add_argument("--codename", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("--connect", help="Pymobiledevice testing", action='store_true')
     parser.add_argument("--copy", help="Copy a file or folder from a connected device using afc", nargs=1, metavar='PATH')
     parser.add_argument("--download", help="Download an ipsw", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--dra", help="Creates an untethered downgrade ipsw with Dora2-iOS's fork of iloader by xerub", nargs=1, metavar='IPSW')
@@ -42,7 +41,7 @@ def main():
     parser.add_argument("--odysseus", help="Creates an ipsw which one you could use to dump a shsh blob", nargs=1, metavar='IPSW')
     parser.add_argument("--pwnage", help="Creates an untethered jailbroken ipsw for any bootrom 3GS", nargs=1, metavar='IPSW')
     parser.add_argument("--reboot", help="Restarts a connected device", action='store_true')
-    parser.add_argument("--recovery", help="Makes a device enter recovery mode", action='store_true')
+    parser.add_argument("--recovery", help="Makes a connected device enter recovery mode", action='store_true')
     parser.add_argument("--signed", help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
     parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", action='store_true')
     parser.add_argument("--split", help="Split a GID decrypted key", nargs=1, metavar='KEY')
@@ -68,9 +67,6 @@ def main():
     elif args.codename:
         manifest = Manifest(argv[2], argv[3])
         print(manifest.getCodename())
-
-    elif args.connect:
-        pass
 
     elif args.copy:
         device = USB()

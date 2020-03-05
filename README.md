@@ -7,23 +7,21 @@ Due to compatibility, ensure Python 3.6 or newer is installed. Basially this is 
 ## Commands
 
     --buildid device iOS  | convert an iOS to its buildid
-    --baseband device iOS | get baseband version of an iOS (not working)
     --clean               | if there are any leftover json files, this will get rid of them
     --codename device iOS | get codename of an iOS
+    --copy path           | Copy a file or folder from a connected device using afc
     --download device iOS | download an ipsw
     --keys device iOS     | get keys for an iOS
     --manifest device iOS | download a build manifest from an iOS
+    --recovery            | makes a connected device enter recovery mode
     --signed device       | print the signed versions for a device
-    --shsh                | (removing for now)
     --split key           | Splits a GID decrypted key
     --tags                | Print the tags and their hex positions of an img3 file
-    --template            | In the works... (not working)
 
 ## Prerequisites
 
+    pip install git+https://github.com/Merculous/pymobiledevice.git
     pip install -r requirements.txt
-
-    pip install git+https://github.com/Merculous/pymobiledevice.git (tested with iPhone 5S on 10.3.3)
 
 ## Planned
 
