@@ -14,10 +14,7 @@ class IPSW(object):
         self.ipsw = ipsw
 
     def isIPSW(self):
-        if zipfile.is_zipfile(self.ipsw):  # ipsw's are just zip archives
-            return True
-        else:
-            return False
+        return zipfile.is_zipfile(self.ipsw)  # ipsw's are just zip archives
 
     def create24KpwnIPSW(self):  # LLB is patched to enable untethered downgrading without shsh
         if self.isIPSW():

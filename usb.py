@@ -3,7 +3,10 @@ import sys
 
 from pymobiledevice.afc import AFCClient, AFCShell
 from pymobiledevice.diagnostics_relay import DIAGClient
+from pymobiledevice.installation_proxy import installation_proxy
 from pymobiledevice.lockdown import LockdownClient
+from pymobiledevice.mobilebackup2 import MobileBackup2
+from pymobiledevice.syslog import Syslog
 
 
 """
@@ -50,6 +53,9 @@ class USB(object):
     def deviceReboot(self):
         device = DIAGClient()
         device.restart()
+        # Apparently this works only for stock devices, and jailbroken devices due to another reboot binary?
+        # You need to delete the file /sbin/reboot which is not present on stock iOS. [https://github.com/libimobiledevice/libimobiledevice/issues/586]
+        # Still not working on iOS 10.3.3 iPhone 5S
 
     def deviceEnterRecovery(self):
         device = LockdownClient()
@@ -64,3 +70,35 @@ class USB(object):
         device = DIAGClient()
         data = device.query_mobilegestalt()
         return data['UniqueChipID']
+
+    def listDirectoryWithAFC(self):
+        device = AFCShell()
+        device.do_ls('.')
+
+    def backup(self):
+        device = MobileBackup2()
+        device.backup()  # full backup is true by default
+
+    def syslog(self):
+        data = Syslog()
+        data.watch()
+
+    def pair(self):
+        device = LockdownClient()
+        paired = device.pair()
+        if paired:
+            return sys.exit('Device is already paired!')
+        else:
+            return sys.exit('Device is NOT paired!')
+
+    def diagnostics(self):
+        device = DIAGClient()
+        print(device.diagnostics('GasGauge'))
+        print(device.diagnostics('HDMI'))
+        print(device.diagnostics('NAND'))
+        print(device.diagnostics('WiFi'))
+
+    def proxy(self):
+        # device = installation_proxy()
+        # data = device.browse() # Returns tons of data :D
+        pass
