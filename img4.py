@@ -1,7 +1,3 @@
-import os
-import sys
-
-
 class img4(object):
     def __init__(self, file):
         super().__init__()

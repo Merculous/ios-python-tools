@@ -1,9 +1,3 @@
-import json
-import re
-
-import iphonewiki
-
-
 """
 
 This will handle the key template stuff from iphonewiki (webpage)
@@ -35,3 +29,8 @@ For DownloadURL, do not place anything other than URLs to free firmwares hosted 
 class Template(object):
     def __init__(self):
         super().__init__()
+
+    def readTemplate(self):
+        with open('key-template.txt', 'r') as f:
+            data = f.readlines()
+        f.close()

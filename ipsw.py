@@ -2,7 +2,6 @@ import os
 import sys
 import zipfile
 
-import bsdiff4
 
 # TODO Create a write-up to make on how to make these patches manually
 

@@ -9,17 +9,13 @@ Handles arguments and passes them to the functions.
 """
 
 import argparse
-import os
 import sys
 
 from img3 import img3
-from img4 import img4
-from iphonewiki import iPhoneWiki
 from ipsw import IPSW
 from ipswapi import APIParser
 from manifest import Manifest
 from template import Template
-from tss import TSS
 from usb import USB
 from utils import clean, splitKbag
 
@@ -32,7 +28,7 @@ def main():
     parser.add_argument("--baseband", help="Get the baseband version of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--buildid", help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--bundle", help="Creates a bundle with the provided patches to allow xpwn's ipsw binary to use the bundle", nargs=2, metavar=('IPSW', 'TYPE'))
-    parser.add_argument("--clean", help="If there are any leftover json files, this will get rid of them", action='store_true')
+    parser.add_argument("--clean", help="If there are any leftover files, this will get rid of them", action='store_true')
     parser.add_argument("--codename", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--copy", help="Copy a file or folder from a connected device using afc", nargs=1, metavar='PATH')
     parser.add_argument("--download", help="Download an ipsw", nargs=2, metavar=('DEVICE', 'iOS'))
@@ -60,9 +56,8 @@ def main():
         device.backup()
 
     elif args.baseband:
-        # manifest = Manifest(argv[2], argv[3])
-        # manifest.getBasebandVersion()  # ./yeet --baseband device version
-        pass
+        manifest = Manifest(argv[2], argv[3])
+        print(manifest.getBasebandVersion())  # ./yeet --baseband device version
 
     elif args.buildid:
         api = APIParser(argv[2], argv[3])
@@ -90,8 +85,7 @@ def main():
         pass
 
     elif args.keys:
-        wiki = iPhoneWiki(argv[2], argv[3])
-        wiki.getWikiKeys()  # ./yeet --keys device version
+        pass
 
     elif args.kpwn:
         ipsw = IPSW(argv[2])
@@ -140,10 +134,13 @@ def main():
         pass
 
     elif args.test:
-        pass
+        stuff = Template()
+        stuff.readTemplate()
 
     else:
         sys.exit(parser.print_help(sys.stderr))
+
+    clean()
 
 
 if __name__ == '__main__':

@@ -6,8 +6,6 @@ from math import floor
 from urllib.parse import urlsplit
 from urllib.request import urlopen
 
-from remotezip import RemoteZip
-
 """
 
 All of the helper functions or just a module to store other functions
@@ -59,4 +57,6 @@ def splitKbag(kbag):
 def clean():
     for file in os.listdir(os.getcwd()):
         if file.endswith('json'):
+            os.remove(file)
+        elif file.endswith('plist'):
             os.remove(file)

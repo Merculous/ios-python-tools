@@ -1,8 +1,5 @@
-import json
 import os
 import re
-
-from remotezip import RemoteZip
 
 from ipswapi import APIParser
 
@@ -40,5 +37,11 @@ class Manifest(object):  # TODO Add OTA compatibility
         buildid = api.iOSToBuildid()
         manifest = f'BuildManifest_{self.device}_{self.version}_{buildid}.plist'
         data = self.manifestParser(manifest)
-        control = data.index('<key>BasebandFirmware</key>')  # 33, wrong, need the second (not particularly bad)
-        print(control)
+        strings = []
+        for stuff in data:
+            if stuff.endswith('bbfw</string>'):
+                if stuff not in strings:
+                    strings.append(stuff)
+        versions = re.findall(r"[0-9.]*[0-9]+", str(strings))  # regex check for numbers, and periods
+        os.remove(manifest)
+        return max(versions, key=len)  # TODO This can be done much much much better, plus some have more than one baseband so I need to fix this

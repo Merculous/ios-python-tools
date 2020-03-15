@@ -1,13 +1,10 @@
-import os
 import sys
 
-from pymobiledevice.afc import AFCClient, AFCShell
+from pymobiledevice.afc import AFCShell
 from pymobiledevice.diagnostics_relay import DIAGClient
-from pymobiledevice.installation_proxy import installation_proxy
 from pymobiledevice.lockdown import LockdownClient
 from pymobiledevice.mobilebackup2 import MobileBackup2
 from pymobiledevice.syslog import Syslog
-
 
 """
 

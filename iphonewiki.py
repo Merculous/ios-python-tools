@@ -1,12 +1,7 @@
-import json
-import os
 from urllib.request import urlopen
-
-from bs4 import BeautifulSoup
 
 from ipswapi import APIParser
 from manifest import Manifest
-
 
 """
 Handles data on the iphonewiki page.
@@ -30,8 +25,7 @@ class iPhoneWiki(object):
         request = urlopen(wikiUrl).read().decode('utf-8')
         data = request.split('{{keys')[1].split('}}')[0].replace('|', '').splitlines()
         del data[0:8]  # Remove the top info we don't need
-        for keys in data:
-            print(keys)
+        return data
 
     def uploadWikiKeys(self):
         pass
