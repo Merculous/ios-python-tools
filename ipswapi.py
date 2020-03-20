@@ -65,7 +65,7 @@ class APIParser(object):
         file.close()
 
     def signed(self):
-        signedVersions = []
+        signedVersions = list()
 
         # Get ipsw signed versions
 
@@ -119,7 +119,6 @@ class APIParser(object):
 
             url = data['firmwares'][i]['url']
             zip = RemoteZip(url)
-            print('Downloading:', path)
             zip.extract(path)
             if output:
                 os.rename(path, output)

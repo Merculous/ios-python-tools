@@ -30,7 +30,7 @@ def main():
     parser.add_argument("--bundle", help="Creates a bundle with the provided patches to allow xpwn's ipsw binary to use the bundle", nargs=2, metavar=('IPSW', 'TYPE'))
     parser.add_argument("--clean", help="If there are any leftover files, this will get rid of them", action='store_true')
     parser.add_argument("--codename", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("--copy", help="Copy a file or folder from a connected device using afc", nargs=1, metavar='PATH')
+    parser.add_argument("--copy", help="Copy a file or folder to a connected device using afc", nargs=1, metavar='IN')
     parser.add_argument("--download", help="Download an ipsw", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--dra", help="Creates an untethered downgrade ipsw with Dora2-iOS's fork of iloader by xerub", nargs=1, metavar='IPSW')
     parser.add_argument("--keys", help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
@@ -47,7 +47,7 @@ def main():
     parser.add_argument("--tags", help="Print the tags and their hex positions of an img3 file", nargs=1, metavar='FILE')
     parser.add_argument("--template", help="Template parsing", action='store_true')
 
-    parser.add_argument("--test", action='store_true')
+    parser.add_argument("--test", nargs=2)
 
     args = parser.parse_args()
 
@@ -56,8 +56,9 @@ def main():
         device.backup()
 
     elif args.baseband:
-        manifest = Manifest(argv[2], argv[3])
-        print(manifest.getBasebandVersion())  # ./yeet --baseband device version
+        #manifest = Manifest(argv[2], argv[3])
+        # print(manifest.getBasebandVersion())  # ./yeet --baseband device version
+        pass
 
     elif args.buildid:
         api = APIParser(argv[2], argv[3])
@@ -74,8 +75,8 @@ def main():
         print(manifest.getCodename())
 
     elif args.copy:
-        device = USB()
-        device.copyFromDevice(argv[2])
+        device = USB()  # TODO
+        device.copyToDevice(argv[2])
 
     elif args.download:
         api = APIParser(argv[2], argv[3])
@@ -134,8 +135,8 @@ def main():
         pass
 
     elif args.test:
-        stuff = Template()
-        stuff.readTemplate()
+        manifest = Manifest(argv[2], argv[3])
+        print(manifest.getFilePaths())
 
     else:
         sys.exit(parser.print_help(sys.stderr))

@@ -1,10 +1,11 @@
 import sys
 
-from pymobiledevice.afc import AFCShell
+from pymobiledevice.afc import AFC2Client, AFCShell
 from pymobiledevice.diagnostics_relay import DIAGClient
 from pymobiledevice.lockdown import LockdownClient
 from pymobiledevice.mobilebackup2 import MobileBackup2
 from pymobiledevice.syslog import Syslog
+
 
 """
 
@@ -21,12 +22,16 @@ class USB(object):
         device = LockdownClient()
         return device.validate_pairing()
 
-    def copyFromDevice(self, path):
+    def copyToDevice(self, input, output=False):  # AFC2
         if self.deviceISPaired():
             print('[NOTE] AFC is restricted to a certain directory: /var/mobile/Media')
-            shell = AFCShell()
-            print('Downloading:', path)
-            shell.do_pull(path)
+            device = AFC2Client()
+            print(device.read_directory('.'))
+            if output:
+                device.set_file_contents(output, input)
+            else:
+                device.set_file_contents(input, input)
+            print(device.read_directory('.'))
         else:
             sys.exit('Not continuing since the device is not paired')
 
