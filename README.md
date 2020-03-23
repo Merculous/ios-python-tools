@@ -6,18 +6,16 @@ Due to compatibility, ensure Python 3.6 or newer is installed. Basically this is
 
 ### Prerequisites
 
-    pip install git+https://github.com/Merculous/pymobiledevice.git
-    pip install -r requirements.txt
+    pip3 install pipenv
+    pipenv install
 
 ### Commands
 
     --buildid device iOS  | convert an iOS to its buildid
     --clean               | if there are any leftover json files, this will get rid of them
     --codename device iOS | get codename of an iOS
-    --copy path           | copy a file or folder from a connected device using afc (requires pymobiledevice and sudo)
     --download device iOS | download an ipsw
     --keys device iOS     | get keys for an iOS
-    --recovery            | makes a connected device enter recovery mode (requires pymobiledevice and sudo)
     --signed device       | print the signed versions for a device
     --split key           | splits a GID decrypted key
     --tags file           | print the tags and their hex positions of an img3 file
@@ -35,3 +33,4 @@ Due to compatibility, ensure Python 3.6 or newer is installed. Basically this is
     IPSW download progress: https://blog.shichao.io/2012/10/04/progress_speed_indicator_for_urlretrieve_in_python.html (have plans to make my own function that will replace this)
     mcg29 @mcg29_: Helping with this project
     Regex expression used in getCodename(): https://stackoverflow.com/questions/3662142/how-to-remove-tags-from-a-string-in-python-using-regular-expressions-not-in-ht
+    Pypa: For setup.py https://github.com/pypa/sampleproject/blob/master/setup.py

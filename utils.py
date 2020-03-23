@@ -45,13 +45,17 @@ def splitToFileName(path):
     return filename
 
 
-def splitKbag(kbag):
+def splitKbag(kbag=str):
     if len(kbag) != 96:
         sys.exit('String provided is not 96 bytes! The length read was:', len(kbag))
-    else:
-        iv = kbag[:32]
-        key = kbag[-64:]
-        return f'IV: {iv} Key: {key}'
+
+    iv = kbag[:32]
+    key = kbag[-64:]
+    data = {
+        'iv': iv,
+        'key': key
+    }
+    return data
 
 
 def clean():

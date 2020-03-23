@@ -12,55 +12,42 @@ import argparse
 import sys
 
 from img3 import img3
+from iphonewiki import iPhoneWiki
 from ipsw import IPSW
 from ipswapi import APIParser
 from manifest import Manifest
-from template import Template
-from usb import USB
 from utils import clean, splitKbag
 
 
 def main():
+    """
+
+    Main file to interact with the ipsw.me api and such.
+    Some stuff to parse iOS and etc.
+
+    """
     argv = sys.argv
 
     parser = argparse.ArgumentParser(usage=f'{argv[0]} <option> <args>', description='provides useful tools/commands which are used in iOS research')
-    parser.add_argument("--backup", help="Backs up a connected device with AFC2", action='store_true')
-    parser.add_argument("--baseband", help="Get the baseband version of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--buildid", help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--bundle", help="Creates a bundle with the provided patches to allow xpwn's ipsw binary to use the bundle", nargs=2, metavar=('IPSW', 'TYPE'))
     parser.add_argument("--clean", help="If there are any leftover files, this will get rid of them", action='store_true')
-    parser.add_argument("--codename", help="Get the codename of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("--copy", help="Copy a file or folder to a connected device using afc", nargs=1, metavar='IN')
     parser.add_argument("--download", help="Download an ipsw", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--dra", help="Creates an untethered downgrade ipsw with Dora2-iOS's fork of iloader by xerub", nargs=1, metavar='IPSW')
     parser.add_argument("--keys", help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--kpwn", help="Creates an untethered downgrade ipsw for any bootrom 3GS", nargs=1, metavar='IPSW')
     parser.add_argument("--odysseus", help="Creates an ipsw which one you could use to dump a shsh blob", nargs=1, metavar='IPSW')
-    parser.add_argument("--pair", help="Just pair a connected device", action='store_true')
     parser.add_argument("--pwnage", help="Creates an untethered jailbroken ipsw for any bootrom 3GS", nargs=1, metavar='IPSW')
-    parser.add_argument("--reboot", help="Restarts a connected device", action='store_true')
-    parser.add_argument("--recovery", help="Makes a connected device enter recovery mode", action='store_true')
     parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", action='store_true')
     parser.add_argument("--signed", help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
     parser.add_argument("--split", help="Split a GID decrypted key", nargs=1, metavar='KEY')
-    parser.add_argument("--syslog", help="Print syslog of the device", action='store_true')
     parser.add_argument("--tags", help="Print the tags and their hex positions of an img3 file", nargs=1, metavar='FILE')
-    parser.add_argument("--template", help="Template parsing", action='store_true')
 
-    parser.add_argument("--test", nargs=2)
+    parser.add_argument("--test")
 
     args = parser.parse_args()
 
-    if args.backup:
-        device = USB()
-        device.backup()
-
-    elif args.baseband:
-        #manifest = Manifest(argv[2], argv[3])
-        # print(manifest.getBasebandVersion())  # ./yeet --baseband device version
-        pass
-
-    elif args.buildid:
+    if args.buildid:
         api = APIParser(argv[2], argv[3])
         print(api.iOSToBuildid())  # ./yeet --buildid device version
 
@@ -70,14 +57,6 @@ def main():
     elif args.clean:
         clean()
 
-    elif args.codename:
-        manifest = Manifest(argv[2], argv[3])
-        print(manifest.getCodename())
-
-    elif args.copy:
-        device = USB()  # TODO
-        device.copyToDevice(argv[2])
-
     elif args.download:
         api = APIParser(argv[2], argv[3])
         api.downloadIPSW()  # ./yeet --download device version
@@ -86,7 +65,10 @@ def main():
         pass
 
     elif args.keys:
-        pass
+        wiki = iPhoneWiki(argv[2], argv[3])
+        data = wiki.getWikiKeys()
+        for stuff in data:
+            print(stuff)
 
     elif args.kpwn:
         ipsw = IPSW(argv[2])
@@ -95,21 +77,8 @@ def main():
     elif args.odysseus:
         pass
 
-    elif args.pair:
-        # device = USB()
-        # device.pair()
-        pass
-
     elif args.pwnage:
         pass
-
-    elif args.reboot:
-        device = USB()
-        device.deviceReboot()  # Damn, only works on my iPhone 4
-
-    elif args.recovery:
-        device = USB()
-        device.deviceEnterRecovery()
 
     elif args.shsh:
         pass
@@ -121,21 +90,16 @@ def main():
             print(f'iOS: {stuff[0]} ({stuff[1]}) ({stuff[2]})')
 
     elif args.split:
-        print(splitKbag(str(argv[2])))  # ./yeet --split kbag
-
-    elif args.syslog:
-        device = USB()
-        device.syslog()
+        kbag = splitKbag(argv[2])  # ./yeet --split kbag
+        print('IV:', kbag['iv'])
+        print('Key:', kbag['key'])
 
     elif args.tags:
         image = img3(argv[2])
         image.parseImage()
 
-    elif args.template:
-        pass
-
     elif args.test:
-        manifest = Manifest(argv[2], argv[3])
+        manifest = Manifest()
         print(manifest.getFilePaths())
 
     else:

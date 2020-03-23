@@ -1,6 +1,5 @@
 import os
 import re
-from xml.etree import ElementTree
 
 import xmltodict
 
@@ -8,19 +7,13 @@ from ipswapi import APIParser
 
 
 class Manifest(object):  # TODO Add OTA compatibility
-    def __init__(self, device, version, path='BuildManifest.plist'):
+    def __init__(self, path='BuildManifest.plist'):
         super().__init__()
 
-        self.device = device
-        self.version = version
         self.path = path
 
     def extractData(self):
-        if not os.path.exists(self.path):
-            api = APIParser(self.device, self.version)
-            api.downloadFileFromArchive(self.path)
-
-        with open(self.path, 'r') as f:
+        with open(self.path, 'r') as f:  # path will default to BuildManifest.plist, unless user provides custom
             data = xmltodict.parse(f.read())
             buildid = data['plist']['dict']['string'][0]
             iOS = data['plist']['dict']['string'][1]
@@ -50,3 +43,6 @@ class Manifest(object):  # TODO Add OTA compatibility
 
     def getFilePaths(self):
         return self.extractData()['files']
+
+    def getBasebandVersion(self):
+        pass

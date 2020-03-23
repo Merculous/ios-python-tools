@@ -17,10 +17,12 @@ Handles data from ipsw.me api
 
 
 class APIParser(object):
-    def __init__(self, device, version, beta=False):
+    def __init__(self, device, version, ota=False, beta=False):
         super().__init__()
         self.device = device
         self.version = version
+        self.ota = ota
+        self.beta = beta
 
     def linksForDevice(self, filetype):
         url = f'https://api.ipsw.me/v4/device/{self.device}?type={filetype}'
