@@ -4,7 +4,7 @@ from urllib.request import urlretrieve
 
 from remotezip import RemoteZip
 
-from utils import downloadJSONData, progress, splitToFileName
+from .utils import downloadJSONData, progress, splitToFileName
 
 
 """

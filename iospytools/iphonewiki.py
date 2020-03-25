@@ -1,8 +1,8 @@
 import os
 from urllib.request import urlopen
 
-from ipswapi import APIParser
-from manifest import Manifest
+from .ipswapi import APIParser
+from .manifest import Manifest
 
 
 class iPhoneWiki(object):
