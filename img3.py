@@ -1,7 +1,4 @@
-import os
 import re
-import struct
-import sys
 
 
 """
@@ -17,9 +14,7 @@ typedef struct img3File {
                           // etc. 
     img3Tag  tags[];      // continues until end of file
 };
-"""
 
-"""
 typedef struct img3Tag {
     uint32_t magic;            // see below
     uint32_t totalLength;      // length of tag including "magic" and these two length values
@@ -27,9 +22,8 @@ typedef struct img3Tag {
     uint8_t  data[dataLength];
     uint8_t  pad[totalLength - dataLength - 12]; // Typically padded to 4 byte multiple
 };
-"""
 
-"""
+
 VERS: iBoot version of the image
 SEPO: Security Epoch
 SDOM: Security Domain
@@ -56,9 +50,21 @@ class img3(object):
 
         self.file = file
 
+        """
+
+        Class to parse and interact with Apple's img3 formatted files.
+
+        """
+
     # Data is reversed (little-endian) IMG3 magic will be "3gmI". Need a good way to take a string, convert to hex or whatever, and reverse it.
 
     def parseImage(self):
+        """
+
+        Print the tags of an img3 file
+
+        """
+
         with open(self.file, 'rb') as f:
             data = f.read()
 

@@ -6,8 +6,7 @@ Due to compatibility, ensure Python 3.6 or newer is installed. Basically this is
 
 ### Prerequisites
 
-    pip3 install pipenv
-    pipenv install
+    pip3 install -r requirements.txt
 
 ### Commands
 

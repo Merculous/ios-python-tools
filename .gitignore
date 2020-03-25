@@ -10,7 +10,4 @@ nonces.txt
 IPSW
 devices.txt
 *.IPSW
-
-NOR_generator_dump.py
-shshget.py
-textToHex.py
+.idea

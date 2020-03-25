@@ -133,14 +133,14 @@ class TSS(object):
             if self.device == 'iPhone6,1':
                 # For safety, also grab blobs with DFU colliding nonces
                 for nonces in a7_dfu_nonces:
-                    subprocess.run(['tsschecker', '-d', self.device, '-i', versions[0], '-e', self.ecid, '--apnonce', nonces, '-s', '--save-path', self.shsh_path])
+                    subprocess.check_output(['tsschecker', '-d', self.device, '-i', versions[0], '-e', self.ecid, '--apnonce', nonces, '-s', '--save-path', self.shsh_path])
             elif self.device == 'iPhone7,2':
                 # For safety, also grab blobs with DFU colliding nonces
                 for nonces in a8_dfu_nonces:
-                    subprocess.run(['tsschecker', '-d', self.device, '-i', versions[0], '-e', self.ecid, '--apnonce', nonces, '-s', '--save-path', self.shsh_path])
+                    subprocess.check_output(['tsschecker', '-d', self.device, '-i', versions[0], '-e', self.ecid, '--apnonce', nonces, '-s', '--save-path', self.shsh_path])
             elif self.device == 'iPhone11,6':
                 # Use unc0ver's custom apnonce
-                subprocess.run(['tsschecker', '-d', self.device, '-i', versions[0], '-e', self.ecid, '--apnonce', unc0ver_nonce, '-s', '--save-path', self.shsh_path])
+                subprocess.check_output(['tsschecker', '-d', self.device, '-i', versions[0], '-e', self.ecid, '--apnonce', unc0ver_nonce, '-s', '--save-path', self.shsh_path])
             else:
                 # No custom apnonce used
-                subprocess.run(['tsschecker', '-d', self.device, '-i', versions[0], '-e', self.ecid, '-s', '--save-path', self.shsh_path])
+                subprocess.check_output(['tsschecker', '-d', self.device, '-i', versions[0], '-e', self.ecid, '-s', '--save-path', self.shsh_path])

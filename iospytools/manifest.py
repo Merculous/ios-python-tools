@@ -1,9 +1,4 @@
-import os
-import re
-
 import xmltodict
-
-from ipswapi import APIParser
 
 
 class Manifest(object):  # TODO Add OTA compatibility

@@ -9,14 +9,17 @@ Handles arguments and passes them to the functions.
 """
 
 import argparse
+import os
 import sys
 
-from img3 import img3
-from iphonewiki import iPhoneWiki
-from ipsw import IPSW
-from ipswapi import APIParser
-from manifest import Manifest
-from utils import clean, splitKbag
+from iospytools.img3 import img3
+from iospytools.iphonewiki import iPhoneWiki
+from iospytools.ipsw import IPSW
+from iospytools.ipswapi import APIParser
+from iospytools.manifest import Manifest
+from iospytools.utils import clean, splitKbag
+
+# TODO Fix
 
 
 def main():

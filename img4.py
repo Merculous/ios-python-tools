@@ -4,7 +4,17 @@ class img4(object):
 
         self.file = file
 
+        """
+
+        Class to parse and interact with Apple's img4 formatted files.
+
+        """
+
     def printTags(self):
+        """
+        Print the tags of an img3 file
+        """
+
         with open(self.file, 'rb') as f:
             data = f.read()
 
