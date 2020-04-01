@@ -4,7 +4,7 @@ from urllib.request import urlretrieve
 
 from remotezip import RemoteZip
 
-from .utils import downloadJSONData, progress, splitToFileName
+from .utils import downloadJSONData, show_progress, splitToFileName
 
 
 """
@@ -62,8 +62,7 @@ class APIParser(object):
             print('iOS:', ios)
             print('Buildid:', buildidFromJsonFile)
             print('Filename:', filename)
-            urlretrieve(url, filename, progress)
-            print('\n')
+            urlretrieve(url, filename, show_progress)
         file.close()
 
     def signed(self):

@@ -4,9 +4,11 @@ import sys
 import time
 import ssl
 import platform
+import urllib.request
 from math import floor
 from urllib.parse import urlsplit
-from urllib.request import urlopen
+
+import progressbar
 
 """
 
@@ -19,18 +21,21 @@ Basically just 'tools'.
 
 # Maybe convert progress into my own custom file downloader that auto grabs the data such as filesize, duration, etc.
 
+# https://stackoverflow.com/questions/37748105/how-to-use-progressbar-module-with-urlretrieve
 
-def progress(count, block_size, total_size):  # Check README for credit (not mine)
-    global start_time
-    if count == 0:
-        start_time = time.time()
-        return
-    duration = time.time() - start_time
-    progress_size = int(count * block_size)
-    speed = int(progress_size / (1024 * duration))
-    percent = int(count * block_size * 100 / total_size)
-    sys.stdout.write(f'\r{percent}%, {floor(progress_size / (1024 * 1024))} MB, {speed} KB/s, {floor(duration)} seconds passed')
-    sys.stdout.flush()
+pbar = None
+
+def show_progress(block_num, block_size, total_size):
+    global pbar
+    if pbar is None:
+        pbar = progressbar.ProgressBar(maxval=total_size)
+        pbar.start()
+    downloaded = block_num * block_size
+    if downloaded < total_size:
+        pbar.update(downloaded)
+    else:
+        pbar.finish()
+        pbar = None
 
 
 def downloadJSONData(url, filename):
@@ -38,7 +43,7 @@ def downloadJSONData(url, filename):
         if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
             ssl._create_default_https_context = ssl._create_unverified_context
         
-    request = urlopen(url).read()
+    request = urllib.request.urlopen(url).read()
     convert = json.loads(request)
     with open(f'{filename}.json', 'w') as file:
         json.dump(convert, file, indent=4)
