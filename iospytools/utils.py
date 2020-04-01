@@ -2,6 +2,8 @@ import json
 import os
 import sys
 import time
+import ssl
+import platform
 from math import floor
 from urllib.parse import urlsplit
 from urllib.request import urlopen
@@ -32,6 +34,10 @@ def progress(count, block_size, total_size):  # Check README for credit (not min
 
 
 def downloadJSONData(url, filename):
+    if platform.system() == 'Windows': # I don't see any ssl certficate like in MacOS for Windows
+        if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
+            ssl._create_default_https_context = ssl._create_unverified_context
+        
     request = urlopen(url).read()
     convert = json.loads(request)
     with open(f'{filename}.json', 'w') as file:

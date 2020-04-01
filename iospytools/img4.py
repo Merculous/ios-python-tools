@@ -1,4 +1,4 @@
-class img4(object):
+class IMG4(object):
     def __init__(self, file):
         super().__init__()
 

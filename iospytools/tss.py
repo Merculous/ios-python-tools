@@ -3,8 +3,7 @@ import os
 import subprocess
 from urllib.request import Request, urlopen, urlretrieve
 
-from ipswapi import APIParser
-
+from .ipswapi import APIParser
 
 class TSS(object):
     def __init__(self, device, ecid, version=False, apnonce=False, useDFUCollidingNonces=False, shsh_path=f"{os.environ['HOME']}/.shsh"):

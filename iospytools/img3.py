@@ -44,7 +44,7 @@ SALT:
 """
 
 
-class img3(object):
+class IMG3(object):
     def __init__(self, file):
         super().__init__()
 
