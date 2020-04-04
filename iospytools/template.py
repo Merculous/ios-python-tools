@@ -1,3 +1,12 @@
+import re
+import json
+import os
+
+from .ipsw import IPSW
+from .iphonewiki import iPhoneWiki
+from .ipswapi import APIParser
+from .manifest import Manifest
+
 """
 
 This will handle the key template stuff from iphonewiki (webpage)
@@ -25,12 +34,45 @@ For DownloadURL, do not place anything other than URLs to free firmwares hosted 
 
 """
 
-
 class Template(object):
-    def __init__(self):
+    def __init__(self, device=None, version=None, manifest='BuildManifest.plist'):
         super().__init__()
 
-    def readTemplate(self):
-        with open('key-template.txt', 'r') as f:
-            data = f.readlines()
+        self.device = device
+        self.version = version
+        self.manifest = manifest
+
+    def parseTemplate(self):
+        with open('key-template-img3.txt') as f:
+            data = f.read()
+            keys = data.split('{{keys')[1].split('}}')[0].replace('|', '').splitlines()
+            new_list = list(filter(None, keys)) # Remove all ''
+
+            head = list()
+            body = list()
+
+            for stuff in new_list:
+                fix = re.sub('\s+',' ', stuff)[:-2].strip()
+                if fix == 'RootFS': # YASSSSS Got it working :D
+                    break
+                else:
+                    head.append(fix)
+
+        template = {
+            'template': {
+                'head': head,
+                'keys': {
+                    'filename',
+                    'iv',
+                    'key',
+                    'kbag'
+                }
+            }
+        }
+
+        print(template)
+
         f.close()
+
+    def initTemplateFromIPSW(self):
+        pass

@@ -73,5 +73,3 @@ def clean():
     for file in os.listdir(os.getcwd()):
         if file.endswith('json'):
             os.remove(file)
-        elif file.endswith('plist'):
-            os.remove(file)
