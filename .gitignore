@@ -2,6 +2,7 @@
 __pycache__
 venv
 .vscode
+build
 shsh
 *.plist
 *.code-workspace
