@@ -1,4 +1,4 @@
-certifi==2019.11.28
+certifi==2020.4.5.1
 chardet==3.0.4
 idna==2.9
 progressbar==2.5
@@ -6,4 +6,3 @@ remotezip==0.9.2
 requests==2.23.0
 tabulate==0.8.7
 urllib3==1.25.8
-xmltodict==0.12.0
