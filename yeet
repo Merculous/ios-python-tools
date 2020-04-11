@@ -42,7 +42,7 @@ def main():
     parser.add_argument("--kpwn", help="Creates an untethered downgrade ipsw for any bootrom 3GS", nargs=1, metavar='IPSW')
     parser.add_argument("--odysseus", help="Creates an ipsw which one you could use to dump a shsh blob", nargs=1, metavar='IPSW')
     parser.add_argument("--pwnage", help="Creates an untethered jailbroken ipsw for any bootrom 3GS", nargs=1, metavar='IPSW')
-    parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", action='store_true')
+    parser.add_argument("--shsh", help="Save shsh for all signed iOS versions", nargs=3, metavar=('DEVICE', 'ECID', 'BBSNUM'))
     parser.add_argument("--signed", help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
     parser.add_argument("--split", help="Split a GID decrypted key", nargs=1, metavar='KEY')
     parser.add_argument("--tags", help="Print the tags and their hex positions of an img3 file", nargs=1, metavar='FILE')
@@ -85,7 +85,8 @@ def main():
         pass
 
     elif args.shsh:
-        pass
+        tss = TSS(argv[2], argv[3], bbsnum=argv[4])  # ./yeet --shsh device ecid bbsnum
+        tss.saveBlobs()
 
     elif args.signed:
         api = APIParser(argv[2], None)  # ./yeet --signed device
