@@ -17,10 +17,11 @@ Handles data from ipsw.me api
 
 
 class APIParser(object):
-    def __init__(self, device, version, ota=False, beta=False):
+    def __init__(self, device, version, buildid=False, ota=False, beta=False):
         super().__init__()
         self.device = device
         self.version = version
+        self.buildid = buildid
         self.ota = ota
         self.beta = beta
 
@@ -44,13 +45,15 @@ class APIParser(object):
         return buildid
 
     def downloadIPSW(self):
-        buildid = self.iOSToBuildid()
+        if self.buildid == '':
+            self.buildid = self.iOSToBuildid()
+
         self.linksForDevice('ipsw')
         with open(f'{self.device}.json', 'r') as file:
             data = json.load(file)
             i = 0
             buildidFromJsonFile = data['firmwares'][i]['buildid']
-            while buildidFromJsonFile != buildid:
+            while buildidFromJsonFile != self.buildid:
                 i += 1
                 buildidFromJsonFile = data['firmwares'][i]['buildid']
 
@@ -108,18 +111,20 @@ class APIParser(object):
         return signedVersions
 
     def downloadFileFromArchive(self, path, output=False):
-        buildid = self.iOSToBuildid()
+        if self.buildid == '':
+            self.buildid = self.iOSToBuildid()
+
         self.linksForDevice('ipsw')
         with open(f'{self.device}.json', 'r') as file:
             data = json.load(file)
             i = 0
             buildidFromJsonFile = data['firmwares'][i]['buildid']
-            while buildidFromJsonFile != buildid:
+            while buildidFromJsonFile != self.buildid:
                 i += 1
                 buildidFromJsonFile = data['firmwares'][i]['buildid']
 
             url = data['firmwares'][i]['url']
-            zip = RemoteZip(url)
+            zip = RemoteZip(url, timeout=5.0)  # This should be pretty generous...
             zip.extract(path)
             if output:
                 os.rename(path, output)
@@ -128,13 +133,15 @@ class APIParser(object):
         file.close()
 
     def printURLForArchive(self):
-        buildid = self.iOSToBuildid()
+        if self.buildid == '':
+            self.buildid = self.iOSToBuildid()
+
         self.linksForDevice('ipsw')
         with open(f'{self.device}.json', 'r') as file:
             data = json.load(file)
             i = 0
             buildidFromJsonFile = data['firmwares'][i]['buildid']
-            while buildidFromJsonFile != buildid:
+            while buildidFromJsonFile != self.buildid:
                 i += 1
                 buildidFromJsonFile = data['firmwares'][i]['buildid']
 
