@@ -30,3 +30,4 @@ Due to compatibility, ensure Python 3.6 or newer is installed. Basically this is
     Matteyeux @matteyeux: inspiration, some techniques from ios-tools
     Noah/32Bites @TheNoahParty: some techniques from PyKeys
     mcg29 @mcg29_: Helping with this project
+    wxblank @wxblank2: TSS stuff!
