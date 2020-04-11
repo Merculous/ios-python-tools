@@ -1,84 +1,106 @@
 import json
 import os
+import random
 import subprocess
-from urllib.request import Request, urlopen, urlretrieve
+from secrets import token_hex
+from shutil import rmtree
+from urllib.request import Request, urlopen
 
 from .ipswapi import APIParser
+from .manifest import Manifest
 
 class TSS(object):
-    def __init__(self, device, ecid, version=False, apnonce=False, useDFUCollidingNonces=False, shsh_path=f"{os.environ['HOME']}/.shsh"):
+    def __init__(self, device, ecid, version=False, apnonce=False, sepnonce=False, bbsnum=False, useDFUCollidingNonces=False, shsh_path='shsh'):
         super().__init__()
         self.device = device
         self.ecid = ecid
         self.version = version
         self.apnonce = apnonce
+        self.sepnonce = sepnonce
+        self.bbsnum = bbsnum
         self.useDFUCollidingNonces = useDFUCollidingNonces
         self.shsh_path = shsh_path
 
-    def saveblobs(self):
-        stuff = APIParser(self.device, self.version)
-        signed_versions = stuff.signed()
+    def saveBlobs(self):
+        api = APIParser(self.device, self.version)
+        signed_versions = api.signed()
         tss = 'http://gs.apple.com/TSS/controller?action=2'
 
-        for version, buildid in signed_versions:
-            # Setup shsh folder and copy the manifest inside which will contain the added string
+        if os.path.exists('.shsh'):
+            rmtree('.shsh')
+        os.mkdir('.shsh')
 
-            if os.path.exists('shsh'):
-                # shutil.rmtree('shsh')
-                pass
-            else:
-                print('temporary shsh folder does not exist, making the folder...')
-                os.mkdir('shsh')
+        if not os.path.exists(self.shsh_path):
+            os.mkdir(self.shsh_path)
 
-            manifest = f'shsh/BuildManifest_{self.device}_{version}_{buildid}.plist'
+        vindex = 0
+        for version, buildid, dltype in signed_versions:
+            if dltype == 'ota':
+                continue
 
-            # Check to see if we need to download a manifest or not
+            # Copy the manifest inside which will contain the added string
 
-            if os.path.exists(manifest):
-                print(f'Cool, found {manifest}')
-            else:
-                print('Did not find a local manifest, downloading...')
+            manifest = os.path.join('.shsh', f'BuildManifest_{self.device}_{version}_{buildid}.plist')
+            tssmanifest = os.path.join('.shsh', f'TSSManifest_{self.device}_{version}_{buildid}.plist')
 
-                stuff.linksForDevice('ota')
-                with open(f'{self.device}.json', 'r') as file:
-                    data = json.load(file)
-                    i = 0
-                    buildidFromJsonFile = data['firmwares'][i]['buildid']
-                    while buildidFromJsonFile != buildid:
-                        i += 1
-                        buildidFromJsonFile = data['firmwares'][i]['buildid']
+            api.buildid = buildid
+            api.downloadFileFromArchive('BuildManifest.plist', output=manifest)
 
-                    board = data['boardconfig']
+            if self.apnonce == False:
+                apnonce = token_hex(20)
+                print('Generated ApNonce: ', apnonce)
+            else: apnonce = self.apnonce
 
-                    # This will request a manifest with the ecid key already placed
-                    url = f'http://api.ineal.me/tss/manifest/{board}/{buildid}'
-                    urlretrieve(url, manifest)
-                file.close()
+            if self.sepnonce == False:
+                sepnonce = token_hex(20)
+                print('Generated SepNonce:', sepnonce)
+            else: sepnonce = self.sepnonce
 
-            print('Changing the ECID string value...')
-            # Loop through "manifest", use below (replacing strings, by whatever function...), and write changes back to manifest. Open mode: 'r+' is read/write
-            newFile = ''  # New manifest with ecid
-            with open(manifest, 'r') as m:
-                d = (m.read())
-                # Having the four spaces (should be a tab or \t?) is crucial?
-                newFile = (d.replace('<string>$ECID$</string>',
-                                     f'<integer>{self.ecid}</integer>'))
+            if self.bbsnum == False or self.bbsnum == '0':
+                bbsnum = token_hex(12)
+                print('Generated BbSNUM:  ', bbsnum)
+            else: bbsnum = self.bbsnum
+
+            print('Converting from BuildManifest to TSS manifest...')
+            manobj = Manifest(path=manifest)
+
+            manobj.convertToTSSManifest(self.device, output=tssmanifest, ecid=self.ecid, apnonce=apnonce, sepnonce=sepnonce, bbsnum=bbsnum)
+            os.remove(manifest)
+
             # Hot fix by @mcg29_ Thanks :D
-            with open(manifest, 'w+') as n:  # Open manifest and read/write, creates file in missing
-                n.write(newFile)  # Write modified manifest
-            m.close()
-            n.close()
+            # with open(manifest, 'w') as n:
+            #     n.write(newFile)  # Write modified manifest
 
-            print('Beginning to start asking TSS for shsh...')
-            header = {'User-Agent': 'InetURL/1.0', 'Content-type': 'text/xml'}
-            request = Request(url=tss, headers=header,
-                              data=manifest.encode('utf-8'))
-            response = urlopen(request).read()
-            print(response)
+            print('Sending TSS request for', version, '(' + buildid + ')...')
+            
+            headers = {'Host': 'gs.apple.com', 'User-Agent': 'InetURL/1.0', 'Content-type': 'text/xml'}  # See https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
+            with open(tssmanifest, 'rb') as f:
+                req = Request(tss, headers=headers, data=f.read())
 
-        # "Content-type: text/xml; charset=\"utf-8\"" "Expect:"
+            resp = urlopen(req, timeout=2.0)
+            if resp.status != 200:
+                print('Error code in response:', resp.status)
 
-        # os.remove(f'{device}.json')
+            resptext = resp.read().decode('utf-8')
+            if 'STATUS=0' not in resptext:
+                if resp.headers['Content-Length'] == '0':
+                    print('Server returned no response... are you blacklisted?')
+                else:
+                    print('Server error:', resptext)
+            else:
+                resptext = resptext[resptext.find('<?xml'):]  # Remove TSS response header
+                blobpath = os.path.join(self.shsh_path, f'{self.ecid}_{self.device}_{version}-{buildid}_{apnonce}.shsh2')
+                with open(blobpath, 'w+') as blob:
+                    blob.write(resptext)
+                    print('Saved', version, 'blob to', blobpath)
+
+            vindex += 1
+
+            if len(signed_versions) > vindex:
+                print()
+
+        os.remove(f'{self.device}.json')
+        rmtree('.shsh')
 
     def saveBlobsWithTSSChecker(self):
         a7_dfu_nonces = [
