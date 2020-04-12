@@ -1,45 +1,186 @@
 import os
 import plistlib
-from secrets import token_bytes
 
-class Manifest(object):  # TODO Add OTA compatibility
+from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision
+
+class BuildManifest(object):
     def __init__(self, path='BuildManifest.plist'):
         super().__init__()
 
         self.path = path
+        with open(self.path, 'rb+') as f:
+            self.data = plistlib.load(f)
 
     def extractData(self):
-        with open(self.path, 'rb+') as f:  # path will default to BuildManifest.plist, unless user provides custom
-            data = plistlib.load(f)
-            buildid = data['ProductBuildVersion']
-            iOS = data['ProductVersion']
-            device = data['SupportedProductTypes'][0]
-            codename = data['BuildIdentities'][0]['Info']['BuildTrain']
-            files = data['BuildIdentities'][0]['Manifest']
-            file_paths = list()
-
-            for stuff in files:  # To help with crammed view in debugger
-                file_paths.append(stuff['Info']['Path'])  # File paths
-
-        # TODO Fix parsing manifests with multiple devices. iPhone6,1 10.3.3 'files' gives output of n69 instead of its n51
-
-        info = {
-            'device': device,
-            'ios': iOS,
-            'buildid': buildid,
-            'codename': codename,
-            'files': file_paths
+        return {
+            'devices':  self.getDevices(),
+            'ios':      self.getVersion(),
+            'buildid':  self.getBuildID(),
+            'codename': self.getCodename(),
+            'files':    self.getFilePaths()
         }
-        return info
 
-    def convertToTSSManifest(self, device, output=False, ecid=False, apnonce=False, sepnonce=False, bbsnum=False):  # See 'Sending data (request)' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
-        with open(self.path, 'rb+') as f:
+    def getDevices(self):
+        return self.data['SupportedProductTypes']
+
+    def getVersion(self):
+        return self.data['ProductVersion']
+
+    def getBuildID(self):
+        return self.data['ProductBuildVersion']
+
+    def getCodename(self):
+        return self.data['BuildIdentities'][0]['Info']['BuildTrain']
+
+    def getFilePaths(self):
+        files = list()
+        for component in data['BuildIdentities'][0]['Manifest']:
+            files.append(component['Info']['Path'])
+        
+        return files
+
+    def getBasebandVersion(self):
+        pass
+
+class TSSManifest(object):
+    def __init__(self, path):
+        super().__init__()
+
+        self.path = path
+
+    # Thanks tihmstar! http://blog.tihmstar.net/2017/01/basebandgoldcertid-not-found-please.html
+    # https://github.com/tihmstar/tsschecker/blob/master/tsschecker/tsschecker.c#L110
+
+    def getBbGoldCertIdForDevice(self, device):
+        if getDeviceType(device) == 'iPhone':
+            if getMajorDeviceRevision(device) == 1 \
+            or getMajorDeviceRevision(device) == 2:
+                return -1
+
+            if getMajorDeviceRevision(device) == 3:
+                if getMinorDeviceRevision(device) <= 2:
+                    return 257
+                else:
+                    return 2
+
+            if getMajorDeviceRevision(device) == 4: 
+                return 2
+
+            if getMajorDeviceRevision(device) == 5:
+                if getMinorDeviceRevision(device) <= 2:
+                    return 3255536192
+                else:
+                    return 3554301762
+
+            if getMajorDeviceRevision(device) == 6:
+                return 3554301762
+
+            if getMajorDeviceRevision(device) == 7:
+                return 3840149528
+
+            if getMajorDeviceRevision(device) == 8:
+                return 3840149528
+
+            if getMajorDeviceRevision(device) == 9:
+                if getMinorDeviceRevision(device) <= 2:
+                    return 2315222105
+                else:
+                    return 1421084145
+
+            if getMajorDeviceRevision(device) == 10:
+                if getMinorDeviceRevision(device) <= 3:
+                    return 2315222105
+                else:
+                    return 524245983
+
+            if getMajorDeviceRevision(device) == 11:
+                return 165673526
+
+            if getMajorDeviceRevision(device) == 12:
+                return 524245983
+
+        if getDeviceType(device) == 'iPad':
+            if getMajorDeviceRevision(device) == 1:
+                return -1
+
+            if getMajorDeviceRevision(device) == 2:
+                if  getMinorDeviceRevision(device) >= 2 \
+                and getMinorDeviceRevision(device) <= 3:
+                    return 257
+
+                if  getMinorDeviceRevision(device) >= 6 \
+                and getMinorDeviceRevision(device) <= 7:
+                    return 3255536192
+
+            if getMajorDeviceRevision(device) == 3:
+                if  getMinorDeviceRevision(device) >= 2 \
+                and getMinorDeviceRevision(device) <= 3:
+                    return 4
+
+                if  getMinorDeviceRevision(device) >= 5:
+                    return 3255536192
+
+            if getMajorDeviceRevision(device) == 4:
+                if  (getMinorDeviceRevision(device) >= 2 \
+                and getMinorDeviceRevision(device) <= 3) \
+                                                         \
+                or  (getMinorDeviceRevision(device) >= 5 \
+                and getMinorDeviceRevision(device) <= 6) \
+                                                         \
+                or  (getMinorDeviceRevision(device) >= 8 \
+                and getMinorDeviceRevision(device) <= 9):
+                    return 3554301762
+
+            if getMajorDeviceRevision(device) == 5:
+                if  getMinorDeviceRevision(device) == 2 \
+                or  getMinorDeviceRevision(device) == 4:
+                    return 3840149528
+
+            if getMajorDeviceRevision(device) == 6:
+                if  getMinorDeviceRevision(device) == 4 \
+                or  getMinorDeviceRevision(device) == 8 \
+                or  getMinorDeviceRevision(device) == 11:
+                    return 3840149528
+
+            if getMajorDeviceRevision(device) == 7:
+                if  getMinorDeviceRevision(device) == 2 \
+                or  getMinorDeviceRevision(device) == 4:
+                    return 2315222105
+
+                if  getMinorDeviceRevision(device) == 6:
+                    return 3840149528
+
+                if  getMinorDeviceRevision(device) == 12:
+                    return 524245983
+
+            if getMajorDeviceRevision(device) == 8:
+                if  (getMinorDeviceRevision(device) >= 3 \
+                and getMinorDeviceRevision(device) <= 4) \
+                                                         \
+                or  (getMinorDeviceRevision(device) >= 7 \
+                and getMinorDeviceRevision(device) <= 8):
+                    return 165673526
+
+            if getMajorDeviceRevision(device) == 11:
+                if  getMinorDeviceRevision(device) == 2 \
+                or  getMinorDeviceRevision(device) == 4:
+                    return 165673526
+
+        return 0
+
+    def initFromBuildManifest(self, device, build_manifest_path, ecid, apnonce=False, sepnonce=False, bbsnum=False):  # See 'Sending data (request)' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
+        with open(build_manifest_path, 'rb+') as f:
             data = plistlib.load(f, fmt=plistlib.FMT_XML)
 
+            found_erase_identity = False
             for identity in data['BuildIdentities']:  # Set TSS manifest to the Erase preset
                 if 'Erase' in identity['Info']['Variant']:
                     data = identity
+                    found_erase_identity = True
                     break
+
+            if found_erase_identity == False:
+                raise NoEraseBuildIdentityError('No \'Erase\' BuildIdentity was found in the BuildManifest')
 
             for key in ['Info', 'ProductMarketingVersion']:
                 try: del data[key]
@@ -52,105 +193,53 @@ class Manifest(object):  # TODO Add OTA compatibility
 
             for key in ['ApBoardID', 'ApChipID', 'ApSecurityDomain']:  # Force string keys to integer
                 try: data[key] = int(data[key], 16)
-                except: pass
+                except:
+                    raise RequiredBuildManifestKeyMissingError('The required key \'' + key + '\' is missing from the BuildManifest')
 
-            data['@ApImg4Ticket'] = True
             data['ApProductionMode'] = True
-            data['ApSecurityMode'] = True
 
-            requestBaseband = False
-            if 'BbChipID' in data:
-                data['BbChipID'] = int(data['BbChipID'], 16)
-                requestBaseband = True
+            BbGoldCertId = self.getBbGoldCertIdForDevice(device)
+            if bbsnum != False and BbGoldCertId != -1:
+                if 'BbChipID' in data:
+                    data['BbChipID'] = int(data['BbChipID'], 16)
 
-            if requestBaseband:
-                data['@BBTicket'] = True
+                data['@BBTicket'] =    True
+                data['BbGoldCertId'] = BbGoldCertId
+                data['BbSNUM'] = int(bbsnum, 16).to_bytes(12, 'big')
+            else:
+                for key in list(data):
+                    if 'Bb' in key or key == 'BasebandFirmware':
+                        del data[key]
 
-                if   'iPhone6' in device: data['BbGoldCertId'] =   3554301762
+            if   len(ecid) == 16 or len(ecid) == 14: data['ApECID'] = int(ecid)      # Decimal ECID
+            elif len(ecid) == 13 or len(ecid) == 11: data['ApECID'] = int(ecid, 16)  # Hex ECID
+            else:
+                raise InvalidECIDLengthError('The ECID \'' + ecid + '\' could not be interpreted')
 
-                elif 'iPhone7' in device    \
-                or 'iPhone8' in device: data['BbGoldCertId'] =     3840149528
+            if apnonce != False: data['ApNonce'] = int(apnonce, 16).to_bytes(40, 'big')
 
-                elif device == 'iPhone9,1'  \
-                or device == 'iPhone9,2':  data['BbGoldCertId'] =  2315222105
-                elif device == 'iPhone9,3'  \
-                or device == 'iPhone9,4':  data['BbGoldCertId'] =  1421084145
+            # The following devices have an A7, therefore...
+            #   * They will use IMG4
+            #   * They have SEP
 
-                elif device == 'iPhone10,1' \
-                or device == 'iPhone10,2'   \
-                or device == 'iPhone10,3': data['BbGoldCertId'] =  2315222105
+            if ('iPhone'  in device and getMajorDeviceRevision(device) >= 6) \
+            or ('iPad'    in device and getMajorDeviceRevision(device) >= 4 and getMinorDeviceRevision(device) >= 4) \
+            or ('iPod'    in device and getMajorDeviceRevision(device) >= 7) \
+            or ('AppleTV' in device and getMajorDeviceRevision(device) >= 5):
+                if sepnonce != False:
+                    data['SepNonce'] = int(sepnonce, 16).to_bytes(40, 'big')
 
-                elif device == 'iPhone10,4' \
-                or device == 'iPhone10,5'   \
-                or device == 'iPhone10,6': data['BbGoldCertId'] =  524245983
+                for key in data:
+                    if type(data[key]) is dict and key != 'BasebandFirmware':
+                        data[key]['ESEC'] = True
+                        data[key]['EPRO'] = True
+                        if 'Digest' not in data[key]:
+                            data[key]['Digest'] = bytes(0)
 
-                elif 'iPhone11' in device: data['BbGoldCertId'] =  165673526
-                elif 'iPhone12' in device: data['BbGoldCertId'] =  524245983
+                data['ApSecurityMode'] = True
+                data['@ApImg4Ticket'] =  True
+            else:
+                data['@APTicket'] = True
 
-                elif device == 'iPad2,6'    \
-                or device == 'iPad2,7'      \
-                or device == 'iPad3,5'      \
-                or device == 'iPad3,6': data['BbGoldCertId'] =     3255536192
-
-                elif device == 'iPad4,2'    \
-                or device == 'iPad4,3'      \
-                or device == 'iPad4,5'      \
-                or device == 'iPad4,6'      \
-                or device == 'iPad4,8'      \
-                or device == 'iPad4,9': data['BbGoldCertId'] =     3554301762
-
-                elif device == 'iPad5,2'    \
-                or device == 'iPad5,4'      \
-                or device == 'iPad6,4'      \
-                or device == 'iPad6,8'      \
-                or device == 'iPad6,11'     \
-                or device == 'iPad7,6': data['BbGoldCertId'] =     3840149528
-
-                elif device == 'iPad7,2'    \
-                or device == 'iPad7,4': data['BbGoldCertId'] =     2315222105
-
-                elif device == 'iPad7,12': data['BbGoldCertId'] =  524245983
-
-                elif device == 'iPad8,3'    \
-                or device == 'iPad8,4'      \
-                or device == 'iPad8,7'      \
-                or device == 'iPad8,8'      \
-                or device == 'iPad11,2'     \
-                or device == 'iPad11,4': data['BbGoldCertId'] =    165673526
-
-                else: data['BbGoldCertId'] = 0
-
-                if bbsnum != False: data['BbSNUM'] = int(bbsnum, 16).to_bytes(12, 'big')
-                else: data['BbSNUM'] = token_bytes(12)
-
-            for key in data:
-                if type(data[key]) is dict and key != 'BasebandFirmware':
-                    data[key]['ESEC'] = True
-                    data[key]['EPRO'] = True
-                    if 'Digest' not in data[key]:
-                        data[key]['Digest'] = bytes(0)
-
-            if ecid != False:
-                if len(ecid) == 16: data['ApECID'] =   int(ecid)      # Decimal ECID
-                elif len(ecid) == 13: data['ApECID'] = int(ecid, 16)  # Hex ECID
-            else: data['ApECID'] = 0
-
-            if apnonce != False: data['ApNonce'] =   int(apnonce, 16).to_bytes(40, 'big')
-            if sepnonce != False: data['SepNonce'] = int(sepnonce, 16).to_bytes(40, 'big')
-
-        if output == False:  # Overwrite original file
-            os.remove(self.path)
-            with open(self.path, 'wb+') as p:
-                plistlib.dump(data, p, fmt=plistlib.FMT_XML)
-        else:
-            with open(output, 'wb+') as p:
-                plistlib.dump(data, p, fmt=plistlib.FMT_XML)
-
-    def getCodename(self):
-        return self.extractData()['codename']  # Always works :D
-
-    def getFilePaths(self):
-        return self.extractData()['files']
-
-    def getBasebandVersion(self):
-        pass
+        with open(self.path, 'wb+') as p:
+            plistlib.dump(data, p, fmt=plistlib.FMT_XML)
