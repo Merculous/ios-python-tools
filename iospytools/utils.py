@@ -1,11 +1,13 @@
 import json
 import os
+import ssl
 import sys
 import time
-import ssl
 import platform
 import urllib.request
 from math import floor
+from random import seed, choice
+from string import ascii_letters, digits
 from urllib.parse import urlsplit
 
 import progressbar
@@ -25,7 +27,7 @@ Basically just 'tools'.
 
 pbar = None
 
-def show_progress(block_num, block_size, total_size):
+def showProgress(block_num, block_size, total_size):
     global pbar
     if pbar is None:
         pbar = progressbar.ProgressBar(maxval=total_size)
@@ -67,6 +69,35 @@ def splitKbag(kbag=str):
         'key': key
     }
     return data
+
+
+def getDeviceType(device):
+    for index in range(0, len(device)-3):
+        if device[index] in digits:
+            return device[:index]
+    return False
+
+
+def getMajorDeviceRevision(device):
+    splitting_point = device.find(',')
+    for index in range(splitting_point-1, 3, -1):
+        if device[index] in ascii_letters:
+            return int(device[index+1:splitting_point])
+    return -1
+
+
+def getMinorDeviceRevision(device):
+    return int(device[device.find(',')+1:])
+
+
+def fastTokenHex(byte_length):
+    hexdigits = '0123456789abcdef'
+    token = ''
+
+    seed()
+    for i in range(0, byte_length * 2):
+        token += choice(hexdigits)
+    return token
 
 
 def clean():
