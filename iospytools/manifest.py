@@ -19,7 +19,7 @@ class Manifest(object):  # TODO Add OTA compatibility
             file_paths = list()
 
             for stuff in files:  # To help with crammed view in debugger
-                file_paths.append(stuff['Info']['Path'])  # File paths
+                file_paths.append(files)  # File paths
 
         # TODO Fix parsing manifests with multiple devices. iPhone6,1 10.3.3 'files' gives output of n69 instead of its n51
 
