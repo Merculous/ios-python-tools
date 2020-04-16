@@ -19,13 +19,23 @@ class Manifest(object):  # TODO Add OTA compatibility
 
         # TODO Fix parsing manifests with multiple devices. iPhone6,1 10.3.3 'files' gives output of n69 instead of its n51
 
-        info = {
-            'device': device,
-            'ios': iOS,
-            'buildid': buildid,
-            'codename': codename,
-            'files': files
-        }
+        # yeet, apple gives up the iboot version string in the manifest :D
+
+        for stuff in files:
+            info = {
+                'device': device,
+                'ios': iOS,
+                'buildid': buildid,
+                'codename': codename,
+                'files': {
+                    'name': stuff,
+                    'path': files[stuff]['Info']['Path'],
+                    'iv': None,
+                    'key': None,
+                    'kbag': None
+                }
+            }
+
         return info
 
     def convertToTSSManifest(self, device, output=False, ecid=False, apnonce=False, sepnonce=False, bbsnum=False):  # See 'Sending data (request)' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
