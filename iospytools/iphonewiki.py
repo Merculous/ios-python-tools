@@ -2,7 +2,7 @@ import os
 from urllib.request import urlopen
 
 from .ipswapi import APIParser
-from .manifest import Manifest
+from .manifest import BuildManifest
 
 
 class iPhoneWiki(object):
@@ -26,8 +26,8 @@ class iPhoneWiki(object):
         if not os.path.exists('BuildManifest.plist'):
             api.downloadFileFromArchive('BuildManifest.plist')
 
-        lol = Manifest()
-        codename = lol.getCodename()
+        build_manifest = BuildManifest()
+        codename = build_manifest.getCodename()
 
         wikiUrl = f'https://www.theiphonewiki.com/w/index.php?title={codename}_{buildid}_({self.device})&action=edit'
         request = urlopen(wikiUrl).read().decode('utf-8')
