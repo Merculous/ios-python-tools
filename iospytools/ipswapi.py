@@ -21,7 +21,7 @@ class APIParser(object):
         super().__init__()
         self.device = device
         self.version = version
-        self.buildid = buildid
+        self.buildid = self.iOSToBuildid()
         self.ota = ota
         self.beta = beta
 
@@ -44,9 +44,6 @@ class APIParser(object):
         return buildid
 
     def downloadIPSW(self):
-        if not self.buildid:
-            self.buildid = self.iOSToBuildid()
-
         self.linksForDevice('ipsw')
         with open(f'{self.device}.json', 'r') as file:
             data = json.load(file)
@@ -106,9 +103,6 @@ class APIParser(object):
         return signedVersions
 
     def downloadFileFromArchive(self, path, output=False):
-        if not self.buildid:
-            self.buildid = self.iOSToBuildid()
-
         self.linksForDevice('ipsw')
         with open(f'{self.device}.json', 'r') as file:
             data = json.load(file)
@@ -127,9 +121,6 @@ class APIParser(object):
                     os.rename(path, output)
 
     def printURLForArchive(self):
-        if not self.buildid:
-            self.buildid = self.iOSToBuildid()
-
         self.linksForDevice('ipsw')
         with open(f'{self.device}.json', 'r') as file:
             data = json.load(file)

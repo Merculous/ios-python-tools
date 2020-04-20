@@ -12,22 +12,39 @@ class BuildManifest(object):
             self.data = plistlib.load(f)
 
     def extractData(self):
-        return {
-            'devices':  self.getDevices(),
-            'ios':      self.getVersion(),
-            'buildid':  self.getBuildID(),
-            'codename': self.getCodename(),
-            'files':    self.getFilePaths()
+        with open(self.path, 'rb+') as f:  # path will default to BuildManifest.plist, unless user provides custom
+            data = plistlib.load(f)
+
+            buildid  = data['ProductBuildVersion']
+            iOS      = data['ProductVersion']
+            device   = data['SupportedProductTypes'][0]
+            codename = data['BuildIdentities'][0]['Info']['BuildTrain']
+
+            files = []
+            file_info = dict()
+
+            for file in data['BuildIdentities'][0]['Manifest']:
+                file_info['name'] = file
+                file_info['path'] = file['Info']['Path']
+                file_info['iv']   = None
+                file_info['key']  = None
+                file_info['kbag'] = None
+
+                files.append(file_info)
+
+        # TODO Fix parsing manifests with multiple devices. iPhone6,1 10.3.3 'files' gives output of n69 instead of its n51
+
+        # yeet, apple gives up the iboot version string in the manifest :D
+
+        info = {
+            'device': device,
+            'ios': iOS,
+            'buildid': buildid,
+            'codename': codename,
+            'files': files
         }
 
-    def getDevices(self):
-        return self.data['SupportedProductTypes']
-
-    def getVersion(self):
-        return self.data['ProductVersion']
-
-    def getBuildID(self):
-        return self.data['ProductBuildVersion']
+        return info
 
     def getCodename(self):
         return self.data['BuildIdentities'][0]['Info']['BuildTrain']

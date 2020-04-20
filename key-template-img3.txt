@@ -1,0 +1,101 @@
+{{keys
+ | Version              = 
+ | Build                = 
+ | Device               = 
+ | Codename             = 
+ | Baseband             = 
+ | DownloadURL          = 
+
+ | RootFS               = 
+ | RootFSKey            = 
+
+ | UpdateRamdisk        = 
+ | UpdateRamdiskIV      = 
+ | UpdateRamdiskKey     = 
+ | UpdateRamdiskKBAG    = 
+
+ | RestoreRamdisk       = 
+ | RestoreRamdiskIV     = 
+ | RestoreRamdiskKey    = 
+ | RestoreRamdiskKBAG   = 
+
+ | AppleLogo            = 
+ | AppleLogoIV          = 
+ | AppleLogoKey         = 
+ | AppleLogoKBAG        = 
+
+ | BatteryCharging0     = 
+ | BatteryCharging0IV   = 
+ | BatteryCharging0Key  = 
+ | BatteryCharging0KBAG = 
+
+ | BatteryCharging1     = 
+ | BatteryCharging1IV   = 
+ | BatteryCharging1Key  = 
+ | BatteryCharging1KBAG = 
+
+ | BatteryFull          = 
+ | BatteryFullIV        = 
+ | BatteryFullKey       = 
+ | BatteryFullKBAG      = 
+
+ | BatteryLow0          = 
+ | BatteryLow0IV        = 
+ | BatteryLow0Key       = 
+ | BatteryLow0KBAG      = 
+
+ | BatteryLow1          = 
+ | BatteryLow1IV        = 
+ | BatteryLow1Key       = 
+ | BatteryLow1KBAG      = 
+
+ | DeviceTree           = 
+ | DeviceTreeIV         = 
+ | DeviceTreeKey        = 
+ | DeviceTreeKBAG       = 
+
+ | GlyphCharging        = 
+ | GlyphChargingIV      = 
+ | GlyphChargingKey     = 
+ | GlyphChargingKBAG    = 
+
+ | GlyphPlugin          = 
+ | GlyphPluginIV        = 
+ | GlyphPluginKey       = 
+ | GlyphPluginKBAG      = 
+
+ | iBEC                 = 
+ | iBECIV               = 
+ | iBECKey              = 
+ | iBECKBAG             = 
+
+ | iBoot                = 
+ | iBootIV              = 
+ | iBootKey             = 
+ | iBootKBAG            = 
+
+ | iBSS                 = 
+ | iBSSIV               = 
+ | iBSSKey              = 
+ | iBSSKBAG             = 
+
+ | Kernelcache          = 
+ | KernelcacheIV        = 
+ | KernelcacheKey       = 
+ | KernelcacheKBAG      = 
+
+ | LLB                  = 
+ | LLBIV                = 
+ | LLBKey               = 
+ | LLBKBAG              = 
+
+ | NeedService          = 
+ | NeedServiceIV        = 
+ | NeedServiceKey       = 
+ | NeedServiceKBAG      = 
+
+ | RecoveryMode         = 
+ | RecoveryModeIV       = 
+ | RecoveryModeKey      = 
+ | RecoveryModeKBAG     = 
+}}
