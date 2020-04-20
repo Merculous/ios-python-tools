@@ -5,7 +5,7 @@ import os
 from .ipsw import IPSW
 from .iphonewiki import iPhoneWiki
 from .ipswapi import APIParser
-from .manifest import Manifest
+from .manifest import BuildManifest
 
 """
 
@@ -35,44 +35,43 @@ For DownloadURL, do not place anything other than URLs to free firmwares hosted 
 """
 
 class Template(object):
-    def __init__(self, device=None, version=None, manifest='BuildManifest.plist'):
+    def __init__(self):
         super().__init__()
 
-        self.device = device
-        self.version = version
-        self.manifest = manifest
-
     def parseTemplate(self):
-        with open('key-template-img3.txt') as f:
+        with open('key-template-img3.txt') as f: # Will need to add some comparisons for img4
             data = f.read()
-            keys = data.split('{{keys')[1].split('}}')[0].replace('|', '').splitlines()
+            keys = data.split('{{keys')[1].split('}}')[0].splitlines()
             new_list = list(filter(None, keys)) # Remove all ''
-
-            head = list()
-            body = list()
-
+            fixed = list()
             for stuff in new_list:
-                fix = re.sub('\s+',' ', stuff)[:-2].strip()
-                if fix == 'RootFS': # YASSSSS Got it working :D
-                    break
-                else:
-                    head.append(fix)
-
-        template = {
-            'template': {
-                'head': head,
-                'keys': {
-                    'filename',
-                    'iv',
-                    'key',
-                    'kbag'
-                }
-            }
-        }
-
-        print(template)
-
+                fix = re.sub('\s+',' ', stuff).strip()
+                fixed.append(fix)
+            return fixed
         f.close()
 
-    def initTemplateFromIPSW(self):
-        pass
+    def addManifestData(self):
+        template_data = self.parseTemplate()
+        manifest = Manifest()        
+        manifest_data = manifest.extractData()
+
+        new_data = list()
+
+        version = ' '.join((template_data[0], manifest_data['ios']))
+        buildid = ' '.join((template_data[1], manifest_data['buildid']))
+        device = ' '.join((template_data[2], manifest_data['device']))
+        codename = ' '.join((template_data[3], manifest_data['codename']))
+        #version = ' '.join((template_data[4], manifest_data['baseband']))
+        #version = ' '.join((template_data[5], manifest_data['downloadurl']))
+    
+        print(template_data)
+        new_data.extend([version, buildid, device, codename])
+        print(manifest_data)
+        print(new_data)
+
+        # TODO Figure out a way to not have to declare all of this.
+
+        #for i in range(6, len(template_data)):
+            #print(template_data[i])
+
+        # Within the list, we can just get the name and its index, the next three (or next for RootFS) will be its "data"
