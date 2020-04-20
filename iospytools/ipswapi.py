@@ -41,11 +41,10 @@ class APIParser(object):
 
             buildid = data['firmwares'][i]['buildid']
 
-        file.close()
         return buildid
 
     def downloadIPSW(self):
-        if self.buildid == '':
+        if not self.buildid:
             self.buildid = self.iOSToBuildid()
 
         self.linksForDevice('ipsw')
@@ -66,7 +65,6 @@ class APIParser(object):
             print('Buildid:', buildidFromJsonFile)
             print('Filename:', filename)
             urlretrieve(url, filename, showProgress)
-        file.close()
 
     def signed(self):
         signedVersions = list()
@@ -83,7 +81,6 @@ class APIParser(object):
                 versions = [ios, buildid, 'ipsw']
                 if status:  # If signed
                     signedVersions.append(versions)
-        file.close()
 
         # Get ota signed versions
 
@@ -102,8 +99,6 @@ class APIParser(object):
                         if currentOTA not in signedVersions:
                             signedVersions.append(currentOTA)
 
-        f.close()
-
         # TODO Clean up iOS 10 will have 9.9.10.3.3 for example. We need to print versions with unique buildids once, and if ipsw is signed, only print ipsw signed.
 
         # TODO Printed signed versions for iPhone4,1 still gives 9.3.5 ipsw and ota
@@ -111,7 +106,7 @@ class APIParser(object):
         return signedVersions
 
     def downloadFileFromArchive(self, path, output=False):
-        if self.buildid == '':
+        if not self.buildid:
             self.buildid = self.iOSToBuildid()
 
         self.linksForDevice('ipsw')
@@ -124,16 +119,15 @@ class APIParser(object):
                 buildidFromJsonFile = data['firmwares'][i]['buildid']
 
             url = data['firmwares'][i]['url']
-            zip = RemoteZip(url, timeout=5.0)  # This should be pretty generous...
-            zip.extract(path)
-            if output:
-                os.rename(path, output)
-            zip.close()
 
-        file.close()
+            with RemoteZip(url, timeout=5.0) as zip:
+                zip.extract(path)
+
+                if output:
+                    os.rename(path, output)
 
     def printURLForArchive(self):
-        if self.buildid == '':
+        if not self.buildid:
             self.buildid = self.iOSToBuildid()
 
         self.linksForDevice('ipsw')
@@ -147,5 +141,4 @@ class APIParser(object):
 
             url = data['firmwares'][i]['url']
 
-        file.close()
         return url

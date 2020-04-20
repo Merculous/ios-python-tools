@@ -1,5 +1,6 @@
 import json
 import os
+import plistlib
 import random
 import subprocess
 from shutil import rmtree
@@ -7,10 +8,12 @@ from urllib.request import Request, urlopen
 
 from .ipswapi import APIParser
 from .manifest import TSSManifest
-from .utils import fastTokenHex
+
+tss_url = 'https://gs.apple.com/TSS/controller?action=2'
+tss_headers = {'User-Agent': 'InetURL/1.0', 'Proxy-Connection': 'Keep-Alive', 'Pragma': 'no-cache', 'Content-type': 'text/xml; charset="utf-8"'}  # See https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
 
 class TSS(object):
-    def __init__(self, device, ecid, version=False, apnonce=False, sepnonce=False, bbsnum=False, useDFUCollidingNonces=False, shsh_path='shsh'):
+    def __init__(self, device, ecid, version=False, apnonce='', sepnonce='', bbsnum='', useDFUCollidingNonces=False, shsh_path='shsh'):
         super().__init__()
         self.device = device
         self.ecid = ecid
@@ -21,10 +24,22 @@ class TSS(object):
         self.useDFUCollidingNonces = useDFUCollidingNonces
         self.shsh_path = shsh_path
 
+    def makeTSSRequest(self, data):
+        request = Request(tss_url, headers=tss_headers, data=data)
+
+        response = urlopen(request, timeout=5.0)
+        response_text = response.read().decode('utf-8')
+        if 'STATUS=0' not in response_text:
+            if response.headers['Content-Length'] == '0':
+                print('Server returned no response... are you blacklisted?')
+            else:
+                print('Server error:', response_text)
+        else:
+            return response_text[response_text.find('<?xml'):]  # Remove TSS response header
+
     def saveBlobs(self):
         api = APIParser(self.device, self.version)
         signed_versions = api.signed()
-        tss_url = 'http://gs.apple.com/TSS/controller?action=2'
 
         if os.path.exists('.shsh'):
             rmtree('.shsh')
@@ -32,6 +47,30 @@ class TSS(object):
 
         if not os.path.exists(self.shsh_path):
             os.mkdir(self.shsh_path)
+
+        tss_test_version_manifest = os.path.join('.shsh', 'TSSTestVersionManifest.plist')
+
+        manobj = TSSManifest()
+        manobj.createTSSTestVersionManifest(tss_test_version_manifest)
+
+        #  There is a better way to do the following (likely by using plistlib.loads/dumps)
+
+        print('Sending TSS server version request...')
+
+        with open(tss_test_version_manifest, 'rb') as v:
+            tss_version_response = self.makeTSSRequest(v.read())
+
+        with open(tss_test_version_manifest, 'w') as p:
+            p.write(tss_version_response)
+
+        with open(tss_test_version_manifest, 'rb') as v:
+            tss_version_response = plistlib.load(v, fmt=plistlib.FMT_XML)
+
+        tss_server_version = tss_version_response['@ServerVersion']
+        if tss_server_version != '2.1.0':
+            print('WARNING: TSS server version', tss_server_version, 'may not be supported by this script!')
+
+        print()
 
         index = 0
         for version, buildid, install_type in signed_versions:
@@ -51,19 +90,9 @@ class TSS(object):
             api.buildid = buildid
             api.downloadFileFromArchive('BuildManifest.plist', output=build_manifest)
 
-            if self.apnonce == False:
-                apnonce = fastTokenHex(40)
-            else: apnonce = self.apnonce
-
-            # TODO: Determine is SEPNonce is even needed for device
-
-            if self.sepnonce == False:
-                sepnonce = fastTokenHex(40)
-            else: sepnonce = self.sepnonce
-
             print('Converting from BuildManifest to TSS manifest...')
-            manobj = TSSManifest(path=tss_manifest)
-            manobj.initFromBuildManifest(self.device, build_manifest, self.ecid, apnonce=apnonce, sepnonce=sepnonce, bbsnum=self.bbsnum)
+            apnonce = manobj.initFromBuildManifest(self.device, tss_manifest, build_manifest, self.ecid, apnonce=self.apnonce, sepnonce=self.sepnonce, bbsnum=self.bbsnum)['apnonce']
+
             os.remove(build_manifest)
 
             # Hot fix by @mcg29_ Thanks :D
@@ -72,26 +101,13 @@ class TSS(object):
 
             print('Sending TSS request for', version, '(' + buildid + ')...')
             
-            headers = {'Host': 'gs.apple.com', 'User-Agent': 'InetURL/1.0', 'Content-type': 'text/xml'}  # See https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
             with open(tss_manifest, 'rb') as f:
-                request = Request(tss_url, headers=headers, data=f.read())
+                tss_response = self.makeTSSRequest(f.read())
 
-            response = urlopen(request, timeout=5.0)
-            if response.status != 200:
-                print('Error code in response:', response.status)
-
-            response_text = response.read().decode('utf-8')
-            if 'STATUS=0' not in response_text:
-                if response.headers['Content-Length'] == '0':
-                    print('Server returned no response... are you blacklisted?')
-                else:
-                    print('Server error:', response_text)
-            else:
-                response_text = response_text[response_text.find('<?xml'):]  # Remove TSS response header
-                blob_path = os.path.join(self.shsh_path, f'{self.ecid}_{self.device}_{version}-{buildid}_{apnonce}.shsh2')
-                with open(blob_path, 'w+') as blob:
-                    blob.write(response_text)
-                    print('Saved', version, 'blob to', blob_path)
+            blob_path = os.path.join(self.shsh_path, f'{self.ecid}_{self.device}_{version}-{buildid}_{apnonce}.shsh2')
+            with open(blob_path, 'w+') as blob:
+                blob.write(tss_response)
+                print('Saved', version, 'blob to', blob_path)
 
             index += 1
 

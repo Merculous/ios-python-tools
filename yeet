@@ -42,7 +42,7 @@ def main():
     parser.add_argument("--kpwn",     help="Creates an untethered downgrade IPSW for any bootrom 3GS", nargs=1, metavar='IPSW')
     parser.add_argument("--odysseus", help="Creates an IPSW which one you could use to dump a SHSH blob", nargs=1, metavar='IPSW')
     parser.add_argument("--pwnage",   help="Creates an untethered jailbroken IPSW for any bootrom 3GS", nargs=1, metavar='IPSW')
-    parser.add_argument("--shsh",     help="Save SHSH for all signed iOS versions (opt. BBSNUM=<serial> for saving BBTicket)", nargs=2, metavar=('DEVICE', 'ECID'))
+    parser.add_argument("--shsh",     help="Save SHSH for all signed iOS versions", nargs=2, metavar=('DEVICE', 'ECID'))
     parser.add_argument("--signed",   help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
     parser.add_argument("--split",    help="Split a GID decrypted key", nargs=1, metavar='KEY')
     parser.add_argument("--tags",     help="Print the tags and their hex positions of an img3 file", nargs=1, metavar='FILE')
@@ -85,10 +85,7 @@ def main():
         pass
 
     elif args.shsh:
-        if len(sys.argv) >= 5:
-            tss = TSS(argv[2], argv[3], bbsnum=argv[4][len('BBSNUM='):])  # ./yeet --shsh device ecid bbsnum=<serial>
-        else:
-            tss = TSS(argv[2], argv[3])  # ./yeet --shsh device ecid
+        tss = TSS(argv[2], argv[3])  # ./yeet --shsh device ecid
         tss.saveBlobs()
 
     elif args.signed:
