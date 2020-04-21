@@ -17,7 +17,7 @@ Handles data from ipsw.me api
 
 
 class APIParser(object):
-    def __init__(self, device, version, buildid=False, ota=False, beta=False):
+    def __init__(self, device, version, ota=False, beta=False):
         super().__init__()
         self.device = device
         self.version = version
@@ -33,15 +33,11 @@ class APIParser(object):
         self.linksForDevice('ipsw')
         with open(f'{self.device}.json', 'r') as file:
             data = json.load(file)
-            i = 0
-            iOSFromJsonFile = data['firmwares'][i]['version']
-            while iOSFromJsonFile != self.version:
-                i += 1
-                iOSFromJsonFile = data['firmwares'][i]['version']
+            for i in range(0, len(data['firmwares'])):
+                if data['firmwares'][i]['version'] == self.version:
+                    return data['firmwares'][i]['buildid']
 
-            buildid = data['firmwares'][i]['buildid']
-
-        return buildid
+        return ''
 
     def downloadIPSW(self):
         self.linksForDevice('ipsw')

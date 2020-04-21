@@ -53,7 +53,7 @@ def main():
 
     if args.buildid:
         api = APIParser(argv[2], argv[3])
-        print(api.iOSToBuildid())  # ./yeet --buildid device version
+        print(api.buildid)  # ./yeet --buildid device version
 
     elif args.bundle:
         pass

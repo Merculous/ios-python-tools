@@ -284,13 +284,14 @@ class TSSManifest(object):
                         if key == 'BasebandFirmware' or key[0:2] == 'Bb':
                             del data[key]
 
-            if   len(ecid) == 16 or len(ecid) == 14:
-                data['ApECID'] = int(ecid)      # Decimal ECID
-            elif len(ecid) == 13 or len(ecid) == 11:
-                data['ApECID'] = int(ecid, 16)  # Hex ECID
+
+            if len(ecid) == 13 or len(ecid) == 11:
+                try:
+                    data['ApECID'] = int(ecid, 16)  # Hex ECID
+                except:
+                    data['ApECID'] = int(ecid)      # Decimal ECID
             else:
-                print('The ECID \'' + ecid + '\' could not be interpreted')
-                exit(1)
+                data['ApECID'] = int(ecid)          # Decimal ECID
 
             if apnonce == '':
                 apnonce = fastTokenHex(20)
