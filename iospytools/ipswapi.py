@@ -33,7 +33,6 @@ class APIParser(object):
 		self.linksForDevice('ipsw')
 		with open(f'{self.device}.json', 'r') as file:
 			data = json.load(file)
-			i = -1
 			for i in range(0, len(data['firmwares'])):
 				if data['firmwares'][i]['version'] == self.version:
 					return data['firmwares'][i]['buildid']

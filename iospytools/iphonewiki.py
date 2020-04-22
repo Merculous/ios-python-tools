@@ -23,8 +23,10 @@ class iPhoneWiki(object):
         api = APIParser(self.device, self.version)
         buildid = api.iOSToBuildid()
 
-        if not os.path.exists('BuildManifest.plist'):
-            api.downloadFileFromArchive('BuildManifest.plist')
+        if os.path.exists('BuildManifest.plist'): # Also, just in case if the user terminated
+            os.remove('BuildManifest.plist') # So we don't have a leftover manifest that isn't the same device and or iOS
+
+        api.downloadFileFromArchive('BuildManifest.plist') # To keep data "constant" we need to download every time
 
         build_manifest = BuildManifest()
         codename = build_manifest.getCodename()
@@ -33,6 +35,7 @@ class iPhoneWiki(object):
         request = urlopen(wikiUrl).read().decode('utf-8')
         data = request.split('{{keys')[1].split('}}')[0].replace('|', '').splitlines()
         del data[0:8]  # Remove the top info we don't need
+        os.remove('BuildManifest.plist')
         return data
 
     def uploadWikiKeys(self):
