@@ -10,5 +10,5 @@ nonces.txt
 *.json
 IPSW
 devices.txt
-*.IPSW
+*.ipsw
 .idea

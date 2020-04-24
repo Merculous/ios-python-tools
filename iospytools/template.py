@@ -1,10 +1,5 @@
 import re
-import json
-import os
 
-from .ipsw import IPSW
-from .iphonewiki import iPhoneWiki
-from .ipswapi import APIParser
 from .manifest import BuildManifest
 
 """
@@ -34,25 +29,26 @@ For DownloadURL, do not place anything other than URLs to free firmwares hosted 
 
 """
 
+
 class Template(object):
     def __init__(self):
         super().__init__()
 
     def parseTemplate(self):
-        with open('key-template-img3.txt') as f: # Will need to add some comparisons for img4
+        with open('key-template-img3.txt') as f:  # Will need to add some comparisons for img4
             data = f.read()
             keys = data.split('{{keys')[1].split('}}')[0].splitlines()
-            new_list = list(filter(None, keys)) # Remove all ''
+            new_list = list(filter(None, keys))  # Remove all ''
             fixed = list()
             for stuff in new_list:
-                fix = re.sub('\s+',' ', stuff).strip()
+                fix = re.sub('\s+', ' ', stuff).strip()
                 fixed.append(fix)
             return fixed
         f.close()
 
     def addManifestData(self):
         template_data = self.parseTemplate()
-        manifest = Manifest()        
+        manifest = BuildManifest()
         manifest_data = manifest.extractData()
 
         new_data = list()
@@ -63,7 +59,7 @@ class Template(object):
         codename = ' '.join((template_data[3], manifest_data['codename']))
         #version = ' '.join((template_data[4], manifest_data['baseband']))
         #version = ' '.join((template_data[5], manifest_data['downloadurl']))
-    
+
         print(template_data)
         new_data.extend([version, buildid, device, codename])
         print(manifest_data)
@@ -71,7 +67,7 @@ class Template(object):
 
         # TODO Figure out a way to not have to declare all of this.
 
-        #for i in range(6, len(template_data)):
-            #print(template_data[i])
+        # for i in range(6, len(template_data)):
+        # print(template_data[i])
 
         # Within the list, we can just get the name and its index, the next three (or next for RootFS) will be its "data"

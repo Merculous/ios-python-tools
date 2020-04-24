@@ -1,7 +1,5 @@
-import json
 import os
 import plistlib
-import random
 import subprocess
 from shutil import rmtree
 from urllib.request import Request, urlopen
@@ -10,7 +8,9 @@ from .ipswapi import APIParser
 from .manifest import TSSManifest
 
 tss_url = 'https://gs.apple.com/TSS/controller?action=2'
-tss_headers = {'User-Agent': 'InetURL/1.0', 'Proxy-Connection': 'Keep-Alive', 'Pragma': 'no-cache', 'Content-type': 'text/xml; charset="utf-8"'}  # See https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
+tss_headers = {'User-Agent': 'InetURL/1.0', 'Proxy-Connection': 'Keep-Alive', 'Pragma': 'no-cache',
+               'Content-type': 'text/xml; charset="utf-8"'}  # See https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
+
 
 class TSS(object):
     def __init__(self, device, ecid, version=False, apnonce='', sepnonce='', bbsnum='', useDFUCollidingNonces=False, shsh_path='shsh'):
@@ -85,7 +85,7 @@ class TSS(object):
             # Copy the manifest inside which will contain the added string
 
             build_manifest = os.path.join('.shsh', f'BuildManifest_{self.device}_{version}_{buildid}.plist')
-            tss_manifest =   os.path.join('.shsh', f'TSSManifest_{self.device}_{version}_{buildid}.plist')
+            tss_manifest = os.path.join('.shsh', f'TSSManifest_{self.device}_{version}_{buildid}.plist')
 
             api.buildid = buildid
             api.downloadFileFromArchive('BuildManifest.plist', output=build_manifest)
@@ -100,7 +100,7 @@ class TSS(object):
             #     n.write(newFile)  # Write modified manifest
 
             print('Sending TSS request for', version, '(' + buildid + ')...')
-            
+
             with open(tss_manifest, 'rb') as f:
                 tss_response = self.makeTSSRequest(f.read())
 
@@ -112,7 +112,7 @@ class TSS(object):
             index += 1
 
         os.remove(f'{self.device}.json')
-        #rmtree('.shsh')
+        # rmtree('.shsh')
 
     def saveBlobsWithTSSChecker(self):
         a7_dfu_nonces = [

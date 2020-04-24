@@ -9,19 +9,19 @@ Handles arguments and passes them to the functions.
 """
 
 import argparse
-import os
 import sys
 
-from iospytools.foreman import Foreman
+#from iospytools.foreman import Foreman
 from iospytools.img3 import IMG3
-from iospytools.img4 import IMG4
+#from iospytools.img4 import IMG4
 from iospytools.iphonewiki import iPhoneWiki
 from iospytools.ipsw import IPSW
 from iospytools.ipswapi import APIParser
 from iospytools.manifest import BuildManifest
-from iospytools.template import Template
+#from iospytools.template import Template
 from iospytools.tss import TSS
 from iospytools.utils import clean, splitKbag
+
 
 def main():
     """
@@ -100,7 +100,7 @@ def main():
         print('Key:', kbag['key'])
 
     elif args.tags:
-        image = img3(argv[2])
+        image = IMG3(argv[2])
         image.parseImage()
 
     elif args.test:

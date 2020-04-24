@@ -1,7 +1,7 @@
-import os
 import plistlib
 
 from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
+
 
 class BuildManifest(object):
     def __init__(self, path='BuildManifest.plist'):
@@ -15,9 +15,9 @@ class BuildManifest(object):
         with open(self.path, 'rb+') as f:  # path will default to BuildManifest.plist, unless user provides custom
             data = plistlib.load(f)
 
-            buildid  = data['ProductBuildVersion']
-            iOS      = data['ProductVersion']
-            device   = data['SupportedProductTypes'][0]
+            buildid = data['ProductBuildVersion']
+            iOS = data['ProductVersion']
+            device = data['SupportedProductTypes'][0]
             codename = data['BuildIdentities'][0]['Info']['BuildTrain']
 
             files = []
@@ -26,8 +26,8 @@ class BuildManifest(object):
             for file in data['BuildIdentities'][0]['Manifest']:
                 file_info['name'] = file
                 file_info['path'] = file['Info']['Path']
-                file_info['iv']   = None
-                file_info['key']  = None
+                file_info['iv'] = None
+                file_info['key'] = None
                 file_info['kbag'] = None
 
                 files.append(file_info)
@@ -53,11 +53,12 @@ class BuildManifest(object):
         files = list()
         for component in data['BuildIdentities'][0]['Manifest']:
             files.append(component['Info']['Path'])
-        
+
         return files
 
     def getBasebandVersion(self):
         pass
+
 
 class TSSManifest(object):
     def __init__(self):
@@ -71,7 +72,7 @@ class TSSManifest(object):
     def getBbConfigurationForDevice(self, device):
         if getDeviceType(device) == 'iPhone':
             if getMajorDeviceRevision(device) == 1 \
-            or getMajorDeviceRevision(device) == 2:
+                    or getMajorDeviceRevision(device) == 2:
                 return []
 
             if getMajorDeviceRevision(device) == 3:
@@ -80,7 +81,7 @@ class TSSManifest(object):
                 else:
                     return [2, 4]
 
-            if getMajorDeviceRevision(device) == 4: 
+            if getMajorDeviceRevision(device) == 4:
                 return [2, 4]
 
             if getMajorDeviceRevision(device) == 5:
@@ -121,79 +122,80 @@ class TSSManifest(object):
                 return []
 
             if getMajorDeviceRevision(device) == 2:
-                if  getMinorDeviceRevision(device) >= 2 \
-                and getMinorDeviceRevision(device) <= 3:
+                if getMinorDeviceRevision(device) >= 2 \
+                        and getMinorDeviceRevision(device) <= 3:
                     return [257, 12]
 
-                if  getMinorDeviceRevision(device) >= 6 \
-                and getMinorDeviceRevision(device) <= 7:
+                if getMinorDeviceRevision(device) >= 6 \
+                        and getMinorDeviceRevision(device) <= 7:
                     return [3255536192, 4]
 
             if getMajorDeviceRevision(device) == 3:
-                if  getMinorDeviceRevision(device) >= 2 \
-                and getMinorDeviceRevision(device) <= 3:
+                if getMinorDeviceRevision(device) >= 2 \
+                        and getMinorDeviceRevision(device) <= 3:
                     return [4, 4]
 
-                if  getMinorDeviceRevision(device) >= 5:
+                if getMinorDeviceRevision(device) >= 5:
                     return [3255536192, 4]
 
             if getMajorDeviceRevision(device) == 4:
-                if  (getMinorDeviceRevision(device) >= 2 \
-                and getMinorDeviceRevision(device) <= 3) \
+                if (getMinorDeviceRevision(device) >= 2
+                    and getMinorDeviceRevision(device) <= 3) \
                                                          \
-                or  (getMinorDeviceRevision(device) >= 5 \
-                and getMinorDeviceRevision(device) <= 6) \
+                    or (getMinorDeviceRevision(device) >= 5
+                        and getMinorDeviceRevision(device) <= 6) \
                                                          \
-                or  (getMinorDeviceRevision(device) >= 8 \
-                and getMinorDeviceRevision(device) <= 9):
+                    or (getMinorDeviceRevision(device) >= 8
+                        and getMinorDeviceRevision(device) <= 9):
                     return [3554301762, 4]
 
             if getMajorDeviceRevision(device) == 5:
-                if  getMinorDeviceRevision(device) == 2 \
-                or  getMinorDeviceRevision(device) == 4:
+                if getMinorDeviceRevision(device) == 2 \
+                        or getMinorDeviceRevision(device) == 4:
                     return [3840149528, 4]
 
             if getMajorDeviceRevision(device) == 6:
-                if  getMinorDeviceRevision(device) == 4 \
-                or  getMinorDeviceRevision(device) == 8 \
-                or  getMinorDeviceRevision(device) == 11:
+                if getMinorDeviceRevision(device) == 4 \
+                        or getMinorDeviceRevision(device) == 8 \
+                        or getMinorDeviceRevision(device) == 11:
                     return [3840149528, 4]
 
             if getMajorDeviceRevision(device) == 7:
-                if  getMinorDeviceRevision(device) == 2 \
-                or  getMinorDeviceRevision(device) == 4:
+                if getMinorDeviceRevision(device) == 2 \
+                        or getMinorDeviceRevision(device) == 4:
                     return [2315222105, 4]
 
-                if  getMinorDeviceRevision(device) == 6:
+                if getMinorDeviceRevision(device) == 6:
                     return [3840149528, 4]
 
-                if  getMinorDeviceRevision(device) == 12:
+                if getMinorDeviceRevision(device) == 12:
                     return [524245983, 12]
 
             if getMajorDeviceRevision(device) == 8:
-                if  (getMinorDeviceRevision(device) >= 3 \
-                and getMinorDeviceRevision(device) <= 4) \
+                if (getMinorDeviceRevision(device) >= 3
+                    and getMinorDeviceRevision(device) <= 4) \
                                                          \
-                or  (getMinorDeviceRevision(device) >= 7 \
-                and getMinorDeviceRevision(device) <= 8):
+                    or (getMinorDeviceRevision(device) >= 7
+                        and getMinorDeviceRevision(device) <= 8):
                     return [165673526, 12]
 
             if getMajorDeviceRevision(device) == 11:
-                if  getMinorDeviceRevision(device) == 2 \
-                or  getMinorDeviceRevision(device) == 4:
+                if getMinorDeviceRevision(device) == 2 \
+                        or getMinorDeviceRevision(device) == 4:
                     return [165673526, 12]
 
         return []
 
     def createTSSTestVersionManifest(self, path):  # See 'Notes' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
         testVersionManifest = dict(
-            ApSecurityDomain = 1
+            ApSecurityDomain=1
         )
 
         with open(path, 'wb+') as v:
             plistlib.dump(testVersionManifest, v, fmt=plistlib.FMT_XML)
 
-    def initFromBuildManifest(self, device, tss_manifest_path, build_manifest_path, ecid, apnonce='', sepnonce='', bbsnum=''):  # See 'Sending data (request)' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
+    # See 'Sending data (request)' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
+    def initFromBuildManifest(self, device, tss_manifest_path, build_manifest_path, ecid, apnonce='', sepnonce='', bbsnum=''):
         with open(build_manifest_path, 'rb+') as f:
             data = plistlib.load(f, fmt=plistlib.FMT_XML)
 
@@ -229,7 +231,7 @@ class TSSManifest(object):
                     pass
 
             production_mode = False
-            security_mode =   False
+            security_mode = False
 
             for component in data['Manifest']:
                 content = data['Manifest'][component]
@@ -243,7 +245,7 @@ class TSSManifest(object):
                             if 'ApRequiresImage4' in rule['Conditions']:
                                 if rule['Conditions']['ApRequiresImage4']:
                                     data['@ApImg4Ticket'] = True
-                        
+
                         elif 'ESEC' in rule['Actions']:
                             content['ESEC'] = True
 
@@ -262,7 +264,7 @@ class TSSManifest(object):
             #  These are hardcoded for now; will change later
 
             data['ApProductionMode'] = True
-            data['ApSecurityMode'] =   True
+            data['ApSecurityMode'] = True
 
             if has_baseband:
                 bb_config = self.getBbConfigurationForDevice(device)
@@ -270,7 +272,7 @@ class TSSManifest(object):
                     if 'BbChipID' in data:
                         data['BbChipID'] = int(data['BbChipID'], 16)
 
-                    data['@BBTicket'] =    True
+                    data['@BBTicket'] = True
                     data['BbGoldCertId'] = bb_config[0]
 
                     if len(bbsnum) != bb_config[1]:
@@ -283,7 +285,6 @@ class TSSManifest(object):
                     for key in list(data):
                         if key == 'BasebandFirmware' or key[0:2] == 'Bb':
                             del data[key]
-
 
             if len(ecid) == 13 or len(ecid) == 11:
                 try:
