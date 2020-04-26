@@ -15,6 +15,7 @@ Due to compatibility, ensure Python 3.6 or newer is installed. Basically this is
     --codename device iOS | get codename of an iOS
     --download device iOS | download an ipsw
     --keys device iOS     | get keys for an iOS
+    --shsh DEVICE ECID    | save SHSH for all signed iOS versions of a device
     --signed device       | print the signed versions for a device
     --split key           | splits a GID decrypted key
     --tags file           | print the tags and their hex positions of an img3 file

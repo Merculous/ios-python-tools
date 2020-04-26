@@ -10,6 +10,7 @@ Handles arguments and passes them to the functions.
 
 import argparse
 import sys
+import os
 
 #from iospytools.foreman import Foreman
 from iospytools.img3 import IMG3
@@ -36,6 +37,7 @@ def main():
     parser.add_argument("--buildid",  help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--bundle",   help="Creates a bundle with the provided patches to allow xpwn's IPSW binary to use the bundle", nargs=2, metavar=('IPSW', 'TYPE'))
     parser.add_argument("--clean",    help="If there are any leftover files, this will get rid of them", action='store_true')
+    parser.add_argument("--codename", help="Get the codname of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--download", help="Download an IPSW", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--dra",      help="Creates an untethered downgrade IPSW with Dora2-iOS's fork of iloader by xerub", nargs=1, metavar='IPSW')
     parser.add_argument("--keys",     help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
@@ -47,7 +49,7 @@ def main():
     parser.add_argument("--split",    help="Split a GID decrypted key", nargs=1, metavar='KEY')
     parser.add_argument("--tags",     help="Print the tags and their hex positions of an img3 file", nargs=1, metavar='FILE')
 
-    parser.add_argument("--test")
+    parser.add_argument("--test", nargs=1)
 
     args = parser.parse_args()
 
@@ -60,6 +62,18 @@ def main():
 
     elif args.clean:
         clean()
+
+    elif args.codename:
+        cwd = os.listdir(os.getcwd())
+        if 'BuildManifest.plist' not in cwd:
+            api = APIParser(argv[2], argv[3])
+            api.downloadFileFromArchive('BuildManifest.plist')
+        else:
+            os.remove('BuildManifest.plist')
+
+        manifest = BuildManifest()
+        print(manifest.getCodename())
+        os.remove('BuildManifest.plist')
 
     elif args.download:
         api = APIParser(argv[2], argv[3])
@@ -104,8 +118,8 @@ def main():
         image.parseImage()
 
     elif args.test:
-        manifest = BuildManifest()
-        print(manifest.getFilePaths())
+        image = IMG3(argv[2])
+        image.parseImage()
 
     else:
         sys.exit(parser.print_help(sys.stderr))
