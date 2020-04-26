@@ -51,7 +51,7 @@ class BuildManifest(object):
 
     def getFilePaths(self):
         files = list()
-        for component in data['BuildIdentities'][0]['Manifest']:
+        for component in self.data['BuildIdentities'][0]['Manifest']:
             files.append(component['Info']['Path'])
 
         return files
