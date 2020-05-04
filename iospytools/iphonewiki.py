@@ -1,8 +1,12 @@
 import os
 from urllib.request import urlopen
 
-from .ipswapi import APIParser
-from .manifest import BuildManifest
+try:
+    from .ipswapi import APIParser
+    from .manifest import BuildManifest
+except ImportError as error:
+    print('Oof, got error:', error)
+    raise
 
 
 class iPhoneWiki(object):
@@ -19,24 +23,28 @@ class iPhoneWiki(object):
         Grabs keys and codename.
         """
 
-    def getWikiKeys(self):  # TODO Add OTA compatibility
+    def getWikiKeys(self):  # TODO Add OTA compatibility, allow single file grabbing
         api = APIParser(self.device, self.version)
         buildid = api.iOSToBuildid()
 
-        if os.path.exists('BuildManifest.plist'): # Also, just in case if the user terminated
-            os.remove('BuildManifest.plist') # So we don't have a leftover manifest that isn't the same device and or iOS
+        path = 'BuildManifest.plist'
 
-        api.downloadFileFromArchive('BuildManifest.plist') # To keep data "constant" we need to download every time
+        if os.path.exists(path):  # Also, just in case if the user terminated
+            os.remove(path)  # So we don't have a leftover manifest that isn't the same device and or iOS
+
+        api.downloadManifest()  # To keep data "constant" we need to download every time
 
         build_manifest = BuildManifest()
         codename = build_manifest.getCodename()
 
-        wikiUrl = f'https://www.theiphonewiki.com/w/index.php?title={codename}_{buildid}_({self.device})&action=edit'
+        wikiUrl = 'https://www.theiphonewiki.com/w/index.php?title={}_{}_({})&action=edit'.format(codename, buildid, self.device)
         request = urlopen(wikiUrl).read().decode('utf-8')
         data = request.split('{{keys')[1].split('}}')[0].replace('|', '').splitlines()
         del data[0:8]  # Remove the top info we don't need
-        os.remove('BuildManifest.plist')
+        os.remove(path)
         return data
+
+    # TODO Maybe have it open an html file, the page to upload keys, importing template into the page, just needing to press "upload"
 
     def uploadWikiKeys(self):
         pass

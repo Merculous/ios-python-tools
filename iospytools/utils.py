@@ -1,14 +1,18 @@
 import json
 import os
+import platform
 import ssl
 import sys
-import platform
 import urllib.request
-from random import seed, choice
+from random import choice, seed
 from string import ascii_letters, digits
 from urllib.parse import urlsplit
 
-import progressbar
+try:
+    import progressbar
+except ImportError as error:
+    print('Oof, got error:', error)
+    raise
 
 """
 
@@ -46,7 +50,7 @@ def downloadJSONData(url, filename):
 
     request = urllib.request.urlopen(url).read()
     convert = json.loads(request)
-    with open(f'{filename}.json', 'w') as file:
+    with open('{}.json'.format(filename), 'w') as file:
         json.dump(convert, file, indent=4)
     file.close()
 

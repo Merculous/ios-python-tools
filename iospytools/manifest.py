@@ -1,6 +1,10 @@
 import plistlib
 
-from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
+try:
+    from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
+except ImportError as error:
+    print('Oof, got error:', error)
+    raise
 
 
 class BuildManifest(object):

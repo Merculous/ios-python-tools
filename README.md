@@ -1,9 +1,5 @@
 This project was inspired by Matteyeux with his ios-tools repo, this will be a similar project but for my own practice. Also, in native Python 3 code :D
 
-### Note
-
-Due to compatibility, ensure Python 3.6 or newer is installed. Basically this is just due some things being changed like format strings and etc.
-
 ### Prerequisites
 
     pip3 install -r requirements.txt
@@ -20,10 +16,14 @@ Due to compatibility, ensure Python 3.6 or newer is installed. Basically this is
     --split key           | splits a GID decrypted key
     --tags file           | print the tags and their hex positions of an img3 file
 
-### Planned
+### TODO
 
     foreman: key grabbing/uploading
-    template: auto key uploading
+    template: template parsing/creating
+    ota/beta shsh saving: CC @mcg
+    img3: iBoot patcher, kernel patcher
+    img4: idk if I can make this lol
+    ipsw: ipsw handling and creating
 
 ### Credits
 

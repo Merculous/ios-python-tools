@@ -4,8 +4,12 @@ import subprocess
 from shutil import rmtree
 from urllib.request import Request, urlopen
 
-from .ipswapi import APIParser
-from .manifest import TSSManifest
+try:
+    from .ipswapi import APIParser
+    from .manifest import TSSManifest
+except ImportError as error:
+    print('Oof, got error:', error)
+    raise
 
 tss_url = 'https://gs.apple.com/TSS/controller?action=2'
 tss_headers = {'User-Agent': 'InetURL/1.0', 'Proxy-Connection': 'Keep-Alive', 'Pragma': 'no-cache',
@@ -84,8 +88,8 @@ class TSS(object):
 
             # Copy the manifest inside which will contain the added string
 
-            build_manifest = os.path.join('.shsh', f'BuildManifest_{self.device}_{version}_{buildid}.plist')
-            tss_manifest = os.path.join('.shsh', f'TSSManifest_{self.device}_{version}_{buildid}.plist')
+            build_manifest = os.path.join('.shsh', 'BuildManifest_{}_{}_{}.plist'.format(self.device, version, buildid))
+            tss_manifest = os.path.join('.shsh', 'TSSManifest_{}_{}_{}.plist'.format(self.device, version, buildid))
 
             api.buildid = buildid
             api.downloadFileFromArchive('BuildManifest.plist', output=build_manifest)
@@ -104,15 +108,15 @@ class TSS(object):
             with open(tss_manifest, 'rb') as f:
                 tss_response = self.makeTSSRequest(f.read())
 
-            blob_path = os.path.join(self.shsh_path, f'{self.ecid}_{self.device}_{version}-{buildid}_{apnonce}.shsh2')
+            blob_path = os.path.join(self.shsh_path, '{}_{}_{}-{}_{}.shsh2'.format(self.ecid, self.device, version, buildid, apnonce))
             with open(blob_path, 'w+') as blob:
                 blob.write(tss_response)
                 print('Saved', version, 'blob to', blob_path)
 
             index += 1
 
-        os.remove(f'{self.device}.json')
-        # rmtree('.shsh')
+        os.remove('{}.json'.format(self.device))
+        rmtree('.shsh')
 
     def saveBlobsWithTSSChecker(self):
         a7_dfu_nonces = [

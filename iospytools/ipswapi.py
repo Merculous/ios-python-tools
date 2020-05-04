@@ -2,10 +2,12 @@ import json
 import os
 from urllib.request import urlretrieve
 
-from remotezip import RemoteZip
-
-from .utils import downloadJSONData, showProgress, splitToFileName
-
+try:
+    from remotezip import RemoteZip
+    from .utils import downloadJSONData, showProgress, splitToFileName
+except ImportError as error:
+    print('Oof, got error:', error)
+    raise
 
 """
 
@@ -26,12 +28,12 @@ class APIParser(object):
         self.beta = beta
 
     def linksForDevice(self, filetype):
-        url = f'https://api.ipsw.me/v4/device/{self.device}?type={filetype}'
+        url = 'https://api.ipsw.me/v4/device/{}?type={}'.format(self.device, filetype)
         return downloadJSONData(url, self.device)
 
     def iOSToBuildid(self):
         self.linksForDevice('ipsw')
-        with open(f'{self.device}.json', 'r') as file:
+        with open('{}.json'.format(self.device), 'r') as file:
             data = json.load(file)
             for i in range(0, len(data['firmwares'])):
                 if data['firmwares'][i]['version'] == self.version:
@@ -41,7 +43,7 @@ class APIParser(object):
 
     def downloadIPSW(self):
         self.linksForDevice('ipsw')
-        with open(f'{self.device}.json', 'r') as file:
+        with open('{}.json'.format(self.device), 'r') as file:
             data = json.load(file)
             i = 0
             buildidFromJsonFile = data['firmwares'][i]['buildid']
@@ -65,7 +67,7 @@ class APIParser(object):
         # Get ipsw signed versions
 
         self.linksForDevice('ipsw')
-        with open(f'{self.device}.json', 'r') as file:
+        with open('{}.json'.format(self.device), 'r') as file:
             data = json.load(file)
             for stuff in data['firmwares']:
                 ios = stuff['version']
@@ -78,7 +80,7 @@ class APIParser(object):
         # Get ota signed versions
 
         self.linksForDevice('ota')
-        with open(f'{self.device}.json', 'r') as f:
+        with open('{}.json'.format(self.device), 'r') as f:
             data = json.load(f)
             for stuff in data['firmwares']:
                 ios = stuff['version']
@@ -101,7 +103,7 @@ class APIParser(object):
 
     def downloadFileFromArchive(self, path, output=False):
         self.linksForDevice('ipsw')
-        with open(f'{self.device}.json', 'r') as file:
+        with open('{}.json'.format(self.device), 'r') as file:
             data = json.load(file)
             i = 0
             buildidFromJsonFile = data['firmwares'][i]['buildid']
@@ -119,7 +121,7 @@ class APIParser(object):
 
     def printURLForArchive(self):
         self.linksForDevice('ipsw')
-        with open(f'{self.device}.json', 'r') as file:
+        with open('{}.json'.format(self.device), 'r') as file:
             data = json.load(file)
             i = 0
             buildidFromJsonFile = data['firmwares'][i]['buildid']
@@ -130,3 +132,6 @@ class APIParser(object):
             url = data['firmwares'][i]['url']
 
         return url
+
+    def downloadManifest(self):
+        return self.downloadFileFromArchive('BuildManifest.plist')

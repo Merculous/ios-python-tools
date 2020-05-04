@@ -1,6 +1,10 @@
 import re
 
-from .manifest import BuildManifest
+try:
+    from .manifest import BuildManifest
+except ImportError as error:
+    print('Oof, got error:', error)
+    raise
 
 """
 
@@ -33,6 +37,17 @@ For DownloadURL, do not place anything other than URLs to free firmwares hosted 
 class Template(object):
     def __init__(self):
         super().__init__()
+
+    def createTemplate(self):
+        # TODO Make this, completely scrap the template file I have, prepare for pypi functionality
+        # Basically, "{{keys" + list of strings with "| <name> = <data> + IV, Key, KBAG" + "}}"
+        start = "{{keys"
+        data = list()
+        end = "}}"
+
+        tempate = " ".join([start, end])
+
+        return tempate
 
     def parseTemplate(self):
         with open('key-template-img3.txt') as f:  # Will need to add some comparisons for img4

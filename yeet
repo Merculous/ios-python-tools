@@ -12,16 +12,22 @@ import argparse
 import sys
 import os
 
-#from iospytools.foreman import Foreman
-from iospytools.img3 import IMG3
-#from iospytools.img4 import IMG4
-from iospytools.iphonewiki import iPhoneWiki
-from iospytools.ipsw import IPSW
-from iospytools.ipswapi import APIParser
-from iospytools.manifest import BuildManifest
-#from iospytools.template import Template
-from iospytools.tss import TSS
-from iospytools.utils import clean, splitKbag
+try:
+    #from iospytools.bundle import Bundle
+    #from iospytools.foreman import Foreman
+    from iospytools.img3 import IMG3
+    #from iospytools.img4 import IMG4
+    from iospytools.iphonewiki import iPhoneWiki
+    #from iospytools.ipsw import IPSW
+    from iospytools.ipswapi import APIParser
+    from iospytools.manifest import BuildManifest
+    #from iospytools.template import Template
+    from iospytools.tss import TSS
+    from iospytools.utils import clean, splitKbag
+    from iospytools.usb import USB
+except ImportError:
+    print('Did you run pip3 install -r requirements.txt?')
+    raise
 
 
 def main():
@@ -42,6 +48,7 @@ def main():
     parser.add_argument("--dra",      help="Creates an untethered downgrade IPSW with Dora2-iOS's fork of iloader by xerub", nargs=1, metavar='IPSW')
     parser.add_argument("--keys",     help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--kpwn",     help="Creates an untethered downgrade IPSW for any bootrom 3GS", nargs=1, metavar='IPSW')
+    parser.add_argument("--manifest", help="Download a Build Manifest from an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--odysseus", help="Creates an IPSW which one you could use to dump a SHSH blob", nargs=1, metavar='IPSW')
     parser.add_argument("--pwnage",   help="Creates an untethered jailbroken IPSW for any bootrom 3GS", nargs=1, metavar='IPSW')
     parser.add_argument("--shsh",     help="Save SHSH for all signed iOS versions", nargs=2, metavar=('DEVICE', 'ECID'))
@@ -49,7 +56,7 @@ def main():
     parser.add_argument("--split",    help="Split a GID decrypted key", nargs=1, metavar='KEY')
     parser.add_argument("--tags",     help="Print the tags and their hex positions of an img3 file", nargs=1, metavar='FILE')
 
-    parser.add_argument("--test", nargs=1)
+    parser.add_argument("--test", action='store_true')
 
     args = parser.parse_args()
 
@@ -65,15 +72,16 @@ def main():
 
     elif args.codename:
         cwd = os.listdir(os.getcwd())
-        if 'BuildManifest.plist' not in cwd:
+        path = 'BuildManifest.plist'
+        if path not in cwd:
             api = APIParser(argv[2], argv[3])
-            api.downloadFileFromArchive('BuildManifest.plist')
+            api.downloadManifest()
         else:
-            os.remove('BuildManifest.plist')
+            os.remove(path)
 
         manifest = BuildManifest()
         print(manifest.getCodename())
-        os.remove('BuildManifest.plist')
+        os.remove(path)
 
     elif args.download:
         api = APIParser(argv[2], argv[3])
@@ -89,8 +97,11 @@ def main():
             print(stuff)
 
     elif args.kpwn:
-        ipsw = IPSW(argv[2])
-        ipsw.create24KpwnIPSW()  # ./yeet --kpwn ipsw
+        pass
+
+    elif args.manifest:
+        api = APIParser(argv[2], argv[3])
+        api.downloadManifest()
 
     elif args.odysseus:
         pass
@@ -106,7 +117,7 @@ def main():
         api = APIParser(argv[2], None)  # ./yeet --signed device
         data = api.signed()
         for stuff in data:
-            print(f'iOS: {stuff[0]} ({stuff[1]}) ({stuff[2]})')
+            print('iOS: {} ({}) ({})'.format(stuff[0], stuff[1], stuff[2]))
 
     elif args.split:
         kbag = splitKbag(argv[2])  # ./yeet --split kbag
@@ -118,8 +129,8 @@ def main():
         image.parseImage()
 
     elif args.test:
-        image = IMG3(argv[2])
-        image.parseImage()
+        usb = USB()  # 05ac:1227
+        print(usb.dev)
 
     else:
         sys.exit(parser.print_help(sys.stderr))
