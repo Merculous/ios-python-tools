@@ -12,3 +12,4 @@ IPSW
 devices.txt
 *.ipsw
 .idea
+*.pyc

@@ -39,7 +39,7 @@ def main():
     """
     argv = sys.argv
 
-    parser = argparse.ArgumentParser(usage=f'{argv[0]} <option> <args>', description='provides useful tools/commands which are used in iOS research')
+    parser = argparse.ArgumentParser(usage='{} <option> <args>'.format(argv[0]), description='provides useful tools/commands which are used in iOS research')
     parser.add_argument("--buildid",  help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
     parser.add_argument("--bundle",   help="Creates a bundle with the provided patches to allow xpwn's IPSW binary to use the bundle", nargs=2, metavar=('IPSW', 'TYPE'))
     parser.add_argument("--clean",    help="If there are any leftover files, this will get rid of them", action='store_true')
