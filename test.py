@@ -1,6 +1,6 @@
-import pytest
+# content of test_sample.py
+def func(x):
+    return x + 1
 
-
-@pytest.mark.skip(reason="I suck at this")
-def test_the_unknown():
-    pass
+def test_answer():
+    assert func(3) == 5
