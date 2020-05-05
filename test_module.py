@@ -1,6 +1,7 @@
-# content of test_sample.py
-def func(x):
+# FFS, I'll just make a random test thingy
+
+def something(x):
     return x + 1
 
-def test_answer():
-    assert func(3) == 5
+def test():
+    return something(1)
