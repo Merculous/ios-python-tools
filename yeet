@@ -39,24 +39,101 @@ def main():
     """
     argv = sys.argv
 
-    parser = argparse.ArgumentParser(usage='{} <option> <args>'.format(argv[0]), description='provides useful tools/commands which are used in iOS research')
-    parser.add_argument("--buildid",  help="Convert an iOS to its buildid", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("--bundle",   help="Creates a bundle with the provided patches to allow xpwn's IPSW binary to use the bundle", nargs=2, metavar=('IPSW', 'TYPE'))
-    parser.add_argument("--clean",    help="If there are any leftover files, this will get rid of them", action='store_true')
-    parser.add_argument("--codename", help="Get the codname of an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("--download", help="Download an IPSW", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("--dra",      help="Creates an untethered downgrade IPSW with Dora2-iOS's fork of iloader by xerub", nargs=1, metavar='IPSW')
-    parser.add_argument("--keys",     help="Get keys for an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("--kpwn",     help="Creates an untethered downgrade IPSW for any bootrom 3GS", nargs=1, metavar='IPSW')
-    parser.add_argument("--manifest", help="Download a Build Manifest from an iOS", nargs=2, metavar=('DEVICE', 'iOS'))
-    parser.add_argument("--odysseus", help="Creates an IPSW which one you could use to dump a SHSH blob", nargs=1, metavar='IPSW')
-    parser.add_argument("--pwnage",   help="Creates an untethered jailbroken IPSW for any bootrom 3GS", nargs=1, metavar='IPSW')
-    parser.add_argument("--shsh",     help="Save SHSH for all signed iOS versions", nargs=2, metavar=('DEVICE', 'ECID'))
-    parser.add_argument("--signed",   help="Print the signed iOS versions for a device", nargs=1, metavar='DEVICE')
-    parser.add_argument("--split",    help="Split a GID decrypted key", nargs=1, metavar='KEY')
-    parser.add_argument("--tags",     help="Print the tags and their hex positions of an img3 file", nargs=1, metavar='FILE')
+    parser = argparse.ArgumentParser(
+        usage='{} <option> <args>'.format(argv[0]),
+        description='provides useful tools/commands which are used in iOS research')
 
-    parser.add_argument("--test", action='store_true')
+    parser.add_argument(
+        "--buildid",
+        help="Convert an iOS to its buildid",
+        nargs=2,
+        metavar=('DEVICE', 'iOS'))
+
+    parser.add_argument(
+        "--bundle",
+        help="Creates a bundle with the provided patches to allow xpwn's IPSW binary to use the bundle",
+        nargs=2,
+        metavar=('IPSW', 'TYPE'))
+
+    parser.add_argument(
+        "--clean",
+        help="If there are any leftover files, this will get rid of them",
+        action='store_true')
+
+    parser.add_argument(
+        "--codename",
+        help="Get the codname of an iOS",
+        nargs=2,
+        metavar=('DEVICE', 'iOS'))
+
+    parser.add_argument(
+        "--download",
+        help="Download an IPSW",
+        nargs=2,
+        metavar=('DEVICE', 'iOS'))
+
+    parser.add_argument(
+        "--dra",
+        help="Creates an untethered downgrade IPSW with Dora2-iOS's fork of iloader by xerub",
+        nargs=1,
+        metavar='IPSW')
+
+    parser.add_argument(
+        "--keys",
+        help="Get keys for an iOS",
+        nargs=2, metavar=('DEVICE', 'iOS'))
+
+    parser.add_argument(
+        "--kpwn",
+        help="Creates an untethered downgrade IPSW for any bootrom 3GS",
+        nargs=1,
+        metavar='IPSW')
+
+    parser.add_argument(
+        "--manifest",
+        help="Download a Build Manifest from an iOS",
+        nargs=2,
+        metavar=('DEVICE', 'iOS'))
+
+    parser.add_argument(
+        "--odysseus",
+        help="Creates an IPSW which one you could use to dump a SHSH blob",
+        nargs=1,
+        metavar='IPSW')
+
+    parser.add_argument(
+        "--pwnage",
+        help="Creates an untethered jailbroken IPSW for any bootrom 3GS",
+        nargs=1,
+        metavar='IPSW')
+
+    parser.add_argument(
+        "--shsh",
+        help="Save SHSH for all signed iOS versions",
+        nargs=2,
+        metavar=('DEVICE', 'ECID'))
+
+    parser.add_argument(
+        "--signed",
+        help="Print the signed iOS versions for a device",
+        nargs=1,
+        metavar='DEVICE')
+
+    parser.add_argument(
+        "--split",
+        help="Split a GID decrypted key",
+        nargs=1,
+        metavar='KEY')
+
+    parser.add_argument(
+        "--tags",
+        help="Print the tags and their hex positions of an img3 file",
+        nargs=1,
+        metavar='FILE')
+
+    parser.add_argument(
+        "--test",
+        action='store_true')
 
     args = parser.parse_args()
 
@@ -129,8 +206,8 @@ def main():
         image.parseImage()
 
     elif args.test:
-        usb = USB()  # 05ac:1227
-        print(usb.dev)
+        device = USB()
+        device.getDevices()
 
     else:
         sys.exit(parser.print_help(sys.stderr))
