@@ -1,11 +1,11 @@
 import re
-import plistlib
+#import plistlib
 
-try:
-    #from .ipwapi import APIParser
-    from .manifest import BuildManifest
-except:
-    raise ImportError
+# try:
+#from .ipwapi import APIParser
+#from .manifest import BuildManifest
+# except:
+#raise ImportError
 
 """
 
@@ -41,28 +41,29 @@ class Template(object):
 
     def createTemplate(self):
         # TODO Make this, completely scrap the template file I have, prepare for pypi functionality
-        manifest = BuildManifest()
-        data = manifest.extractData()
+        #manifest = BuildManifest()
+        #data = manifest.extractData()
 
-        api = APIParser(data['device'], data['ios'])
-        url = api.printURLForArchive()
+        #api = APIParser(data['device'], data['ios'])
+        #url = api.printURLForArchive()
 
-        raw_template = [
-            "{{keys",
-            "| Version              = ".format(data['ios']),
-            "| Build                = ".format(data['buildid']),
-            "| Device               = ".format(data['device']),
-            "| Codename             = ".format(data['codename']),
-            "| Baseband             = ",
-            "| DownloadURL          = ".format(url),
-            "| RootFS               = ",
-            "| RootFSKey            = ",
-            "| {}                   = ",
-            "| {}IV                 = ",
-            "| {}Key                = ",
-            "| {}KBAG               = ",
-            "}}"
-        ]
+        # raw_template = [
+        # "{{keys",
+        #"| Version              = ".format(data['ios']),
+        #"| Build                = ".format(data['buildid']),
+        #"| Device               = ".format(data['device']),
+        #"| Codename             = ".format(data['codename']),
+        #"| Baseband             = ",
+        #"| DownloadURL          = ".format(url),
+        #"| RootFS               = ",
+        #"| RootFSKey            = ",
+        #"| {}                   = ",
+        #"| {}IV                 = ",
+        #"| {}Key                = ",
+        #"| {}KBAG               = ",
+        # "}}"
+        # ]
+        pass
 
     def parseTemplate(self, string):
         keys = string.split('{{keys')[1].split('}}')[0].splitlines()
