@@ -2,56 +2,65 @@ import plistlib
 
 try:
     from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
-except ImportError as error:
-    print('Oof, got error:', error)
-    raise
+except:
+    raise ImportError
 
 
 class BuildManifest(object):
     def __init__(self, path='BuildManifest.plist'):
         super().__init__()
 
-        self.path = path
-        with open(self.path, 'rb+') as f:
-            self.data = plistlib.load(f)
+        try:
+            self.path = path
+            with open(self.path, 'rb+') as f:
+                self.data = plistlib.load(f)
+        except:
+            raise IOError
 
     def extractData(self):
-        with open(self.path, 'rb+') as f:  # path will default to BuildManifest.plist, unless user provides custom
-            data = plistlib.load(f)
+        # path will default to BuildManifest.plist, unless user provides custom
+        try:
+            with open(self.path, 'rb+') as f:
+                data = plistlib.load(f)
 
-            buildid = data['ProductBuildVersion']
-            iOS = data['ProductVersion']
-            device = data['SupportedProductTypes'][0]
-            codename = data['BuildIdentities'][0]['Info']['BuildTrain']
+                buildid = data['ProductBuildVersion']
+                iOS = data['ProductVersion']
+                device = data['SupportedProductTypes'][0]
+                codename = data['BuildIdentities'][0]['Info']['BuildTrain']
 
-            files = []
-            file_info = dict()
+                files = []
+                file_info = dict()
 
-            for file in data['BuildIdentities'][0]['Manifest']:
-                file_info['name'] = file
-                file_info['path'] = file['Info']['Path']
-                file_info['iv'] = None
-                file_info['key'] = None
-                file_info['kbag'] = None
+                for file in data['BuildIdentities'][0]['Manifest'].items():
+                    file_info['name'] = file[0]
+                    file_info['path'] = file[1]['Info']['Path']
+                    file_info['iv'] = None
+                    file_info['key'] = None
+                    file_info['kbag'] = None
 
-                files.append(file_info)
+                    files.append(file_info)
 
-        # TODO Fix parsing manifests with multiple devices. iPhone6,1 10.3.3 'files' gives output of n69 instead of its n51
+            # TODO Fix parsing manifests with multiple devices. iPhone6,1 10.3.3 'files' gives output of n69 instead of its n51
 
-        # yeet, apple gives up the iboot version string in the manifest :D
+            # yeet, apple gives up the iboot version string in the manifest :D
 
-        info = {
-            'device': device,
-            'ios': iOS,
-            'buildid': buildid,
-            'codename': codename,
-            'files': files
-        }
+            info = {
+                'device': device,
+                'ios': iOS,
+                'buildid': buildid,
+                'codename': codename,
+                'files': files
+            }
 
-        return info
+            return info
+        except:
+            raise FileNotFoundError
 
     def getCodename(self):
-        return self.data['BuildIdentities'][0]['Info']['BuildTrain']
+        try:
+            return self.data['BuildIdentities'][0]['Info']['BuildTrain']
+        except:
+            raise IOError
 
     def getFilePaths(self):
         files = list()
@@ -192,12 +201,14 @@ class TSSManifest(object):
 
         return []
 
-    def createTSSTestVersionManifest(self, path):  # See 'Notes' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
+    # See 'Notes' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
+    def createTSSTestVersionManifest(self, path):
         testVersionManifest = dict(
             ApSecurityDomain=1
         )
 
         with open(path, 'wb+') as v:
+            # I'm getting module plistlib has no 'FMT_XML' member error from pylint, according to docs, its supported, guess this is a bug?
             plistlib.dump(testVersionManifest, v, fmt=plistlib.FMT_XML)
 
     # See 'Sending data (request)' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
@@ -208,19 +219,22 @@ class TSSManifest(object):
             has_baseband = False
             found_erase_identity = False
 
-            for identity in data['BuildIdentities']:  # Set TSS manifest to the Erase preset
+            # Set TSS manifest to the Erase preset
+            for identity in data['BuildIdentities']:
                 if 'Erase' in identity['Info']['Variant']:
                     for component in identity['Info']['VariantContents']:
                         if component == 'SEP':  # Set SepNonce now
                             if sepnonce == '':
                                 sepnonce = fastTokenHex(20)
 
-                            identity['SepNonce'] = int(sepnonce, 16).to_bytes(20, 'big')
+                            identity['SepNonce'] = int(
+                                sepnonce, 16).to_bytes(20, 'big')
 
                         elif component == 'BasebandFirmware':  # Enable Baseband-related keys later
                             has_baseband = True
 
-                    del identity['Info']  # This will clash with the root key labeled 'Info'
+                    # This will clash with the root key labeled 'Info'
+                    del identity['Info']
 
                     data = identity
                     found_erase_identity = True
@@ -236,8 +250,8 @@ class TSSManifest(object):
                 except:
                     pass
 
-            production_mode = False
-            security_mode = False
+            #production_mode = False
+            #security_mode = False
 
             for component in data['Manifest']:
                 content = data['Manifest'][component]
@@ -282,12 +296,15 @@ class TSSManifest(object):
                     data['BbGoldCertId'] = bb_config[0]
 
                     if len(bbsnum) != bb_config[1]:
-                        print('Provided BbSNUM length is', len(bbsnum), 'while the max for', device, 'is', bb_config[1])
+                        print('Provided BbSNUM length is', len(bbsnum),
+                              'while the max for', device, 'is', bb_config[1])
                         exit(1)
 
-                    data['BbSNUM'] = int(bbsnum, 16).to_bytes(bb_config[1], 'big')
+                    data['BbSNUM'] = int(bbsnum, 16).to_bytes(
+                        bb_config[1], 'big')
                 else:
-                    print(device, 'either does not have a known BbGoldCertId and/or you have not supplied a BbSNUM. Skipping BBTicket...')
+                    print(
+                        device, 'either does not have a known BbGoldCertId and/or you have not supplied a BbSNUM. Skipping BBTicket...')
                     for key in list(data):
                         if key == 'BasebandFirmware' or key[0:2] == 'Bb':
                             del data[key]

@@ -7,9 +7,8 @@ from urllib.request import Request, urlopen
 try:
     from .ipswapi import APIParser
     from .manifest import TSSManifest
-except ImportError as error:
-    print('Oof, got error:', error)
-    raise
+except:
+    raise ImportError
 
 tss_url = 'https://gs.apple.com/TSS/controller?action=2'
 tss_headers = {'User-Agent': 'InetURL/1.0', 'Proxy-Connection': 'Keep-Alive', 'Pragma': 'no-cache',

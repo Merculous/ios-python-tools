@@ -1,10 +1,11 @@
 import re
+import plistlib
 
 try:
+    #from .ipwapi import APIParser
     from .manifest import BuildManifest
-except ImportError as error:
-    print('Oof, got error:', error)
-    raise
+except:
+    raise ImportError
 
 """
 
@@ -40,49 +41,36 @@ class Template(object):
 
     def createTemplate(self):
         # TODO Make this, completely scrap the template file I have, prepare for pypi functionality
-        # Basically, "{{keys" + list of strings with "| <name> = <data> + IV, Key, KBAG" + "}}"
-        start = "{{keys"
-        data = list()
-        end = "}}"
-
-        tempate = " ".join([start, end])
-
-        return tempate
-
-    def parseTemplate(self):
-        with open('key-template-img3.txt') as f:  # Will need to add some comparisons for img4
-            data = f.read()
-            keys = data.split('{{keys')[1].split('}}')[0].splitlines()
-            new_list = list(filter(None, keys))  # Remove all ''
-            fixed = list()
-            for stuff in new_list:
-                fix = re.sub('\s+', ' ', stuff).strip()
-                fixed.append(fix)
-            return fixed
-        f.close()
-
-    def addManifestData(self):
-        template_data = self.parseTemplate()
         manifest = BuildManifest()
-        manifest_data = manifest.extractData()
+        data = manifest.extractData()
 
-        new_data = list()
+        api = APIParser(data['device'], data['ios'])
+        url = api.printURLForArchive()
 
-        version = ' '.join((template_data[0], manifest_data['ios']))
-        buildid = ' '.join((template_data[1], manifest_data['buildid']))
-        device = ' '.join((template_data[2], manifest_data['device']))
-        codename = ' '.join((template_data[3], manifest_data['codename']))
-        #version = ' '.join((template_data[4], manifest_data['baseband']))
-        #version = ' '.join((template_data[5], manifest_data['downloadurl']))
+        raw_template = [
+            "{{keys",
+            "| Version              = ".format(data['ios']),
+            "| Build                = ".format(data['buildid']),
+            "| Device               = ".format(data['device']),
+            "| Codename             = ".format(data['codename']),
+            "| Baseband             = ",
+            "| DownloadURL          = ".format(url),
+            "| RootFS               = ",
+            "| RootFSKey            = ",
+            "| {}                   = ",
+            "| {}IV                 = ",
+            "| {}Key                = ",
+            "| {}KBAG               = ",
+            "}}"
+        ]
 
-        print(template_data)
-        new_data.extend([version, buildid, device, codename])
-        print(manifest_data)
-        print(new_data)
-
-        # TODO Figure out a way to not have to declare all of this.
-
-        # for i in range(6, len(template_data)):
-        # print(template_data[i])
-
-        # Within the list, we can just get the name and its index, the next three (or next for RootFS) will be its "data"
+    def parseTemplate(self, string):
+        keys = string.split('{{keys')[1].split('}}')[0].splitlines()
+        new_list = list(filter(None, keys))  # Remove all ''
+        fixed = list()
+        for stuff in new_list:
+            fix = re.sub(r'\s+', ' ', stuff).strip().replace('| ', '')
+            epic_fix = fix.replace(' =', '').split()
+            data = {epic_fix[0]: epic_fix[1]}
+            fixed.append(data)
+        return fixed

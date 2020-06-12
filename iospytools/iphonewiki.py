@@ -1,12 +1,13 @@
 import os
+import json
 from urllib.request import urlopen
 
 try:
     from .ipswapi import APIParser
     from .manifest import BuildManifest
-except ImportError as error:
-    print('Oof, got error:', error)
-    raise
+    from .template import Template
+except:
+    raise ImportError
 
 
 class iPhoneWiki(object):
@@ -23,26 +24,51 @@ class iPhoneWiki(object):
         Grabs keys and codename.
         """
 
-    def getWikiKeys(self):  # TODO Add OTA compatibility, allow single file grabbing
-        api = APIParser(self.device, self.version)
-        buildid = api.iOSToBuildid()
+    # TODO Add OTA compatibility, allow single file grabbing
+    def getWikiKeys(self, save=False, file=False):
+        try:
+            api = APIParser(self.device, self.version)
+            buildid = api.iOSToBuildid()
+        except:
+            raise ConnectionError
+
+        template = Template()
 
         path = 'BuildManifest.plist'
 
         if os.path.exists(path):  # Also, just in case if the user terminated
-            os.remove(path)  # So we don't have a leftover manifest that isn't the same device and or iOS
+            # So we don't have a leftover manifest that isn't the same device and or iOS
+            os.remove(path)
 
-        api.downloadManifest()  # To keep data "constant" we need to download every time
+        try:
+            api.downloadManifest()  # To keep data "constant" we need to download every time
+        except:
+            raise ConnectionError
 
         build_manifest = BuildManifest()
-        codename = build_manifest.getCodename()
+        # Get BuildManiest.plist codename, filenames, and file paths.
+        manifest_data = build_manifest.extractData()
+        codename = manifest_data['codename']
 
-        wikiUrl = 'https://www.theiphonewiki.com/w/index.php?title={}_{}_({})&action=edit'.format(codename, buildid, self.device)
-        request = urlopen(wikiUrl).read().decode('utf-8')
-        data = request.split('{{keys')[1].split('}}')[0].replace('|', '').splitlines()
-        del data[0:8]  # Remove the top info we don't need
-        os.remove(path)
-        return data
+        wikiUrl = 'https://www.theiphonewiki.com/w/index.php?title={}_{}_({})&action=edit'.format(
+            codename, buildid, self.device)
+        try:
+            request = urlopen(wikiUrl).read().decode('utf-8')
+        except:
+            raise ConnectionError
+        else:
+            data = template.parseTemplate(request)
+            if save:  # FIXME
+                json_path = '{}_{}_{}.json'.format(
+                    self.device, self.version, buildid)
+                if path in os.listdir(os.getcwd()):
+                    os.remove(path)
+                with open(json_path, 'w') as f:
+                    print('Writing contents to file...')
+                    f.write(json.dumps(data))
+                f.close()
+            else:
+                return data
 
     # TODO Maybe have it open an html file, the page to upload keys, importing template into the page, just needing to press "upload"
 

@@ -10,9 +10,8 @@ from urllib.parse import urlsplit
 
 try:
     import progressbar
-except ImportError as error:
-    print('Oof, got error:', error)
-    raise
+except:
+    raise ImportError
 
 """
 

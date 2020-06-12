@@ -1,7 +1,7 @@
-import struct
-import sys
+#import struct
+#import sys
 import os
-import math
+#import math
 import humanize
 
 """
@@ -88,7 +88,8 @@ class IMG3(object):
                 data = f.read()
 
                 for tag in tags:
-                    tag = tag.encode()[::-1]  # Convert to bytes, and reverse the bytes due to little-endian
+                    # Convert to bytes, and reverse the bytes due to little-endian
+                    tag = tag.encode()[::-1]
                     count = 1
                     duplicated = list()
                     if tag in data:

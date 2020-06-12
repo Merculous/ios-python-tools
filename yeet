@@ -13,7 +13,7 @@ import sys
 import os
 
 try:
-    #from iospytools.bundle import Bundle
+    from iospytools.bundle import Bundle
     #from iospytools.foreman import Foreman
     from iospytools.img3 import IMG3
     #from iospytools.img4 import IMG4
@@ -24,10 +24,9 @@ try:
     #from iospytools.template import Template
     from iospytools.tss import TSS
     from iospytools.utils import clean, splitKbag
-    from iospytools.usb import USB
-except ImportError:
-    print('Did you run pip3 install -r requirements.txt?')
-    raise
+    #from iospytools.usb import USB
+except:
+    raise ImportError('Did you run pip3 install -r requirements.txt?')
 
 
 def main():
@@ -80,8 +79,9 @@ def main():
 
     parser.add_argument(
         "--keys",
-        help="Get keys for an iOS",
-        nargs=2, metavar=('DEVICE', 'iOS'))
+        help="Get keys for an iOS (Use with --save to save keys into a json file)",
+        nargs=2,
+        metavar=('DEVICE', 'iOS'))
 
     parser.add_argument(
         "--kpwn",
@@ -114,6 +114,11 @@ def main():
         metavar=('DEVICE', 'ECID'))
 
     parser.add_argument(
+        "--save",
+        help="Only use this if you want to also save keys to a json file",
+        action='store_true')
+
+    parser.add_argument(
         "--signed",
         help="Print the signed iOS versions for a device",
         nargs=1,
@@ -133,7 +138,7 @@ def main():
 
     parser.add_argument(
         "--test",
-        action='store_true')
+        nargs=1,)
 
     args = parser.parse_args()
 
@@ -169,9 +174,12 @@ def main():
 
     elif args.keys:
         wiki = iPhoneWiki(argv[2], argv[3])
-        data = wiki.getWikiKeys()
-        for stuff in data:
-            print(stuff)
+        if args.save:
+            data = wiki.getWikiKeys(save=True)
+        else:
+            data = wiki.getWikiKeys()
+            for stuff in data:
+                print(stuff)
 
     elif args.kpwn:
         pass
@@ -206,8 +214,8 @@ def main():
         image.parseImage()
 
     elif args.test:
-        device = USB()
-        device.getDevices()
+        bundle = Bundle(argv[2])
+        bundle.checkBundle()
 
     else:
         sys.exit(parser.print_help(sys.stderr))

@@ -1,8 +1,7 @@
 try:
     import usb
-except ImportError as error:
-    print('Oof, got error:', error)
-    raise
+except:
+    raise ImportError
 
 
 class USB:
