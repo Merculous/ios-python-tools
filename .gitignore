@@ -13,3 +13,4 @@ devices.txt
 *.ipsw
 .idea
 *.pyc
+*.patched

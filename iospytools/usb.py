@@ -1,7 +1,7 @@
 try:
     import usb
-except:
-    raise ImportError
+except ImportError:
+    raise
 
 
 class USB:

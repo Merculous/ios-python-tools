@@ -3,11 +3,11 @@ import json
 from urllib.request import urlopen
 
 try:
-    from .ipswapi import APIParser
+    from .ipswapi import API
     from .manifest import BuildManifest
     from .template import Template
-except:
-    raise ImportError
+except ImportError:
+    raise
 
 
 class iPhoneWiki(object):
@@ -27,10 +27,11 @@ class iPhoneWiki(object):
     # TODO Add OTA compatibility, allow single file grabbing
     def getWikiKeys(self, save=False, file=False):
         try:
-            api = APIParser(self.device, self.version)
+            api = API(self.device, self.version)
             buildid = api.iOSToBuildid()
-        except:
-            raise ConnectionError
+        except ConnectionError:
+            print('Got an Apple or ipsw.me connection error!')
+            raise
 
         template = Template()
 
@@ -42,8 +43,9 @@ class iPhoneWiki(object):
 
         try:
             api.downloadManifest()  # To keep data "constant" we need to download every time
-        except:
-            raise ConnectionError
+        except ConnectionError:
+            print('Failed to download build manifest!')
+            raise
 
         build_manifest = BuildManifest()
         # Get BuildManiest.plist codename, filenames, and file paths.
@@ -54,8 +56,9 @@ class iPhoneWiki(object):
             codename, buildid, self.device)
         try:
             request = urlopen(wikiUrl).read().decode('utf-8')
-        except:
-            raise ConnectionError
+        except ConnectionError:
+            print('Failed to request data from iPhoneWiki!')
+            raise
         else:
             data = template.parseTemplate(request)
             if save:  # FIXME

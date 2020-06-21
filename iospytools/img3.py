@@ -1,7 +1,7 @@
-#import struct
-#import sys
+# import struct
+# import sys
 import os
-#import math
+# import math
 import humanize
 
 """
@@ -83,7 +83,7 @@ class IMG3(object):
                 tags = ['rdsk', 'ibss', 'ibec', 'ibot', 'illb', 'dtre', 'logo', 'chg0',
                         'chg1', 'batF', 'bat0', 'bat1', 'glyC', 'glyP', 'nsrv', 'recm']
 
-                #data = struct.unpack('<I', f.read())
+                # data = struct.unpack('<I', f.read())
                 # print(type(data))
                 data = f.read()
 

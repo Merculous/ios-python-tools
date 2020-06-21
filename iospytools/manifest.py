@@ -2,77 +2,25 @@ import plistlib
 
 try:
     from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
-except:
-    raise ImportError
+except ImportError:
+    pass
 
 
 class BuildManifest(object):
-    def __init__(self, path='BuildManifest.plist'):
+    def __init__(self, data):
         super().__init__()
 
         try:
-            self.path = path
-            with open(self.path, 'rb+') as f:
-                self.data = plistlib.load(f)
-        except:
-            raise IOError
+            stuff = plistlib.loads(data)
+        except IOError:
+            print('Failed to read manifest!')
+            raise
+        else:
+            self.data = stuff
 
-    def extractData(self):
-        # path will default to BuildManifest.plist, unless user provides custom
-        try:
-            with open(self.path, 'rb+') as f:
-                data = plistlib.load(f)
-
-                buildid = data['ProductBuildVersion']
-                iOS = data['ProductVersion']
-                device = data['SupportedProductTypes'][0]
-                codename = data['BuildIdentities'][0]['Info']['BuildTrain']
-
-                files = []
-                file_info = dict()
-
-                for file in data['BuildIdentities'][0]['Manifest'].items():
-                    file_info['name'] = file[0]
-                    file_info['path'] = file[1]['Info']['Path']
-                    file_info['iv'] = None
-                    file_info['key'] = None
-                    file_info['kbag'] = None
-
-                    files.append(file_info)
-
-            # TODO Fix parsing manifests with multiple devices. iPhone6,1 10.3.3 'files' gives output of n69 instead of its n51
-
-            # yeet, apple gives up the iboot version string in the manifest :D
-
-            info = {
-                'device': device,
-                'ios': iOS,
-                'buildid': buildid,
-                'codename': codename,
-                'files': files
-            }
-
-            return info
-        except:
-            raise FileNotFoundError
-
-    def getCodename(self):
-        try:
-            return self.data['BuildIdentities'][0]['Info']['BuildTrain']
-        except:
-            raise IOError
-
-    def getFilePaths(self):
-        files = list()
-        temp = self.data['BuildIdentities'][0]['Manifest']
-        for component in temp.items():
-            path = component[1]['Info']['Path']  # Lmao, was missing [1]
-            files.append(path)
-
-        return files
-
-    def getBasebandVersion(self):
-        pass
+    def parse(self):
+        data = self.data
+        return data
 
 
 class TSSManifest(object):
@@ -250,8 +198,8 @@ class TSSManifest(object):
                 except:
                     pass
 
-            #production_mode = False
-            #security_mode = False
+            # production_mode = False
+            # security_mode = False
 
             for component in data['Manifest']:
                 content = data['Manifest'][component]

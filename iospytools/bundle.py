@@ -3,8 +3,8 @@ import plistlib
 
 try:
     import bsdiff4
-except:
-    raise ImportError
+except ImportError:
+    raise
 
 
 class Bundle:
@@ -14,23 +14,18 @@ class Bundle:
         self.bundle = bundle
 
     def checkBundle(self):
-        if os.path.isdir(self.bundle):
-            # TODO Check for .patch, and Info.plist files
-            if 'Info.plist' in os.listdir(self.bundle):
-                # Check if .patch files exist, check if they are actual patch files
-                pass
-            else:
-                raise FileNotFoundError(
-                    'Info.plist must be needed to patch an ipsw!')
-        else:
-            raise ValueError('{} is not a bundle!'.format(self.bundle))
+        try:
+            os.path.isdir(self.bundle)
+        except ValueError:
+            print('{} is not a bundle!'.format(self.bundle))
+            raise
 
     def parsePlist(self):
-        try:
-            path = self.bundle + '/Info.plist'
-        except FileNotFoundError:
-            print('Oof, Info.plist does not exist!')
-
-        with open(path, 'rb') as f:
+        with open('{}/Info.plist'.format(self.bundle), 'rb') as f:
             data = plistlib.load(f)
-            print(data)
+            return data
+
+    def patch(self, path, patchfile):
+        print('Patching: {}'.format(path))
+        bsdiff4.file_patch(path, '{}.patched'.format(
+            os.path.basename(path)), patchfile)

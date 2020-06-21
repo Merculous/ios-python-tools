@@ -10,23 +10,22 @@ Handles arguments and passes them to the functions.
 
 import argparse
 import sys
-import os
 
 try:
-    from iospytools.bundle import Bundle
-    #from iospytools.foreman import Foreman
+    # from iospytools.bundle import Bundle
+    # from iospytools.foreman import Foreman
     from iospytools.img3 import IMG3
-    #from iospytools.img4 import IMG4
+    # from iospytools.img4 import IMG4
     from iospytools.iphonewiki import iPhoneWiki
-    #from iospytools.ipsw import IPSW
-    from iospytools.ipswapi import APIParser
-    from iospytools.manifest import BuildManifest
-    #from iospytools.template import Template
+    # from iospytools.ipsw import IPSW
+    from iospytools.ipswapi import API
+    # from iospytools.manifest import BuildManifest
+    # from iospytools.template import Template
     from iospytools.tss import TSS
-    from iospytools.utils import clean, splitKbag
-    #from iospytools.usb import USB
-except:
-    raise ImportError('Did you run pip3 install -r requirements.txt?')
+    from iospytools.utils import splitKbag
+    # from iospytools.usb import USB
+except ImportError:
+    raise
 
 
 def main():
@@ -138,41 +137,32 @@ def main():
 
     parser.add_argument(
         "--test",
-        nargs=1,)
+        nargs=2)
 
     args = parser.parse_args()
 
-    if args.buildid:
-        api = APIParser(argv[2], argv[3])
-        print(api.buildid)  # ./yeet --buildid device version
+    if args.buildid:  # ./yeet --buildid device iOS
+        api = API(argv[2], argv[3])
+        print(api.iOSToBuildid())
 
-    elif args.bundle:
+    elif args.bundle:  # ./yeet --bundle bundle ipsw
         pass
 
-    elif args.clean:
-        clean()
-
-    elif args.codename:
-        cwd = os.listdir(os.getcwd())
-        path = 'BuildManifest.plist'
-        if path not in cwd:
-            api = APIParser(argv[2], argv[3])
-            api.downloadManifest()
-        else:
-            os.remove(path)
-
-        manifest = BuildManifest()
-        print(manifest.getCodename())
-        os.remove(path)
-
-    elif args.download:
-        api = APIParser(argv[2], argv[3])
-        api.downloadIPSW()  # ./yeet --download device version
-
-    elif args.dra:
+    elif args.clean:  # TODO IDK if I'll be needing this?
         pass
 
-    elif args.keys:
+    elif args.codename:  # ./yeet --codename device iOS
+        api = API(argv[2], argv[3])
+        print(api.getCodename())
+
+    elif args.download:  # ./yeet --download device iOS
+        api = API(argv[2], argv[3])
+        api.downloadIPSW()
+
+    elif args.dra:  # ./yeet --dra ipsw
+        pass
+
+    elif args.keys:  # ./yeet --keys device iOS (WIP --save)
         wiki = iPhoneWiki(argv[2], argv[3])
         if args.save:
             data = wiki.getWikiKeys(save=True)
@@ -181,46 +171,43 @@ def main():
             for stuff in data:
                 print(stuff)
 
-    elif args.kpwn:
+    elif args.kpwn:  # ./yeet --kpwn ipsw
         pass
 
-    elif args.manifest:
-        api = APIParser(argv[2], argv[3])
-        api.downloadManifest()
+    elif args.manifest:  # ./yeet --manifest device iOS
+        api = API(argv[2], argv[3])
+        api.downloadFileFromArchive('BuildManifest.plist')
 
-    elif args.odysseus:
+    elif args.odysseus:  # ./yeet --odysseus ipsw
         pass
 
-    elif args.pwnage:
+    elif args.pwnage:  # ./yeet --pwnage ipsw
         pass
 
-    elif args.shsh:
-        tss = TSS(argv[2], argv[3])  # ./yeet --shsh device ecid
+    elif args.shsh:  # ./yeet --shsh device ecid
+        tss = TSS(argv[2], argv[3])
         tss.saveBlobs()
 
-    elif args.signed:
-        api = APIParser(argv[2], None)  # ./yeet --signed device
-        data = api.signed()
-        for stuff in data:
-            print('iOS: {} ({}) ({})'.format(stuff[0], stuff[1], stuff[2]))
+    elif args.signed:  # ./yeet --signed device
+        api = API(argv[2])
+        for stuff in api.getSignedVersions():
+            print('{} ({}) {}'.format(
+                stuff['iOS'], stuff['buildid'], stuff['filetype']))
 
-    elif args.split:
-        kbag = splitKbag(argv[2])  # ./yeet --split kbag
+    elif args.split:  # ./yeet --split kbag
+        kbag = splitKbag(argv[2])
         print('IV:', kbag['iv'])
         print('Key:', kbag['key'])
 
-    elif args.tags:
+    elif args.tags:  # ./yeet --tags img3
         image = IMG3(argv[2])
         image.parseImage()
 
     elif args.test:
-        bundle = Bundle(argv[2])
-        bundle.checkBundle()
+        pass
 
     else:
         sys.exit(parser.print_help(sys.stderr))
-
-    clean()
 
 
 if __name__ == '__main__':

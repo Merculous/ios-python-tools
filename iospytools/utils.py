@@ -10,8 +10,8 @@ from urllib.parse import urlsplit
 
 try:
     import progressbar
-except:
-    raise ImportError
+except ImportError:
+    raise
 
 """
 
@@ -100,9 +100,3 @@ def fastTokenHex(byte_length):
     for i in range(0, byte_length * 2):
         token += choice(hexdigits)
     return token
-
-
-def clean():
-    for file in os.listdir(os.getcwd()):
-        if file.endswith('json'):
-            os.remove(file)

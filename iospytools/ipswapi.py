@@ -1,187 +1,146 @@
+
 import json
 import os
-from urllib.request import urlretrieve
+import plistlib
+import sys
+from urllib.request import urlopen, urlretrieve
 
 try:
     from remotezip import RemoteZip
-    from .utils import downloadJSONData, showProgress, splitToFileName
-except:
-    raise ImportError
+except ImportError:
+    raise
 
-"""
-
-This is mainly the heart of the script.
-
-Handles data from ipsw.me api
-
-"""
+try:
+    from .utils import showProgress
+except ImportError:
+    raise
 
 
-class APIParser(object):
-    def __init__(self, device, version, ota=False, beta=False):
+class API(object):
+    def __init__(self, device, version=None, buildid=None):
         super().__init__()
+
         self.device = device
         self.version = version
-        self.buildid = self.iOSToBuildid()
-        self.ota = ota
-        self.beta = beta
+        self.buildid = buildid
 
-    def linksForDevice(self, filetype):
+    def getDeviceJSONData(self, filetype='ipsw'):
+        # Returns JSON Data, rather than downloading each time, see below later on :P
+        if filetype == 'ipsw':
+            api_url = 'https://api.ipsw.me/v4/device/{}?type={}'.format(
+                self.device, 'ipsw')
+        elif filetype == 'ota':
+            api_url = 'https://api.ipsw.me/v4/device/{}?type={}'.format(
+                self.device, 'ota')
+        else:
+            raise ValueError('Only filetypes, "ipsw" and "ota" are supported!')
+
         try:
-            url = 'https://api.ipsw.me/v4/device/{}?type={}'.format(
-                self.device, filetype)
-            return downloadJSONData(url, self.device)
-        except:
-            raise ConnectionError
+            r = urlopen(api_url).read().decode('utf-8')
+        except ConnectionError:
+            print('Failed to download JSON data!')
+            raise
+        else:
+            return json.loads(r)
 
     def iOSToBuildid(self):
-        try:
-            self.linksForDevice('ipsw')
-        except:
-            raise ConnectionError
-        else:
-            try:
-                with open('{}.json'.format(self.device), 'r') as file:
-                    data = json.load(file)
-                    for i in range(0, len(data['firmwares'])):
-                        if data['firmwares'][i]['version'] == self.version:
-                            return data['firmwares'][i]['buildid']
-            except:
-                raise FileNotFoundError
+        # Easy to use function since we don't have to be paranoid about reading leftover json data :D
+        data = self.getDeviceJSONData()
+        for i in range(0, len(data['firmwares'])):
+            if data['firmwares'][i]['version'] == self.version:
+                return data['firmwares'][i]['buildid']
 
-        return ''
+    def getArchiveURL(self, filetype='ipsw'):
+        if filetype == 'ipsw':
+            api_url = 'https://api.ipsw.me/v4/ipsw/{}/{}'.format(
+                self.device, self.iOSToBuildid())
+        elif filetype == 'ota':
+            # TODO Add ota support
+            pass
+        else:
+            raise ValueError('Only filetypes, "ipsw" and "ota" are supported!')
+
+        r = urlopen(api_url).read().decode('utf-8')
+        data = json.loads(r)
+        url = data['url']
+        return url
 
     def downloadIPSW(self):
-        try:
-            self.linksForDevice('ipsw')
-        except:
-            raise ConnectionError
+        # TODO Use given hashes to determine if we need to download a genuine copy or not
+        url = self.getArchiveURL()
+        ipsw_name = os.path.basename(url)
+        if not os.path.exists(ipsw_name):
+            print('URL: {}'.format(url))
+            print('File: {}'.format(ipsw_name))
+            urlretrieve(url, ipsw_name, showProgress)
         else:
-            try:
-                with open('{}.json'.format(self.device), 'r') as file:
-                    data = json.load(file)
-                    i = 0
-                    buildidFromJsonFile = data['firmwares'][i]['buildid']
-                    while buildidFromJsonFile != self.buildid:
-                        i += 1
-                        buildidFromJsonFile = data['firmwares'][i]['buildid']
+            sys.exit('{} already exists!'.format(ipsw_name))
 
-                    url = data['firmwares'][i]['url']
-                    ios = data['firmwares'][i]['version']
-                    filename = splitToFileName(url)
+    # TODO Add beta support CC @mcg29
 
-                    print('Device:', self.device)
-                    print('iOS:', ios)
-                    print('Buildid:', buildidFromJsonFile)
-                    print('Filename:', filename)
-                    try:
-                        urlretrieve(url, filename, showProgress)
-                    except:
-                        raise ConnectionError
-            except:
-                raise FileNotFoundError
+    def getSignedVersions(self, beta=False):
+        data = self.getDeviceJSONData()
+        signed = list()
+        for i in range(0, len(data['firmwares'])):
+            version_from_json = data['firmwares'][i]['version']
+            buildid_from_json = data['firmwares'][i]['buildid']
+            signature_from_json = data['firmwares'][i]['signed']
+            if signature_from_json:
+                stuff = {
+                    'iOS': version_from_json,
+                    'buildid': buildid_from_json,
+                    'signed': signature_from_json,
+                    'filetype': 'ipsw'
+                }
+                if stuff not in signed:
+                    signed.append(stuff)
 
-    def signed(self):
-        # Get ipsw signed versions
-        try:
-            self.linksForDevice('ipsw')
-        except:
-            raise ConnectionError
+        data = self.getDeviceJSONData('ota')
+        for i in range(0, len(data['firmwares'])):
+            version_from_json = data['firmwares'][i]['version']
+            buildid_from_json = data['firmwares'][i]['buildid']
+            signature_from_json = data['firmwares'][i]['signed']
+            if signature_from_json:
+                stuff = {
+                    'iOS': version_from_json,
+                    'buildid': buildid_from_json,
+                    'signed': signature_from_json,
+                    'filetype': 'ota'
+                }
+                if stuff not in signed:
+                    signed.append(stuff)
+
+        return signed
+
+    def downloadFileFromArchive(self, path, filetype='ipsw'):
+        url = self.getArchiveURL()
+        if filetype == 'ipsw':
+            with RemoteZip(url) as f:
+                files = f.namelist()
+                if not os.path.exists(path):
+                    if path in files:
+                        print('Downloading: {}'.format(path))
+                        f.extract(path)
+                else:
+                    raise FileExistsError
+
+        elif filetype == 'ota':
+            # TODO Add ota support
+            pass
+
         else:
-            try:
-                with open('{}.json'.format(self.device), 'r') as file:
-                    signedVersions = list()
-                    data = json.load(file)
-                    for stuff in data['firmwares']:
-                        ios = stuff['version']
-                        buildid = stuff['buildid']
-                        status = stuff['signed']
-                        versions = [ios, buildid, 'ipsw']
-                        if status:  # If signed
-                            signedVersions.append(versions)
-            except:
-                raise FileNotFoundError
+            raise ValueError('Only filetypes, "ipsw" and "ota" are supported!')
 
-        # Get ota signed versions
-        try:
-            self.linksForDevice('ota')
-        except:
-            raise ConnectionError
-        else:
-            try:
-                with open('{}.json'.format(self.device), 'r') as f:
-                    data = json.load(f)
-                    for stuff in data['firmwares']:
-                        ios = stuff['version']
-                        # Beginning with iOS 10, now versions also include 9.9 at the beginning, example, 9.9.10.3.3. Skip these.
-                        if ios[0:3] == "9.9":
-                            pass
-                        else:
-                            buildid = stuff['buildid']
-                            status = stuff['signed']
-                            currentOTA = [ios, buildid, 'ota']
-                            if status:
-                                if currentOTA not in signedVersions:
-                                    signedVersions.append(currentOTA)
-            except:
-                raise FileNotFoundError
+    # Same as above but we don't download, which does help with leftover json data and such
 
-        # TODO Clean up iOS 10 will have 9.9.10.3.3 for example. We need to print versions with unique buildids once, and if ipsw is signed, only print ipsw signed.
+    def readFileFromArchive(self, path):
+        url = self.getArchiveURL()
+        with RemoteZip(url) as f:
+            data = f.read(path)
+            return data
 
-        # TODO Printed signed versions for iPhone4,1 still gives 9.3.5 ipsw and ota
-
-        return signedVersions
-
-    def downloadFileFromArchive(self, path, output=False):
-        try:
-            self.linksForDevice('ipsw')
-        except:
-            raise ConnectionError
-        else:
-            try:
-                with open('{}.json'.format(self.device), 'r') as file:
-                    data = json.load(file)
-                    i = 0
-                    buildidFromJsonFile = data['firmwares'][i]['buildid']
-                    while buildidFromJsonFile != self.buildid:
-                        i += 1
-                        buildidFromJsonFile = data['firmwares'][i]['buildid']
-
-                    url = data['firmwares'][i]['url']
-                    try:
-                        with RemoteZip(url, timeout=5.0) as zip:
-                            zip.extract(path)
-                    except:
-                        raise ConnectionError
-                    finally:
-                        if output:
-                            os.rename(path, output)
-            except:
-                raise FileNotFoundError
-
-    def printURLForArchive(self):
-        try:
-            self.linksForDevice('ipsw')
-        except:
-            raise ConnectionError
-        else:
-            try:
-                with open('{}.json'.format(self.device), 'r') as file:
-                    data = json.load(file)
-                    i = 0
-                    buildidFromJsonFile = data['firmwares'][i]['buildid']
-                    while buildidFromJsonFile != self.buildid:
-                        i += 1
-                        buildidFromJsonFile = data['firmwares'][i]['buildid']
-
-                    url = data['firmwares'][i]['url']
-
-                return url
-            except:
-                raise FileNotFoundError
-
-    def downloadManifest(self):
-        try:
-            return self.downloadFileFromArchive('BuildManifest.plist')
-        except:
-            raise ConnectionError
+    def getCodename(self):
+        data = self.readFileFromArchive('BuildManifest.plist')
+        stuff = plistlib.loads(data)
+        codename = stuff['BuildIdentities'][0]['Info']['BuildTrain']
+        return codename

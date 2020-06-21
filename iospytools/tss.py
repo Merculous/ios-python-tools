@@ -5,10 +5,10 @@ from shutil import rmtree
 from urllib.request import Request, urlopen
 
 try:
-    from .ipswapi import APIParser
+    from .ipswapi import API
     from .manifest import TSSManifest
-except:
-    raise ImportError
+except ImportError:
+    raise
 
 tss_url = 'https://gs.apple.com/TSS/controller?action=2'
 tss_headers = {'User-Agent': 'InetURL/1.0', 'Proxy-Connection': 'Keep-Alive', 'Pragma': 'no-cache',
@@ -38,10 +38,11 @@ class TSS(object):
             else:
                 print('Server error:', response_text)
         else:
-            return response_text[response_text.find('<?xml'):]  # Remove TSS response header
+            # Remove TSS response header
+            return response_text[response_text.find('<?xml'):]
 
     def saveBlobs(self):
-        api = APIParser(self.device, self.version)
+        api = API(self.device, self.version)
         signed_versions = api.signed()
 
         if os.path.exists('.shsh'):
@@ -51,7 +52,8 @@ class TSS(object):
         if not os.path.exists(self.shsh_path):
             os.mkdir(self.shsh_path)
 
-        tss_test_version_manifest = os.path.join('.shsh', 'TSSTestVersionManifest.plist')
+        tss_test_version_manifest = os.path.join(
+            '.shsh', 'TSSTestVersionManifest.plist')
 
         manobj = TSSManifest()
         manobj.createTSSTestVersionManifest(tss_test_version_manifest)
@@ -71,7 +73,8 @@ class TSS(object):
 
         tss_server_version = tss_version_response['@ServerVersion']
         if tss_server_version != '2.1.0':
-            print('WARNING: TSS server version', tss_server_version, 'may not be supported by this script!')
+            print('WARNING: TSS server version', tss_server_version,
+                  'may not be supported by this script!')
 
         print()
 
@@ -87,14 +90,18 @@ class TSS(object):
 
             # Copy the manifest inside which will contain the added string
 
-            build_manifest = os.path.join('.shsh', 'BuildManifest_{}_{}_{}.plist'.format(self.device, version, buildid))
-            tss_manifest = os.path.join('.shsh', 'TSSManifest_{}_{}_{}.plist'.format(self.device, version, buildid))
+            build_manifest = os.path.join(
+                '.shsh', 'BuildManifest_{}_{}_{}.plist'.format(self.device, version, buildid))
+            tss_manifest = os.path.join(
+                '.shsh', 'TSSManifest_{}_{}_{}.plist'.format(self.device, version, buildid))
 
             api.buildid = buildid
-            api.downloadFileFromArchive('BuildManifest.plist', output=build_manifest)
+            api.downloadFileFromArchive(
+                'BuildManifest.plist', output=build_manifest)
 
             print('Converting from BuildManifest to TSS manifest...')
-            apnonce = manobj.initFromBuildManifest(self.device, tss_manifest, build_manifest, self.ecid, apnonce=self.apnonce, sepnonce=self.sepnonce, bbsnum=self.bbsnum)['apnonce']
+            apnonce = manobj.initFromBuildManifest(
+                self.device, tss_manifest, build_manifest, self.ecid, apnonce=self.apnonce, sepnonce=self.sepnonce, bbsnum=self.bbsnum)['apnonce']
 
             os.remove(build_manifest)
 
@@ -107,7 +114,8 @@ class TSS(object):
             with open(tss_manifest, 'rb') as f:
                 tss_response = self.makeTSSRequest(f.read())
 
-            blob_path = os.path.join(self.shsh_path, '{}_{}_{}-{}_{}.shsh2'.format(self.ecid, self.device, version, buildid, apnonce))
+            blob_path = os.path.join(self.shsh_path, '{}_{}_{}-{}_{}.shsh2'.format(
+                self.ecid, self.device, version, buildid, apnonce))
             with open(blob_path, 'w+') as blob:
                 blob.write(tss_response)
                 print('Saved', version, 'blob to', blob_path)
@@ -159,9 +167,10 @@ class TSS(object):
             "0a475cf24cc2118e9d639f85951c5892e2a5f92e"
         ]
 
-        unc0ver_nonce = "33ad71ce72c2c1d51482af4c40cd4df5c2fd378e43d230793704f18f314fdc83"  # 0x1111111111111111 // default boot-nonce, used in unc0ver
+        # 0x1111111111111111 // default boot-nonce, used in unc0ver
+        unc0ver_nonce = "33ad71ce72c2c1d51482af4c40cd4df5c2fd378e43d230793704f18f314fdc83"
 
-        api = APIParser(self.device, None)
+        api = API(self.device, None)
         for versions in api.signed():
 
             # TODO Add checks to see if we already have the shsh locally
@@ -169,14 +178,18 @@ class TSS(object):
             if self.device == 'iPhone6,1':
                 # For safety, also grab blobs with DFU colliding nonces
                 for nonces in a7_dfu_nonces:
-                    subprocess.check_output(['tsschecker', '-d', self.device, '-i', versions[0], '-e', self.ecid, '--apnonce', nonces, '-s', '--save-path', self.shsh_path])
+                    subprocess.check_output(['tsschecker', '-d', self.device, '-i', versions[0],
+                                             '-e', self.ecid, '--apnonce', nonces, '-s', '--save-path', self.shsh_path])
             elif self.device == 'iPhone7,2':
                 # For safety, also grab blobs with DFU colliding nonces
                 for nonces in a8_dfu_nonces:
-                    subprocess.check_output(['tsschecker', '-d', self.device, '-i', versions[0], '-e', self.ecid, '--apnonce', nonces, '-s', '--save-path', self.shsh_path])
+                    subprocess.check_output(['tsschecker', '-d', self.device, '-i', versions[0],
+                                             '-e', self.ecid, '--apnonce', nonces, '-s', '--save-path', self.shsh_path])
             elif self.device == 'iPhone11,6':
                 # Use unc0ver's custom apnonce
-                subprocess.check_output(['tsschecker', '-d', self.device, '-i', versions[0], '-e', self.ecid, '--apnonce', unc0ver_nonce, '-s', '--save-path', self.shsh_path])
+                subprocess.check_output(['tsschecker', '-d', self.device, '-i', versions[0], '-e',
+                                         self.ecid, '--apnonce', unc0ver_nonce, '-s', '--save-path', self.shsh_path])
             else:
                 # No custom apnonce used
-                subprocess.check_output(['tsschecker', '-d', self.device, '-i', versions[0], '-e', self.ecid, '-s', '--save-path', self.shsh_path])
+                subprocess.check_output(['tsschecker', '-d', self.device, '-i',
+                                         versions[0], '-e', self.ecid, '-s', '--save-path', self.shsh_path])
