@@ -122,7 +122,7 @@ class API(object):
                         print('Downloading: {}'.format(path))
                         f.extract(path)
                 else:
-                    raise FileExistsError
+                    raise FileExistsError('{} already exists!'.format(path))
 
         elif filetype == 'ota':
             # TODO Add ota support

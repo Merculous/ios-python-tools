@@ -2,8 +2,10 @@ This project was inspired by Matteyeux with his ios-tools repo, this will be a s
 
 ### Prerequisites
 
-    1. Run: "pip3 install ." (without the quotes)
+    1. Run: ./install.sh, which also updates, so run this each time to update
     2. You should then have a module called: "iospytools"
+
+    Example: iospytools --keys iPhone2,1 3.0
 
 ### Commands
 
@@ -12,15 +14,14 @@ This project was inspired by Matteyeux with his ios-tools repo, this will be a s
     --codename device iOS | get codename of an iOS
     --download device iOS | download an ipsw
     --keys device iOS     | get keys for an iOS
-    --shsh DEVICE ECID    | save SHSH for all signed iOS versions of a device
+    --shsh DEVICE ECID    | save SHSH for all signed iOS versions of a device (Disabled atm, needs updating.)
     --signed device       | print the signed versions for a device
     --split key           | splits a GID decrypted key
-    --tags file           | print the tags and their hex positions of an img3 file
 
 ### TODO
 
     foreman: key grabbing/uploading
-    template: template parsing/creating
+    template: template creating
     ota/beta shsh saving: CC @mcg
     img3: iBoot patcher, kernel patcher
     img4: idk if I can make this lol
