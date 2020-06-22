@@ -38,7 +38,7 @@ def main():
     argv = sys.argv
 
     parser = argparse.ArgumentParser(
-        usage='{} <option> <args>'.format(argv[0]),
+        usage='iospytools <option> <args>',
         description='provides useful tools/commands which are used in iOS research')
 
     parser.add_argument(

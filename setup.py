@@ -16,6 +16,11 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/merculous/ios-python-tools",
     packages=find_packages(),
+    entry_points={
+        "console_scripts": [
+            "iospytools = iospytools.__main__:main",
+        ]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System     :: OS Independent",

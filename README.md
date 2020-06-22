@@ -2,7 +2,8 @@ This project was inspired by Matteyeux with his ios-tools repo, this will be a s
 
 ### Prerequisites
 
-    pip3 install -r requirements.txt
+    1. Run: "pip3 install ." (without the quotes)
+    2. You should then have a module called: "iospytools"
 
 ### Commands
 
