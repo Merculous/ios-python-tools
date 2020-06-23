@@ -17,7 +17,6 @@ keyring==21.2.1
 mccabe==0.6.1
 more-itertools==8.4.0
 packaging==20.4
-pkg-resources==0.0.0
 pkginfo==1.5.0.1
 pluggy==0.13.1
 progressbar==2.5
