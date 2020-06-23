@@ -3,9 +3,6 @@ from setuptools import find_packages, setup
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
-# rbp https://stackoverflow.com/questions/6947988/when-to-use-pip-requirements-file-versus-install-requires-in-setup-py
-
 setup(
     name="iospytools",
     version="1.0",
@@ -23,12 +20,12 @@ setup(
     },
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Operating System     :: OS Independent",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8"
+        "Programming Language :: Python :: 3.8",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+		"Operating System     :: OS Independent",
     ],
     python_requires='>=3.5',
-    install_requires=REQUIREMENTS
 )

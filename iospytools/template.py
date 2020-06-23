@@ -65,6 +65,8 @@ class Template(object):
         # ]
         pass
 
+    # FIXME I know I can make this a little better...
+
     def parseTemplate(self, string):
         keys = string.split('{{keys')[1].split('}}')[0].splitlines()
         new_list = list(filter(None, keys))  # Remove all ''

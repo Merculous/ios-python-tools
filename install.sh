@@ -1,5 +1,6 @@
 #!/bin/bash
 
-# Installs, and also updates
+python setup.py bdist_wheel sdist
 
-pip3 install -U .
+pip install -e .
+
