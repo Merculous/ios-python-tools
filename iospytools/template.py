@@ -67,13 +67,13 @@ class Template(object):
 
     # FIXME I know I can make this a little better...
 
-    def parseTemplate(self, string):
-        keys = string.split('{{keys')[1].split('}}')[0].splitlines()
+    def parseTemplate(self, data):
+        keys = data.split('{{keys')[1].split('}}')[0].splitlines()
         new_list = list(filter(None, keys))  # Remove all ''
         fixed = list()
         for stuff in new_list:
             fix = re.sub(r'\s+', ' ', stuff).strip().replace('| ', '')
             epic_fix = fix.replace(' =', '').split()
-            data = {epic_fix[0]: epic_fix[1]}
-            fixed.append(data)
+            thingy = {epic_fix[0]: epic_fix[1]}
+            fixed.append(thingy)
         return fixed

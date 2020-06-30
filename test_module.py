@@ -3,5 +3,6 @@
 def something(x):
     return x + 1
 
+
 def test():
     return something(1)

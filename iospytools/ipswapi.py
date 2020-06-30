@@ -17,23 +17,29 @@ except ImportError:
 
 
 class API(object):
-    def __init__(self, device, version=None, buildid=None):
+    def __init__(self, device=str, version=str, buildid=str, ota=False, beta=False):
         super().__init__()
 
         self.device = device
         self.version = version
-        self.buildid = buildid
 
-    def getDeviceJSONData(self, filetype='ipsw'):
+        if buildid:
+            self.buildid = buildid
+        else:
+            self.buildid = self.iOSToBuildid()
+
+        self.ota = ota
+        self.beta = beta
+
+    def getDeviceJSONData(self):
         # Returns JSON Data, rather than downloading each time, see below later on :P
-        if filetype == 'ipsw':
-            api_url = 'https://api.ipsw.me/v4/device/{}?type={}'.format(
-                self.device, 'ipsw')
-        elif filetype == 'ota':
+
+        if self.ota:
             api_url = 'https://api.ipsw.me/v4/device/{}?type={}'.format(
                 self.device, 'ota')
         else:
-            raise ValueError('Only filetypes, "ipsw" and "ota" are supported!')
+            api_url = 'https://api.ipsw.me/v4/device/{}?type={}'.format(
+                self.device, 'ipsw')
 
         try:
             r = urlopen(api_url).read().decode('utf-8')

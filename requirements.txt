@@ -11,9 +11,9 @@ flake8==3.8.3
 humanize==2.4.0
 idna==2.9
 importlib-metadata==1.6.1
--e git+https://github.com/merculous/ios-python-tools@d6ac4725e1023c4dbd41ba8e18f1bcb0578141d8#egg=iospytools
+-e git+https://github.com/merculous/ios-python-tools@20e2c4e8606e0e35c3b747eb3aa1a02d546cdf1d#egg=iospytools
 jeepney==0.4.3
-keyring==20.0.0
+keyring==21.2.1
 mccabe==0.6.1
 more-itertools==8.4.0
 packaging==20.4

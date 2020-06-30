@@ -1,9 +1,4 @@
-import json
-import os
-import platform
-import ssl
 import sys
-import urllib.request
 from random import choice, seed
 from string import ascii_letters, digits
 from urllib.parse import urlsplit
@@ -40,18 +35,6 @@ def showProgress(block_num, block_size, total_size):
     else:
         pbar.finish()
         pbar = None
-
-
-def downloadJSONData(url, filename):
-    if platform.system() == 'Windows':  # I don't see any ssl certficate like in MacOS for Windows
-        if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
-            ssl._create_default_https_context = ssl._create_unverified_context
-
-    request = urllib.request.urlopen(url).read()
-    convert = json.loads(request)
-    with open('{}.json'.format(filename), 'w') as file:
-        json.dump(convert, file, indent=4)
-    file.close()
 
 
 def splitToFileName(path):
