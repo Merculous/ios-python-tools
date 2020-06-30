@@ -31,7 +31,7 @@ class API(object):
         self.ota = ota
         self.beta = beta
 
-    def getDeviceJSONData(self):
+    def getDeviceJSONData(self, ota=False):
         # Returns JSON Data, rather than downloading each time, see below later on :P
 
         if self.ota:

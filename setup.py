@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="iospytools",
-    version="1.0",
+    version="1.0.1",
     author="Merculous",
     author_email="vycemerculous@gmail.com",
     description="provides useful tools/commands which are used in iOS research",
@@ -15,7 +15,7 @@ setup(
     packages=find_packages(),
     entry_points={
         "console_scripts": [
-            "iospytools = iospytools.__main__:main",
+            "iospytools = src.__main__:main",
         ]
     },
     classifiers=[

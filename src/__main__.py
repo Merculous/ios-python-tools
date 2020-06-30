@@ -12,18 +12,18 @@ import argparse
 import sys
 
 try:
-    # from iospytools.bundle import Bundle
-    # from iospytools.foreman import Foreman
-    # from iospytools.img3 import IMG3
-    # from iospytools.img4 import IMG4
-    from iospytools.iphonewiki import iPhoneWiki
-    # from iospytools.ipsw import IPSW
-    from iospytools.ipswapi import API
-    # from iospytools.manifest import BuildManifest
-    # from iospytools.template import Template
-    # from iospytools.tss import TSS
-    from iospytools.utils import splitKbag
-    # from iospytools.usb import USB
+    # from .bundle import Bundle
+    # from .foreman import Foreman
+    # from .img3 import IMG3
+    # from .img4 import IMG4
+    from .iphonewiki import iPhoneWiki
+    # from .ipsw import IPSW
+    from .ipswapi import API
+    # from .manifest import BuildManifest
+    # from .template import Template
+    # from .tss import TSS
+    from .utils import splitKbag
+    # from .usb import USB
 except ImportError:
     raise
 
