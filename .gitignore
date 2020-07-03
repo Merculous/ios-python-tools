@@ -3,7 +3,7 @@ __pycache__
 venv
 .vscode
 shsh
-*.plist
+BuildManifest.plist
 *.code-workspace
 IPSW
 *.ipsw
@@ -12,3 +12,4 @@ IPSW
 *.egg-info
 dist
 build
+.shsh
