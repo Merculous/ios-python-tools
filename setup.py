@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="iospytools",
-    version="1.0.2",
+    version="1.0.3",
     author="Merculous",
     author_email="vycemerculous@gmail.com",
     description="provides useful tools/commands which are used in iOS research",

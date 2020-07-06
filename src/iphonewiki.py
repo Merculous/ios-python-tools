@@ -9,7 +9,7 @@ except ImportError:
 
 
 class iPhoneWiki(object):
-    def __init__(self, device, version, buildid=False, codename=False, ota=False, beta=False):
+    def __init__(self, device: str, version: str, buildid=False, codename=False, ota=False, beta=False):
         super().__init__()
         self.device = device
         self.version = version

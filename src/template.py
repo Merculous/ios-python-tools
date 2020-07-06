@@ -67,7 +67,7 @@ class Template(object):
 
     # FIXME I know I can make this a little better...
 
-    def parseTemplate(self, data):
+    def parseTemplate(self, data: str):
         keys = data.split('{{keys')[1].split('}}')[0].splitlines()
         new_list = list(filter(None, keys))  # Remove all ''
         fixed = list()

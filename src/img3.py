@@ -2,7 +2,11 @@
 # import sys
 import os
 # import math
-import humanize
+
+try:
+    import humanize
+except ImportError:
+    raise
 
 """
 typedef struct img3File {
@@ -48,7 +52,7 @@ SALT:
 
 
 class IMG3(object):
-    def __init__(self, file):
+    def __init__(self, file: str):
         super().__init__()
 
         self.file = file

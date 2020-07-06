@@ -1,7 +1,6 @@
 import sys
 from random import choice, seed
 from string import ascii_letters, digits
-from urllib.parse import urlsplit
 
 try:
     import progressbar
@@ -37,13 +36,7 @@ def showProgress(block_num, block_size, total_size):
         pbar = None
 
 
-def splitToFileName(path):
-    split = urlsplit(path)
-    filename = split.path.split('/')[-1]
-    return filename
-
-
-def splitKbag(kbag=str):
+def splitKbag(kbag: str):
     if len(kbag) != 96:
         sys.exit('String provided is not 96 bytes! The length read was:', len(kbag))
 
@@ -56,14 +49,14 @@ def splitKbag(kbag=str):
     return data
 
 
-def getDeviceType(device):
+def getDeviceType(device: str):
     for index in range(0, len(device)-3):
         if device[index] in digits:
             return device[:index]
     return False
 
 
-def getMajorDeviceRevision(device):
+def getMajorDeviceRevision(device: str):
     splitting_point = device.find(',')
     for index in range(splitting_point-1, 3, -1):
         if device[index] in ascii_letters:
@@ -71,11 +64,11 @@ def getMajorDeviceRevision(device):
     return -1
 
 
-def getMinorDeviceRevision(device):
+def getMinorDeviceRevision(device: str):
     return int(device[device.find(',')+1:])
 
 
-def fastTokenHex(byte_length):
+def fastTokenHex(byte_length: int):
     hexdigits = '0123456789abcdef'
     token = ''
 

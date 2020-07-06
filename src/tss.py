@@ -15,7 +15,7 @@ tss_headers = {'User-Agent': 'InetURL/1.0', 'Proxy-Connection': 'Keep-Alive', 'P
 
 
 class TSS(object):
-    def __init__(self, device, ecid, version=False, apnonce='', sepnonce='', bbsnum='', useDFUCollidingNonces=False, shsh_path='shsh'):
+    def __init__(self, device: str, ecid: str, version=False, apnonce='', sepnonce='', bbsnum='', useDFUCollidingNonces=False, shsh_path='shsh'):
         super().__init__()
         self.device = device
         self.ecid = ecid
@@ -26,7 +26,7 @@ class TSS(object):
         self.useDFUCollidingNonces = useDFUCollidingNonces
         self.shsh_path = shsh_path
 
-    def makeTSSRequest(self, data):
+    def makeTSSRequest(self, data: bytes):
         request = Request(tss_url, headers=tss_headers, data=data)
 
         response = urlopen(request, timeout=5.0)

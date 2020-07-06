@@ -7,7 +7,7 @@ except ImportError:
 
 
 class BuildManifest(object):
-    def __init__(self, data):
+    def __init__(self, data: str):
         super().__init__()
 
         try:
@@ -32,7 +32,7 @@ class TSSManifest(object):
 
     #  Returns BbGoldCertId, BbSNUM length
 
-    def getBbConfigurationForDevice(self, device):
+    def getBbConfigurationForDevice(self, device: str):
         if getDeviceType(device) == 'iPhone':
             if getMajorDeviceRevision(device) == 1 \
                     or getMajorDeviceRevision(device) == 2:
@@ -150,7 +150,7 @@ class TSSManifest(object):
         return []
 
     # See 'Notes' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
-    def createTSSTestVersionManifest(self, path):
+    def createTSSTestVersionManifest(self, path: str):
         testVersionManifest = dict(
             ApSecurityDomain=1
         )
@@ -160,7 +160,7 @@ class TSSManifest(object):
             plistlib.dump(testVersionManifest, v, fmt=plistlib.FMT_XML)
 
     # See 'Sending data (request)' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
-    def initFromBuildManifest(self, device, tss_manifest_path, build_manifest_path, ecid, apnonce='', sepnonce='', bbsnum=''):
+    def initFromBuildManifest(self, device: str, tss_manifest_path: str, build_manifest_path: str, ecid: str, apnonce='', sepnonce='', bbsnum=''):
         with open(build_manifest_path, 'rb+') as f:
             data = plistlib.load(f, fmt=plistlib.FMT_XML)
 

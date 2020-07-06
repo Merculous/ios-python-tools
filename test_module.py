@@ -1,6 +1,6 @@
 # FFS, I'll just make a random test thingy
 
-def something(x):
+def something(x: int):
     return x + 1
 
 

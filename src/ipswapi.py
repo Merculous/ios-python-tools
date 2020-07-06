@@ -17,7 +17,7 @@ except ImportError:
 
 
 class API(object):
-    def __init__(self, device=str, version=str, buildid=str, ota=False, beta=False):
+    def __init__(self, device: str, version: str, buildid: str, ota=False, beta=False):
         super().__init__()
 
         self.device = device
@@ -118,7 +118,7 @@ class API(object):
 
         return signed
 
-    def downloadFileFromArchive(self, path, filetype='ipsw'):
+    def downloadFileFromArchive(self, path: str, filetype='ipsw'):
         url = self.getArchiveURL()
         if filetype == 'ipsw':
             with RemoteZip(url) as f:
@@ -139,7 +139,7 @@ class API(object):
 
     # Same as above but we don't download, which does help with leftover json data and such
 
-    def readFileFromArchive(self, path):
+    def readFileFromArchive(self, path: str):
         url = self.getArchiveURL()
         with RemoteZip(url) as f:
             data = f.read(path)

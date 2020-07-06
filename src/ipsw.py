@@ -11,7 +11,7 @@ except ImportError:
 
 
 class IPSW(object):
-    def __init__(self, ipsw):
+    def __init__(self, ipsw: str):
         super().__init__()
 
         try:

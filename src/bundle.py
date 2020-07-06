@@ -8,7 +8,7 @@ except ImportError:
 
 
 class Bundle:
-    def __init__(self, bundle):
+    def __init__(self, bundle: str):
         super().__init__()
 
         self.bundle = bundle
@@ -25,7 +25,7 @@ class Bundle:
             data = plistlib.load(f)
             return data
 
-    def patch(self, path, patchfile):
+    def patch(self, path: str, patchfile: str):
         print('Patching: {}'.format(path))
         bsdiff4.file_patch(path, '{}.patched'.format(
             os.path.basename(path)), patchfile)
