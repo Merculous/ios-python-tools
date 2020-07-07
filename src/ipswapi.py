@@ -17,7 +17,7 @@ except ImportError:
 
 
 class API(object):
-    def __init__(self, device: str, version: str, buildid: str, ota=False, beta=False):
+    def __init__(self, device: str, version: str, buildid=False, ota=False, beta=False):
         super().__init__()
 
         self.device = device
@@ -28,13 +28,16 @@ class API(object):
         else:
             self.buildid = self.iOSToBuildid()
 
-        self.ota = ota
-        self.beta = beta
+        if ota:
+            self.ota = ota
+
+        if beta:
+            self.beta = beta
 
     def getDeviceJSONData(self, ota=False):
         # Returns JSON Data, rather than downloading each time, see below later on :P
 
-        if self.ota:
+        if ota:
             api_url = 'https://api.ipsw.me/v4/device/{}?type={}'.format(
                 self.device, 'ota')
         else:
