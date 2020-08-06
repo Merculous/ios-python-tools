@@ -1,14 +1,7 @@
-# import struct
-# import sys
-import os
-# import math
+import struct
 
-try:
-    import humanize
-except ImportError:
-    raise
+'''
 
-"""
 typedef struct img3File {
     uint32_t magic;       // ASCII_LE("Img3")
     uint32_t fullSize;    // full size of fw image
@@ -21,7 +14,6 @@ typedef struct img3File {
                           // etc.
     img3Tag  tags[];      // continues until end of file
 };
-
 typedef struct img3Tag {
     uint32_t magic;            // see below
     uint32_t totalLength;      // length of tag including "magic" and these two length values
@@ -30,6 +22,9 @@ typedef struct img3Tag {
     uint8_t  pad[totalLength - dataLength - 12]; // Typically padded to 4 byte multiple
 };
 
+'''
+
+'''
 
 VERS: iBoot version of the image
 SEPO: Security Epoch
@@ -45,64 +40,104 @@ TYPE: Type of image, should contain the same string as the header's ident
 DATA: Real content of the file
 NONC: Nonce used when file was signed.
 CEPO: Chip epoch
-OVRD: Override thingy for demotion - axi0mX
+OVRD: For demoting -axi0mX
 RAND:
-SALT:
-"""
+SALT: For flavor -axi0mX (lmao)
+
+'''
+
+'''
+
+Decryption is done using the modulus at cert + 0xA15
+0xC to SHSH is SHAed
+
+'''
 
 
-class IMG3(object):
-    def __init__(self, file: str):
+class IMG3:
+    def __init__(self, file):
         super().__init__()
 
-        self.file = file
-        self.totalsize = os.path.getsize(self.file)
-        print('Name: {}'.format(os.path.basename(self.file)))
-        print('Size: {}'.format(humanize.naturalsize(self.totalsize)))
+        with open(file, 'rb') as f:
+            self.data = f.read()
+            self.info = {
+                'magic': struct.unpack('4s', self.data[0:4])[0][::-1].decode(),
+                'size': struct.unpack('I', self.data[4:8])[0],
+                'unpacksize': struct.unpack('I', self.data[8:12])[0],
+                'sigcheckarea': struct.unpack('I', self.data[12:16])[0],
+                'ident': struct.unpack('4s', self.data[16:20])[0][::-1].decode(),
+                'tags': None,
+                'kbag': None,
+                'version': None
+            }
 
-        """
+            # Add tag values
 
-        Class to parse and interact with Apple's img3 formatted files.
+            tags = list()
 
-        """
+            i = 20
 
-    def parseImage(self):
-        # Return tags, iBoot version, and other info about an img3
+            while i < 20 + self.info['unpacksize']:
+                self.tag_info = {
+                    'magic': struct.unpack('4s', self.data[i:i+4])[0][::-1].decode(),
+                    'totalsize': struct.unpack('I', self.data[i+4:i+8])[0],
+                    'datasize': struct.unpack('I', self.data[i+8:i+12])[0],
+                    'data': None
+                }
 
-        # Can return a dict with tags and their position, maybe even make this somewhat of a new way of parsing img3?
-        # info = {
-        #
-        # }
+                tag_size = self.tag_info['totalsize']
+                self.tag_info['data'] = self.data[i+12:i+tag_size]
 
-        with open(self.file, 'rb') as f:
-            img3_start = f.read(4)
-            new = img3_start.decode('utf-8')[::-1]
-            if new == 'Img3':
-                # To grab proper tag type, we must not only get the type tag, which will give the correct tag, ident will also give the same value
-                # which means, we have two sources. So, we should not base the file off of one, to increase likelihood that whatever is parsed is done
-                # with as much precision as possible. At least from my point of view, that seems reasonable enough, because with built iBoot however...
+                tags.append(self.tag_info)
+                self.info['tags'] = tags
 
-                # Get type of img3
+                # Done with tag, move on to next
 
-                tags = ['rdsk', 'ibss', 'ibec', 'ibot', 'illb', 'dtre', 'logo', 'chg0',
-                        'chg1', 'batF', 'bat0', 'bat1', 'glyC', 'glyP', 'nsrv', 'recm']
+                i += tag_size
 
-                # data = struct.unpack('<I', f.read())
-                # print(type(data))
-                data = f.read()
+            # Add iBoot version string, if iBoot, of course
 
-                for tag in tags:
-                    # Convert to bytes, and reverse the bytes due to little-endian
-                    tag = tag.encode()[::-1]
-                    count = 1
-                    duplicated = list()
-                    if tag in data:
-                        count += 1
-                        duplicated.append(tag)
-                        duplicated.append(count)
+            for version in self.info['tags']:
+                if version['magic'] == 'VERS':
+                    version_info = {
+                        'stringsize': struct.unpack('I', version['data'][:4])[0],
+                        'string': None
+                    }
+                    size = version_info['stringsize']
+                    version_info['string'] = struct.unpack(
+                        '{}s'.format(size), version['data'][4:4+size])[0].decode()
+                    self.info['version'] = version_info
 
-                    print('Tag {} repeated {} times!'.format(
-                        duplicated[0], duplicated[1]))
+            # Add kbag values
 
-            else:
-                raise ValueError('Not an img3 file')
+            kbags = list()
+            for kbag in self.info['tags']:
+                if kbag['magic'] == 'KBAG':
+                    kbag_info = {
+                        'type': struct.unpack('I', kbag['data'][:4])[0],
+                        'aes_type': struct.unpack('I', kbag['data'][4:8])[0],
+                        'kbag': kbag['data'][8:56].hex()
+                    }
+                    kbags.append(kbag_info)
+            self.info['kbag'] = kbags
+
+            # Add SHSH values
+
+            for blob in self.info['tags']:
+                if blob['magic'] == 'SHSH':
+                    pass
+
+            # Add CERT values
+
+            for cert in self.info['tags']:
+                if cert['magic'] == 'CERT':
+                    pass
+
+    def printInfo(self):
+        return self.info
+
+    def printTags(self):
+        return self.info['tags']
+
+    def getKBAGS(self):
+        return self.info['kbag']

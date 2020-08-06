@@ -17,7 +17,7 @@ except ImportError:
 
 
 class API(object):
-    def __init__(self, device: str, version: str, buildid=False, ota=False, beta=False):
+    def __init__(self, device: str, version=False, buildid=False, ota=False, beta=False):
         super().__init__()
 
         self.device = device
