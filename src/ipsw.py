@@ -2,8 +2,8 @@ import os
 import zipfile
 
 try:
-    # from .bundle import Bundle
-    from .manifest import BuildManifest
+    # from bundle import Bundle
+    from manifest import BuildManifest
 except ImportError:
     raise
 

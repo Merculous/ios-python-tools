@@ -2,8 +2,8 @@ import sys
 from urllib.request import urlopen
 
 try:
-    from .ipswapi import API
-    from .template import Template
+    from ipswapi import API
+    from template import Template
 except ImportError:
     raise
 

@@ -4,8 +4,8 @@ from shutil import rmtree
 from urllib.request import Request, urlopen
 
 try:
-    from .ipswapi import API
-    from .manifest import TSSManifest
+    from ipswapi import API
+    from manifest import TSSManifest
 except ImportError:
     raise
 

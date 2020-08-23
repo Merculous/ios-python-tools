@@ -11,7 +11,7 @@ except ImportError:
     raise
 
 try:
-    from .utils import showProgress
+    from utils import showProgress
 except ImportError:
     raise
 

@@ -8,22 +8,26 @@ Handles arguments and passes them to the functions.
 
 """
 
+import os
 import sys
 from argparse import ArgumentParser
 
+file_dir = os.path.dirname(__file__)
+sys.path.append(file_dir)
+
 try:
-    # from .bundle import Bundle
-    # from .foreman import Foreman
-    from .img3 import IMG3
-    # from .img4 import IMG4
-    from .iphonewiki import iPhoneWiki
-    # from .ipsw import IPSW
-    from .ipswapi import API
-    # from .manifest import BuildManifest
-    # from .template import Template
-    from .tss import TSS
-    from .utils import splitKbag
-    # from .usb import USB
+    # from bundle import Bundle
+    # from foreman import Foreman
+    from img3 import IMG3
+    # from img4 import IMG4
+    from iphonewiki import iPhoneWiki
+    # from ipsw import IPSW
+    from ipswapi import API
+    # from manifest import BuildManifest
+    # from template import Template
+    from tss import TSS
+    from utils import splitKbag
+    # from usb import USB
 except ImportError:
     raise
 
@@ -102,7 +106,7 @@ def main():
         metavar='FILE'
     )
 
-    parser.add_argument('--test', action='store_true')
+    parser.add_argument('--test', nargs=1)
 
     args = parser.parse_args()
 
@@ -151,9 +155,8 @@ def main():
         tags = IMG3(args.tags[0])
         tags.printTags()
 
+    elif args.test:
+        pass
+
     else:
         sys.exit(parser.print_help(sys.stderr))
-
-
-if __name__ == '__main__':
-    main()

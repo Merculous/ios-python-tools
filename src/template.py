@@ -1,11 +1,3 @@
-import re
-# import plistlib
-
-# try:
-# from .ipwapi import APIParser
-# from .manifest import BuildManifest
-# except ImportError:
-# raise
 
 """
 
@@ -65,15 +57,16 @@ class Template(object):
         # ]
         pass
 
-    # FIXME I know I can make this a little better...
-
     def parseTemplate(self, data: str):
         keys = data.split('{{keys')[1].split('}}')[0].splitlines()
         new_list = list(filter(None, keys))  # Remove all ''
-        fixed = list()
+        del new_list[0:6]  # Don't need to parse this
+
+        info = list()
+
         for stuff in new_list:
-            fix = re.sub(r'\s+', ' ', stuff).strip().replace('| ', '')
-            epic_fix = fix.replace(' =', '').split()
-            thingy = {epic_fix[0]: epic_fix[1]}
-            fixed.append(thingy)
-        return fixed
+            yeet = stuff.replace('|', '').replace('=', '').strip()
+            yort = yeet.split()
+            info.append({yort[0]: yort[1]})
+
+        return info

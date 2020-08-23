@@ -1,7 +1,7 @@
 import plistlib
 
 try:
-    from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
+    from utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
 except ImportError:
     pass
 
