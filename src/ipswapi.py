@@ -121,7 +121,7 @@ class API(object):
 
         return signed
 
-    def downloadFileFromArchive(self, path: str, filetype='ipsw'):
+    def downloadFileFromArchive(self, path: str, out=False, filetype='ipsw'):
         url = self.getArchiveURL()
         if filetype == 'ipsw':
             with RemoteZip(url) as f:
@@ -129,7 +129,10 @@ class API(object):
                 if not os.path.exists(path):
                     if path in files:
                         print('Downloading: {}'.format(path))
-                        f.extract(path)
+                        if not out:
+                            f.extract(path)
+                        else:
+                            f.extract(path, out)
                 else:
                     raise FileExistsError('{} already exists!'.format(path))
 

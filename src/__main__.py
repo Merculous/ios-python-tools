@@ -160,3 +160,6 @@ def main():
 
     else:
         sys.exit(parser.print_help(sys.stderr))
+
+
+main()  # Call main no matter what so that I can debug and also call from this file

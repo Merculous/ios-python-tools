@@ -1,6 +1,6 @@
 import os
 import plistlib
-from shutil import rmtree
+import shutil
 from urllib.request import Request, urlopen
 
 try:
@@ -15,11 +15,12 @@ tss_headers = {'User-Agent': 'InetURL/1.0', 'Proxy-Connection': 'Keep-Alive', 'P
 
 
 class TSS(object):
-    def __init__(self, device: str, ecid: str, version=False, apnonce='', sepnonce='', bbsnum='', useDFUCollidingNonces=False, shsh_path='shsh'):
+    def __init__(self, device: str, ecid: str, version='', buildid='', apnonce='', sepnonce='', bbsnum='', useDFUCollidingNonces=False, shsh_path='shsh'):
         super().__init__()
         self.device = device
         self.ecid = ecid
         self.version = version
+        self.buildid = buildid
         self.apnonce = apnonce
         self.sepnonce = sepnonce
         self.bbsnum = bbsnum
@@ -35,7 +36,7 @@ class TSS(object):
             if response.headers['Content-Length'] == '0':
                 print('Server returned no response... are you blacklisted?')
             else:
-                print('Server error:', response_text)
+                print('Server error: {}'.format(response_text))
         else:
             # Remove TSS response header
             return response_text[response_text.find('<?xml'):]
@@ -45,7 +46,7 @@ class TSS(object):
         signed_versions = api.getSignedVersions()
 
         if os.path.exists('.shsh'):
-            rmtree('.shsh')
+            shutil.rmtree('.shsh')
         os.mkdir('.shsh')
 
         if not os.path.exists(self.shsh_path):
@@ -72,8 +73,8 @@ class TSS(object):
 
         tss_server_version = tss_version_response['@ServerVersion']
         if tss_server_version != '2.1.0':
-            print('WARNING: TSS server version', tss_server_version,
-                  'may not be supported by this script!')
+            print('WARNING: TSS server version {} may not be supported by this script!'.format(
+                tss_server_version))
 
         # FIXME Need to update the stuff below
 
@@ -81,20 +82,23 @@ class TSS(object):
             version = stuff['iOS']
             buildid = stuff['buildid']
 
+            oof = API(self.device, version)
+
             # Copy the manifest inside which will contain the added string
 
-            build_manifest = os.path.join(
-                '.shsh', 'BuildManifest_{}_{}_{}.plist'.format(self.device, version, buildid))
-            tss_manifest = os.path.join(
-                '.shsh', 'TSSManifest_{}_{}_{}.plist'.format(self.device, version, buildid))
+            build_manifest = '.shsh/BuildManifest_{}_{}_{}.plist'.format(
+                self.device, version, buildid)
+            tss_manifest = '.shsh/TSSManifest_{}_{}_{}.plist'.format(
+                self.device, version, buildid)
 
-            api.downloadFileFromArchive('BuildManifest.plist')
+            oof.downloadFileFromArchive('BuildManifest.plist', '.shsh')
+            shutil.move('.shsh/BuildManifest.plist', build_manifest)
 
             print('Converting from BuildManifest to TSS manifest...')
             apnonce = manobj.initFromBuildManifest(
                 self.device, tss_manifest, build_manifest, self.ecid, apnonce=self.apnonce, sepnonce=self.sepnonce, bbsnum=self.bbsnum)['apnonce']
 
-            print('Sending TSS request for', version, '(' + buildid + ')...')
+            print('Sending TSS request for {} ({})...'.format(version, buildid))
 
             with open(tss_manifest, 'rb') as f:
                 tss_response = self.makeTSSRequest(f.read())
@@ -103,6 +107,6 @@ class TSS(object):
                 self.ecid, self.device, version, buildid, apnonce))
             with open(blob_path, 'w+') as blob:
                 blob.write(tss_response)
-                print('Saved', version, 'blob to', blob_path)
+                print('Saved {} blob to {}'.format(version, blob_path))
 
-        rmtree('.shsh')
+        shutil.rmtree('.shsh')
