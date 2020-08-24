@@ -8,7 +8,7 @@ REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
 
 setup(
     name="iospytools",
-    version="1.0.5",
+    version="1.0.6",
     author="Merculous",
     author_email="vycemerculous@gmail.com",
     description="provides useful tools/commands which are used in iOS research",
