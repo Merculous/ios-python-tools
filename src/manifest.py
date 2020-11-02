@@ -6,23 +6,6 @@ except ImportError:
     pass
 
 
-class BuildManifest(object):
-    def __init__(self, data: str):
-        super().__init__()
-
-        try:
-            stuff = plistlib.loads(data)
-        except IOError:
-            print('Failed to read manifest!')
-            raise
-        else:
-            self.data = stuff
-
-    def parse(self):
-        data = self.data
-        return data
-
-
 class TSSManifest(object):
     def __init__(self):
         super().__init__()
@@ -156,7 +139,6 @@ class TSSManifest(object):
         )
 
         with open(path, 'wb+') as v:
-            # I'm getting module plistlib has no 'FMT_XML' member error from pylint, according to docs, its supported, guess this is a bug?
             plistlib.dump(testVersionManifest, v, fmt=plistlib.FMT_XML)
 
     # See 'Sending data (request)' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
@@ -274,6 +256,6 @@ class TSSManifest(object):
             plistlib.dump(data, p, fmt=plistlib.FMT_XML)
 
         return {
-            'apnonce':  apnonce,
+            'apnonce': apnonce,
             'sepnonce': sepnonce
         }
