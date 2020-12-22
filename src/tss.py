@@ -4,7 +4,7 @@ import shutil
 from urllib.request import Request, urlopen
 
 try:
-    from ipswapi import API
+    from api import API
     from manifest import TSSManifest
 except ImportError:
     raise
@@ -15,7 +15,7 @@ tss_headers = {'User-Agent': 'InetURL/1.0', 'Proxy-Connection': 'Keep-Alive', 'P
 
 
 class TSS(object):
-    def __init__(self, device: str, ecid: str, version='', buildid='', apnonce='', sepnonce='', bbsnum='', useDFUCollidingNonces=False, shsh_path='shsh'):
+    def __init__(self, device: str, ecid: str, version='', buildid='', apnonce='', sepnonce='', bbsnum='', shsh_path='shsh'):
         super().__init__()
         self.device = device
         self.ecid = ecid
@@ -24,7 +24,6 @@ class TSS(object):
         self.apnonce = apnonce
         self.sepnonce = sepnonce
         self.bbsnum = bbsnum
-        self.useDFUCollidingNonces = useDFUCollidingNonces
         self.shsh_path = shsh_path
 
     def makeTSSRequest(self, data: bytes):
@@ -75,8 +74,6 @@ class TSS(object):
         if tss_server_version != '2.1.0':
             print('WARNING: TSS server version {} may not be supported by this script!'.format(
                 tss_server_version))
-
-        # FIXME Need to update the stuff below
 
         for stuff in signed_versions:
             version = stuff['iOS']

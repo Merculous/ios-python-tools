@@ -1,6 +1,8 @@
 try:
-    import usb
+    import usb.core
+    import usb.util
 except ImportError:
+    print('Failed to import PyUSB!')
     raise
 
 
@@ -30,8 +32,9 @@ class USB:
 
         # TODO Add Pwnage 2.0 support. Just uploading a malformed certificate/file
 
+
     def getDevices(self):
-        pass
+        arm64_normal_mode = usb.core.find(idVendor=0x05ac, idProduct=0x12a8)
 
     def sendPacket(self):
         pass
@@ -46,4 +49,7 @@ class USB:
         pass
 
     def enterRecovery(self):
+        pass
+
+    def reboot(self):
         pass
