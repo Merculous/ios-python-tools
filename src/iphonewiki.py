@@ -1,5 +1,6 @@
 from urllib.request import urlopen
 
+from template import Template
 
 class Wiki(object):
     def __init__(self, device, buildid, codename):
