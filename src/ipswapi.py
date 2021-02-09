@@ -140,17 +140,18 @@ class API(object):
             raise ValueError('No version was passed!')
 
     def getArchiveURL(self) -> str:
-        if not self.buildid:
-            info = self.iOSToBuildid()
-            data = self.getDeviceData(info['type'])
-            firmwares = data['firmwares']
+        # I want to be absolutely sure we have the correct info.
+        # Because of this, I will just use my self.iOSToBuildid()
+        # function. This means, I'm going to ignore self.buildid
+        # and self.beta. My function will give you all three.
+        info = self.iOSToBuildid()
+        data = self.getDeviceData(info['type'])
+        firmwares = data['firmwares']
 
-            for i in range(len(firmwares)):
-                version = firmwares[i]['version']
-                buildid = firmwares[i]['buildid']
+        for i in range(len(firmwares)):
+            version = firmwares[i]['version']
+            buildid = firmwares[i]['buildid']
 
-                if version == self.version and buildid == info['buildid']:
-                    url = firmwares[i]['url']
-                    return url
-
-        # TODO Add self.buildid support (beta too)
+            if version == self.version and buildid == info['buildid']:
+                url = firmwares[i]['url']
+                return url
