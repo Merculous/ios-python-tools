@@ -74,7 +74,8 @@ class API(object):
 
             for skip in skips:
                 if self.version.startswith(skip):
-                    return info
+                    if len(info[version]) == 1:
+                        return info[version][0]
 
             i = 0
             restore_type = 'ota'
@@ -107,7 +108,33 @@ class API(object):
                 else:
                     continue
 
-            return info
+            # We can have more than one "version" and or buildid
+            # Init user interaction
+
+            tmp1 = list()
+
+            for value1 in info:
+                if value1 not in tmp1:
+                    tmp1.append(value1)
+
+            if len(tmp1) > 1:
+                prompt1 = 'Please select which version you\'d like to use.'
+                choice1 = enquiries.choose(prompt1, tmp1)
+            else:
+                choice1 = tmp1[0]
+
+            buildids = list()
+
+            for value2 in info[choice1]:
+                if value2 not in buildids:
+                    buildids.append(value2)
+
+            if len(buildids) > 1:
+                prompt2 = 'Please select which buildid you\'d like to use.'
+                choice2 = enquiries.choose(prompt2, buildids)
+                return choice2
+            else:
+                return buildids[0]
 
         else:
             raise ValueError('No version was passed!')
