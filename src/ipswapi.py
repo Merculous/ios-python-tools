@@ -1,9 +1,12 @@
 
 import json
+import os
 from urllib.request import urlopen, urlretrieve
 
 import enquiries
 from remotezip import RemoteZip
+
+from .utils import showProgress
 
 
 class API(object):
@@ -155,3 +158,13 @@ class API(object):
             if version == self.version and buildid == info['buildid']:
                 url = firmwares[i]['url']
                 return url
+
+    def downloadArchive(self) -> None:
+        url = self.getArchiveURL()
+        name = os.path.basename(url)
+
+        if not os.path.exists(name):
+            print(f'Downloading: {name}')
+            urlretrieve(url, name, showProgress)
+        else:
+            raise FileExistsError(f'{name} already exists!')
