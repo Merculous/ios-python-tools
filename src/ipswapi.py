@@ -138,3 +138,19 @@ class API(object):
 
         else:
             raise ValueError('No version was passed!')
+
+    def getArchiveURL(self) -> str:
+        if not self.buildid:
+            info = self.iOSToBuildid()
+            data = self.getDeviceData(info['type'])
+            firmwares = data['firmwares']
+
+            for i in range(len(firmwares)):
+                version = firmwares[i]['version']
+                buildid = firmwares[i]['buildid']
+
+                if version == self.version and buildid == info['buildid']:
+                    url = firmwares[i]['url']
+                    return url
+
+        # TODO Add self.buildid support (beta too)
