@@ -172,3 +172,17 @@ class API(object):
             urlretrieve(url, path, showProgress)
         else:
             raise FileExistsError(f'{path} already exists!')
+
+    def readFromRemoteArchive(self, path: str, save: bool, out=None) -> bytes:
+        url = self.getArchiveURL()
+        with RemoteZip(url) as f:
+            data = f.read(path)
+            if save:
+                name = os.path.basename(path)
+                if not os.path.exists(name):
+                    with open(name, 'wb') as ff:
+                        ff.write(data)
+                else:
+                    raise FileExistsError(f'{name} already exists!')
+            else:
+                return data
