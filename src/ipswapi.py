@@ -159,12 +159,16 @@ class API(object):
                 url = firmwares[i]['url']
                 return url
 
-    def downloadArchive(self) -> None:
+    def downloadArchive(self, path=None) -> None:
         url = self.getArchiveURL()
         name = os.path.basename(url)
 
-        if not os.path.exists(name):
-            print(f'Downloading: {name}')
-            urlretrieve(url, name, showProgress)
+        if not path:
+            path = name
+
+        if not os.path.isfile(path):
+            print(f'Downloading: {path}')
+            # Defaults to saving in current directory
+            urlretrieve(url, path, showProgress)
         else:
-            raise FileExistsError(f'{name} already exists!')
+            raise FileExistsError(f'{path} already exists!')
