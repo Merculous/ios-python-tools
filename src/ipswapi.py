@@ -189,7 +189,7 @@ class API(object):
             else:
                 return data
 
-    def getSignedVersions(self) -> None:
+    def getSignedVersions(self) -> dict:
         devices = self.getAllDevices()
         tmp1 = list()
 
