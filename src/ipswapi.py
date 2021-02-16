@@ -173,6 +173,8 @@ class API(object):
         else:
             raise FileExistsError(f'{path} already exists!')
 
+    # TODO use out variable
+
     def readFromRemoteArchive(self, path: str, save: bool, out=None) -> bytes:
         url = self.getArchiveURL()
         with RemoteZip(url) as f:
@@ -186,3 +188,42 @@ class API(object):
                     raise FileExistsError(f'{name} already exists!')
             else:
                 return data
+
+    def getSignedVersions(self) -> None:
+        devices = self.getAllDevices()
+        tmp1 = list()
+
+        for device in devices:
+            if device['identifier'] not in tmp1:
+                tmp1.append(device['identifier'])
+
+        info = dict()
+
+        # TODO Ensure if self.device is already set, get signed versions for that device
+
+        for value in tmp1:
+            self.device = value
+            data = self.getDeviceData('ota')
+            firmwares = data['firmwares']
+
+            for i in range(len(firmwares)):
+                version = firmwares[i]['version']
+                buildid = firmwares[i]['buildid']
+                is_signed = firmwares[i]['signed']
+
+                if is_signed:
+                    if version not in info:
+                        info[version] = dict()
+                        info[version]['buildid'] = list()
+                        info[version]['device'] = list()
+
+                    if buildid not in info[version]['buildid']:
+                        info[version]['buildid'].append(buildid)
+
+                    if self.device not in info[version]['device']:
+                        info[version]['device'].append(self.device)
+
+                else:
+                    continue
+
+        return info
