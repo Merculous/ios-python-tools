@@ -24,7 +24,16 @@ class API(object):
         url = f'{self.base_url}/devices'
         r = urlopen(url).read()
         data = json.loads(r)
-        return data
+        supported = ('iPhone', 'iPad', 'iPod', 'AppleTV')
+        devices = list()
+
+        for device in data:
+            for devicetype in supported:
+                if device['identifier'].startswith(devicetype):
+                    if device not in devices:
+                        devices.append(device)
+
+        return devices
 
     def getDeviceData(self, restore_type: str) -> dict:
         if self.device:
