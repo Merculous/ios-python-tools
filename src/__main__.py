@@ -12,14 +12,86 @@ def main() -> None:
         description='provides useful commands which are used in iOS research'
     )
 
-    parser.add_argument('--test', action='store_true')
+    parser.add_argument(
+        '-d',
+        nargs=1,
+        type=str,
+        metavar='device'
+    )
+
+    parser.add_argument(
+        '-i',
+        nargs=1,
+        type=str,
+        metavar='iOS'
+    )
+
+    parser.add_argument(
+        '--convert',
+        action='store_true',
+        help='convert an iOS to a buildid (Used with -d and -i)'
+    )
+
+    parser.add_argument(
+        '--url',
+        action='store_true',
+        help='Return the url to an iOS (Used with -d and -i)'
+    )
+
+    parser.add_argument(
+        '--download',
+        action='store_true',
+        help='Download an ipsw or OTA archive (Used with -d and -i)'
+    )
+
+    parser.add_argument(
+        '--path',
+        nargs=1,
+        type=str,
+        metavar='path',
+        help='Download a file (used with --download)'
+    )
+
+    parser.add_argument(
+        '--signed',
+        action='store_true',
+        help='Get all currently signed iOS versions, including OTA and beta'
+    )
+
+    parser.add_argument(
+        '--test',
+        action='store_true'
+    )
 
     args = parser.parse_args()
 
     if args.test:
-        a = API('iPhone6,1', '10.3.3')
-        stuff = a.iOSToBuildid()
-        oof = ''
+        pass
+
+    elif args.d:
+
+        if args.i:
+            a = API(args.d[0], args.i[0])
+
+            if args.convert:
+                buildid = a.iOSToBuildid()
+                print(buildid['buildid'])
+
+            if args.url:
+                url = a.getArchiveURL()
+                print(url)
+
+            if args.download and not args.path:
+                a.downloadArchive()
+
+            elif args.download and args.path:
+                a.readFromRemoteArchive(args.path[0], True)
+
+    elif args.signed:
+        a = API()
+        versions = a.getSignedVersions()
+        print(versions)
+
     else:
         sys.exit(parser.print_help(sys.stderr))
 
