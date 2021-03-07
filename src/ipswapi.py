@@ -6,6 +6,8 @@ from urllib.request import urlopen, urlretrieve
 import enquiries
 from remotezip import RemoteZip
 
+from .iphonewiki import Wiki
+from .manifest import Manifest
 from .utils import showProgress
 
 
@@ -182,7 +184,7 @@ class API(object):
         else:
             raise FileExistsError(f'{path} already exists!')
 
-    # TODO use out variable
+    # TODO use out variable, also fix finding BuildManifest.plist
 
     def readFromRemoteArchive(self, path: str, save: bool, out=None) -> bytes:
         url = self.getArchiveURL()
@@ -199,40 +201,81 @@ class API(object):
                 return data
 
     def getSignedVersions(self) -> dict:
-        devices = self.getAllDevices()
         tmp1 = list()
 
-        for device in devices:
-            if device['identifier'] not in tmp1:
-                tmp1.append(device['identifier'])
+        if not self.device:
+            devices = self.getAllDevices()
+
+            for device in devices:
+                if device['identifier'] not in tmp1:
+                    tmp1.append(device['identifier'])
+        else:
+            tmp1.append(self.device)
 
         info = dict()
 
-        # TODO Ensure if self.device is already set, get signed versions for that device
+        # TODO Clean up code when using only one device. Make loops more efficient.
 
         for value in tmp1:
-            self.device = value
-            data = self.getDeviceData('ota')
-            firmwares = data['firmwares']
 
-            for i in range(len(firmwares)):
-                version = firmwares[i]['version']
-                buildid = firmwares[i]['buildid']
-                is_signed = firmwares[i]['signed']
+            if len(tmp1) > 1:
+                self.device = value
+
+            data_ipsw = self.getDeviceData('ipsw')
+            firmware_ipsw = data_ipsw['firmwares']
+
+            for i in range(len(firmware_ipsw)):
+                version = firmware_ipsw[i]['version']
+                buildid = firmware_ipsw[i]['buildid']
+                is_signed = firmware_ipsw[i]['signed']
 
                 if is_signed:
                     if version not in info:
                         info[version] = dict()
-                        info[version]['buildid'] = list()
-                        info[version]['device'] = list()
+                        info[version]['ipsw'] = dict()
+                        info[version]['ipsw']['buildid'] = list()
+                        info[version]['ipsw']['device'] = list()
 
-                    if buildid not in info[version]['buildid']:
-                        info[version]['buildid'].append(buildid)
+                    if buildid not in info[version]['ipsw']['buildid']:
+                        info[version]['ipsw']['buildid'].append(buildid)
 
-                    if self.device not in info[version]['device']:
-                        info[version]['device'].append(self.device)
+                    if self.device not in info[version]['ipsw']['device']:
+                        info[version]['ipsw']['device'].append(self.device)
+
+                else:
+                    continue
+
+            data_ota = self.getDeviceData('ota')
+            firmware_ota = data_ota['firmwares']
+
+            for ii in range(len(firmware_ota)):
+                version = firmware_ota[ii]['version']
+                buildid = firmware_ota[ii]['buildid']
+                is_signed = firmware_ota[ii]['signed']
+
+                if is_signed:
+                    if version not in info:
+                        info[version] = dict()
+                        info[version]['ota'] = dict()
+                        info[version]['ota']['buildid'] = list()
+                        info[version]['ota']['device'] = list()
+
+                    if buildid not in info[version]['ota']['buildid']:
+                        info[version]['ota']['buildid'].append(buildid)
+
+                    if self.device not in info[version]['ota']['device']:
+                        info[version]['ota']['device'].append(self.device)
 
                 else:
                     continue
 
         return info
+
+    def getCodename(self) -> str:
+        data = self.readFromRemoteArchive('BuildManifest.plist', False)
+        m = Manifest(data)
+        codename = m.getInfo()['codename']
+        return codename
+
+    def getKeys(self) -> list:
+        pass
