@@ -6,7 +6,7 @@ from urllib.request import urlopen, urlretrieve
 import enquiries
 from remotezip import RemoteZip
 
-from .iphonewiki import Wiki
+# from .iphonewiki import Wiki
 from .manifest import Manifest
 from .utils import showProgress
 
@@ -234,14 +234,15 @@ class API(object):
                         info[version] = dict()
                         info[version]['ipsw'] = dict()
                         info[version]['ipsw']['buildid'] = list()
-                        info[version]['ipsw']['device'] = list()
 
-                    if buildid not in info[version]['ipsw']['buildid']:
-                        info[version]['ipsw']['buildid'].append(buildid)
+                        if buildid not in info[version]['ipsw']['buildid']:
+                            info[version]['ipsw']['buildid'].append(buildid)
 
-                    if self.device not in info[version]['ipsw']['device']:
-                        info[version]['ipsw']['device'].append(self.device)
-
+                        if len(tmp1) > 1:
+                            info[version]['ipsw']['device'] = list()
+                            if self.device not in info[version]['ipsw']['device']:
+                                info[version]['ipsw']['device'].append(
+                                    self.device)
                 else:
                     continue
 
@@ -258,13 +259,15 @@ class API(object):
                         info[version] = dict()
                         info[version]['ota'] = dict()
                         info[version]['ota']['buildid'] = list()
-                        info[version]['ota']['device'] = list()
 
-                    if buildid not in info[version]['ota']['buildid']:
-                        info[version]['ota']['buildid'].append(buildid)
+                        if buildid not in info[version]['ota']['buildid']:
+                            info[version]['ota']['buildid'].append(buildid)
 
-                    if self.device not in info[version]['ota']['device']:
-                        info[version]['ota']['device'].append(self.device)
+                        if len(tmp1) > 1:
+                            info[version]['ota']['device'] = list()
+                            if self.device not in info[version]['ota']['device']:
+                                info[version]['ota']['device'].append(
+                                    self.device)
 
                 else:
                     continue
