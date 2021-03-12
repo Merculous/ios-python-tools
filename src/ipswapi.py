@@ -81,16 +81,6 @@ class API(object):
                 else:
                     continue
 
-            # OTA wasn't added until iOS 5. We need to check
-            # and only run the code below if our version is >=5.x.x
-
-            skips = ('1.', '2.', '3.', '4.')
-
-            for skip in skips:
-                if self.version.startswith(skip):
-                    if len(info[version]) == 1:
-                        return info[version][0]
-
             i = 0
             restore_type = 'ota'
 

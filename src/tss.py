@@ -112,4 +112,4 @@ class TSS(object):
                         blob.write(tss_response)
                         print('Saved {} blob to {}'.format(version, blob_path))
 
-                    shutil.rmtree('.shsh')
+        shutil.rmtree('.shsh')
