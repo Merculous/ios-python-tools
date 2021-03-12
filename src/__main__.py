@@ -75,7 +75,7 @@ def main() -> None:
     parser.add_argument(
         '--shsh',
         action='store_true',
-        help='Save shsh blobs for each signed iOS, OTA included (used with -d and -e)'
+        help='Save an shsh blob for a signed iOS (ipsw only atm) (used with -d and -e)'
     )
 
     parser.add_argument(
@@ -96,7 +96,7 @@ def main() -> None:
 
     elif args.d:
 
-        if args.e:
+        if args.e and args.shsh:
             t = TSS(args.d[0], args.e[0])
             t.saveBlobs()
 
@@ -124,7 +124,7 @@ def main() -> None:
                 url = a.getArchiveURL()
                 print(url)
 
-        if args.signed:
+        if args.signed and not args.e:
             a = API(args.d[0])
             versions = a.getSignedVersions()
             print(versions)

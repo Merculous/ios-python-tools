@@ -184,17 +184,25 @@ class API(object):
         else:
             raise FileExistsError(f'{path} already exists!')
 
-    # TODO use out variable, also fix finding BuildManifest.plist
+    # TODO fix finding BuildManifest.plist
 
     def readFromRemoteArchive(self, path: str, save: bool, out=None) -> bytes:
         url = self.getArchiveURL()
+
         with RemoteZip(url) as f:
             data = f.read(path)
+
             if save:
                 name = os.path.basename(path)
+
+                if out:
+                    if os.path.isdir(out):
+                        name = f'{out}/{name}'
+
                 if not os.path.exists(name):
                     with open(name, 'wb') as ff:
                         ff.write(data)
+
                 else:
                     raise FileExistsError(f'{name} already exists!')
             else:
