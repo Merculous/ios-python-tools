@@ -36,10 +36,12 @@ class TSS(object):
             if response.headers['Content-Length'] == '0':
                 print('Server returned no response... are you blacklisted?')
             else:
-                print('Server error: {}'.format(response_text))
+                print(f'Server error: {response_text}')
         else:
             # Remove TSS response header
             return response_text[response_text.find('<?xml'):]
+
+    # TODO Add exception if we can't get a blob for a iOS/buildid
 
     def saveBlobs(self):
         if os.path.exists('.shsh'):
@@ -105,11 +107,13 @@ class TSS(object):
                     with open(tss_manifest, 'rb') as f:
                         tss_response = self.makeTSSRequest(f.read())
 
-                    blob_path = os.path.join(
-                        self.shsh_path, f'{self.ecid}_{self.device}_{version}-{buildid}_{apnonce}.shsh2')
+                    if tss_response:
 
-                    with open(blob_path, 'w+') as blob:
-                        blob.write(tss_response)
-                        print('Saved {} blob to {}'.format(version, blob_path))
+                        blob_path = os.path.join(
+                            self.shsh_path, f'{self.ecid}_{self.device}_{version}-{buildid}_{apnonce}.shsh2')
+
+                        with open(blob_path, 'w+') as blob:
+                            blob.write(tss_response)
+                            print(f'Saved {version} blob to {blob_path}')
 
         shutil.rmtree('.shsh')
