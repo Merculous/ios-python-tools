@@ -1,36 +1,12 @@
 import os
-import plistlib
 import shutil
 from zipfile import is_zipfile, ZipFile
 
-
-class Manifest(object):
-    def __init__(self, manifest: bytes):
-        super().__init__()
-
-        self.manifest = plistlib.loads(manifest)
-
-    def getInfo(self):
-        info = {
-            'device': self.manifest['SupportedProductTypes'][0],
-            'ios': self.manifest['ProductVersion'],
-            'buildid': self.manifest['ProductBuildVersion'],
-            'chipid': self.manifest['BuildIdentities'][0]['ApChipID'],
-            'codename': self.manifest['BuildIdentities'][0]['Info']['BuildTrain'],
-            'deviceclass': self.manifest['BuildIdentities'][0]['Info']['DeviceClass'],
-            'paths': list()
-        }
-
-        for path in self.manifest['BuildIdentities'][0]['Manifest'].items():
-            name = path[0]
-            filepath = path[1]['Info']['Path']
-            info['paths'].append({name: filepath})
-
-        return info
+from .manifest import Manifest
 
 
 class IPSW(object):
-    def __init__(self, ipsw):
+    def __init__(self, ipsw: str):
         super().__init__()
 
         try:

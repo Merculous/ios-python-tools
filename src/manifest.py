@@ -1,9 +1,34 @@
 import plistlib
 
 try:
-    from utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
+    from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
 except ImportError:
     pass
+
+
+class Manifest(object):
+    def __init__(self, manifest: bytes):
+        super().__init__()
+
+        self.manifest = plistlib.loads(manifest)
+
+    def getInfo(self):
+        info = {
+            'device': self.manifest['SupportedProductTypes'][0],
+            'ios': self.manifest['ProductVersion'],
+            'buildid': self.manifest['ProductBuildVersion'],
+            'chipid': self.manifest['BuildIdentities'][0]['ApChipID'],
+            'codename': self.manifest['BuildIdentities'][0]['Info']['BuildTrain'],
+            'deviceclass': self.manifest['BuildIdentities'][0]['Info']['DeviceClass'],
+            'paths': list()
+        }
+
+        for path in self.manifest['BuildIdentities'][0]['Manifest'].items():
+            name = path[0]
+            filepath = path[1]['Info']['Path']
+            info['paths'].append({name: filepath})
+
+        return info
 
 
 class TSSManifest(object):
@@ -174,11 +199,9 @@ class TSSManifest(object):
                 print('No \'Erase\' BuildIdentity was found in the BuildManifest')
                 exit(1)
 
-            for key in ['Info', 'ProductMarketingVersion']:  # Remove unnecessary root keys
-                try:
+            for key in ('Info', 'ProductMarketingVersion'):  # Remove unnecessary root keys
+                if key in data:
                     del data[key]
-                except:
-                    pass
 
             # production_mode = False
             # security_mode = False
