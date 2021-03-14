@@ -6,7 +6,7 @@ from urllib.request import urlopen, urlretrieve
 import enquiries
 from remotezip import RemoteZip
 
-# from .iphonewiki import Wiki
+from .iphonewiki import Wiki
 from .manifest import Manifest
 from .utils import showProgress
 
@@ -279,4 +279,11 @@ class API(object):
         return codename
 
     def getKeys(self) -> list:
-        pass
+        if not self.buildid:
+            buildid = self.iOSToBuildid()['buildid']
+        else:
+            buildid = self.buildid
+
+        codename = self.getCodename()
+        w = Wiki(self.device, buildid, codename)
+        return w.requestKeys()

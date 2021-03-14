@@ -1,10 +1,10 @@
 class Template(object):
-    def __init__(self, template: str):
+    def __init__(self, template: str) -> None:
         super().__init__()
 
         self.template = template
 
-    def parse(self):
+    def parse(self) -> list:
         data = self.template.split('{{keys')[1].split('}}')[0].splitlines()
         new_list = list(filter(None, data))  # Remove all ''
         info = list()

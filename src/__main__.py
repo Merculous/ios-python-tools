@@ -3,6 +3,7 @@
 import sys
 from argparse import ArgumentParser
 
+from src.iphonewiki import Wiki
 from src.ipswapi import API
 from src.tss import TSS
 
@@ -118,7 +119,8 @@ def main() -> None:
                 a.readFromRemoteArchive(args.path[0], True)
 
             if args.keys:
-                pass
+                keys = a.getKeys()
+                print(keys)
 
             if args.url:
                 url = a.getArchiveURL()
