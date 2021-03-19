@@ -5,8 +5,8 @@ This project was inspired by Matteyeux with his ios-tools repo, this will be a s
     Python >= 3.6
 
 ## How to install
-    1. python3 -m venv {your environment name here}
-    2. source {environment name}
+    1. python3 -m venv venv
+    2. source venv/bin/activate
     3. pip install .
     
     After this, running "iospytools" will print the help menu,
