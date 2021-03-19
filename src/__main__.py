@@ -3,7 +3,6 @@
 import sys
 from argparse import ArgumentParser
 
-from src.iphonewiki import Wiki
 from src.ipswapi import API
 from src.tss import TSS
 

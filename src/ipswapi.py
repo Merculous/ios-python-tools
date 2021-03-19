@@ -174,29 +174,43 @@ class API(object):
         else:
             raise FileExistsError(f'{path} already exists!')
 
-    # TODO fix finding BuildManifest.plist
-
     def readFromRemoteArchive(self, path: str, save: bool, out=None) -> bytes:
         url = self.getArchiveURL()
 
         with RemoteZip(url) as f:
+            stuff = f.namelist()
+
+            for i in range(len(stuff)):
+                if path in stuff[i]:
+                    path = stuff[i]
+                    break
+
             data = f.read(path)
 
-            if save:
-                name = os.path.basename(path)
+        if save:
+            name = os.path.basename(path)
 
-                if out:
-                    if os.path.isdir(out):
-                        name = f'{out}/{name}'
+            if out:
 
-                if not os.path.exists(name):
-                    with open(name, 'wb') as ff:
-                        ff.write(data)
+                if not os.path.exists(out):
+                    os.makedirs(out)
 
-                else:
-                    raise FileExistsError(f'{name} already exists!')
-            else:
-                return data
+                    try:
+                        os.path.exists(out)
+                    except IOError:
+                        raise
+
+                name = os.path.join(out, name)
+
+                if os.path.isfile(name):
+                    raise FileExistsError
+
+            if not os.path.exists(name):
+                with open(name, 'wb') as p:
+                    p.write(data)
+
+        else:
+            return data
 
     def getSignedVersions(self) -> dict:
         tmp1 = list()
