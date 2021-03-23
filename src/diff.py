@@ -5,7 +5,7 @@ def getDifferences(orig, new):
     with open(new, 'rb') as n:
         n_data = n.read()
 
-    stuff = list()
+    stuff = []
 
     for i, n_value in enumerate(n_data):
         if n_value != o_data[i]:

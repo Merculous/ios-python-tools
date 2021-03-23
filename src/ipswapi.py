@@ -25,7 +25,7 @@ class API:
         r = urlopen(url).read()
         data = json.loads(r)
         supported = ('iPhone', 'iPad', 'iPod', 'AppleTV')
-        devices = list()
+        devices = []
 
         for device in data:
             for devicetype in supported:
@@ -54,7 +54,7 @@ class API:
 
     def iOSToBuildid(self) -> dict:
         if self.version:
-            info = dict()
+            info = {}
             restore_type = 'ipsw'
             device_ipsw = self.getDeviceData(restore_type)
             ipsw_firmwares = device_ipsw['firmwares']
@@ -65,7 +65,7 @@ class API:
 
                 if version.endswith(self.version):
                     if version not in info:
-                        info[version] = list()
+                        info[version] = []
 
                     tmp = {
                         'type': restore_type,
@@ -92,7 +92,7 @@ class API:
 
                 if version.endswith(self.version):
                     if version not in info:
-                        info[version] = list()
+                        info[version] = []
 
                     tmp = {
                         'type': restore_type,
@@ -113,7 +113,7 @@ class API:
             # We can have more than one "version" and or buildid
             # Init user interaction
 
-            tmp1 = list()
+            tmp1 = []
 
             for value1 in info:
                 if value1 not in tmp1:
@@ -125,7 +125,7 @@ class API:
             else:
                 choice1 = tmp1[0]
 
-            buildids = list()
+            buildids = []
 
             for value2 in info[choice1]:
                 if value2 not in buildids:
@@ -176,7 +176,7 @@ class API:
         url = self.getArchiveURL()
 
         with RemoteZip(url) as f:
-            stuff = f.namelist()
+            stuff = f.name[]
 
             for i in range(len(stuff)):
                 if path in stuff[i]:
@@ -211,7 +211,7 @@ class API:
             return data
 
     def getSignedVersions(self) -> dict:
-        tmp1 = list()
+        tmp1 = []
 
         if not self.device:
             devices = self.getAllDevices()
@@ -222,7 +222,7 @@ class API:
         else:
             tmp1.append(self.device)
 
-        info = dict()
+        info = {}
 
         # TODO Clean up code when using only one device. Make loops more efficient.
 
@@ -241,15 +241,15 @@ class API:
 
                 if is_signed:
                     if version not in info:
-                        info[version] = dict()
-                        info[version]['ipsw'] = dict()
-                        info[version]['ipsw']['buildid'] = list()
+                        info[version] = {}
+                        info[version]['ipsw'] = {}
+                        info[version]['ipsw']['buildid'] = []
 
                         if buildid not in info[version]['ipsw']['buildid']:
                             info[version]['ipsw']['buildid'].append(buildid)
 
                         if len(tmp1) > 1:
-                            info[version]['ipsw']['device'] = list()
+                            info[version]['ipsw']['device'] = []
                             if self.device not in info[version]['ipsw']['device']:
                                 info[version]['ipsw']['device'].append(
                                     self.device)
@@ -266,15 +266,15 @@ class API:
 
                 if is_signed:
                     if version not in info:
-                        info[version] = dict()
-                        info[version]['ota'] = dict()
-                        info[version]['ota']['buildid'] = list()
+                        info[version] = {}
+                        info[version]['ota'] = {}
+                        info[version]['ota']['buildid'] = []
 
                         if buildid not in info[version]['ota']['buildid']:
                             info[version]['ota']['buildid'].append(buildid)
 
                         if len(tmp1) > 1:
-                            info[version]['ota']['device'] = list()
+                            info[version]['ota']['device'] = []
                             if self.device not in info[version]['ota']['device']:
                                 info[version]['ota']['device'].append(
                                     self.device)

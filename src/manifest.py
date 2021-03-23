@@ -18,7 +18,7 @@ class Manifest:
             'chipid': self.manifest['BuildIdentities'][0]['ApChipID'],
             'codename': self.manifest['BuildIdentities'][0]['Info']['BuildTrain'],
             'deviceclass': self.manifest['BuildIdentities'][0]['Info']['DeviceClass'],
-            'paths': list()
+            'paths': []
         }
 
         for path in self.manifest['BuildIdentities'][0]['Manifest'].items():

@@ -34,10 +34,10 @@ class Bundle:
                 'RootFSSize': int,
                 'RootFSKey': str,
                 'RootFSMountName': str,
-                'Patches': list()
+                'Patches': []
             },
-            'Firmware': list(),
-            'Ramdisk': list()
+            'Firmware': [],
+            'Ramdisk': []
         }
 
         with open('{}/Info.plist'.format(self.bundle), 'rb') as f:

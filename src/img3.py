@@ -71,7 +71,7 @@ class IMG3:
 
             # Add tag values
 
-            tags = list()
+            tags = []
 
             i = 20
 
@@ -108,7 +108,7 @@ class IMG3:
 
             # Add kbag values
 
-            kbags = list()
+            kbags = []
             for kbag in self.info['tags']:
                 if kbag['magic'] == 'KBAG':
                     kbag_info = {
