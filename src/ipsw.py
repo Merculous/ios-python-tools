@@ -5,10 +5,8 @@ from zipfile import is_zipfile, ZipFile
 from .manifest import Manifest
 
 
-class IPSW(object):
+class IPSW:
     def __init__(self, ipsw: str):
-        super().__init__()
-
         try:
             is_zipfile(ipsw)
         except OSError:

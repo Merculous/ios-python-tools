@@ -1,4 +1,3 @@
-
 def getDifferences(orig, new):
     with open(orig, 'rb') as o:
         o_data = o.read()

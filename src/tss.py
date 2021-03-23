@@ -16,10 +16,8 @@ tss_headers = {'User-Agent': 'InetURL/1.0', 'Proxy-Connection': 'Keep-Alive', 'P
 
 # TODO Add support for OTA saving
 
-class TSS(object):
+class TSS:
     def __init__(self, device: str, ecid: str, apnonce='', sepnonce='', bbsnum='', shsh_path='shsh'):
-        super().__init__()
-
         self.device = device
         self.ecid = ecid
         self.apnonce = apnonce

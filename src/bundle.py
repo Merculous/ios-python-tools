@@ -2,10 +2,8 @@ import os
 import plistlib
 
 
-class Bundle(object):
+class Bundle:
     def __init__(self, bundle=None):
-        super().__init__()
-
         if not os.path.exists('FirmwareBundles'):
             os.mkdir('FirmwareBundles')
 

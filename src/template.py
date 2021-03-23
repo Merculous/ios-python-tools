@@ -1,7 +1,5 @@
-class Template(object):
+class Template:
     def __init__(self, template: str) -> None:
-        super().__init__()
-
         self.template = template
 
     def parse(self) -> list:

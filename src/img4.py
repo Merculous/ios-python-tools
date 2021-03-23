@@ -1,7 +1,5 @@
-class IMG4(object):
+class IMG4:
     def __init__(self, file: str):
-        super().__init__()
-
         self.file = file
 
         """

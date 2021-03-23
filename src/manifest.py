@@ -6,10 +6,8 @@ except ImportError:
     pass
 
 
-class Manifest(object):
+class Manifest:
     def __init__(self, manifest: bytes):
-        super().__init__()
-
         self.manifest = plistlib.loads(manifest)
 
     def getInfo(self):
@@ -31,10 +29,7 @@ class Manifest(object):
         return info
 
 
-class TSSManifest(object):
-    def __init__(self):
-        super().__init__()
-
+class TSSManifest:
     # Thanks tihmstar! http://blog.tihmstar.net/2017/01/basebandgoldcertid-not-found-please.html
     # https://github.com/tihmstar/tsschecker/blob/master/tsschecker/tsschecker.c#L110
 

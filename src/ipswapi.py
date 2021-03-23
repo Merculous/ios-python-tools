@@ -11,10 +11,8 @@ from .manifest import Manifest
 from .utils import showProgress
 
 
-class API(object):
+class API:
     def __init__(self, device=None, version=None, buildid=None, beta=None) -> None:
-        super().__init__()
-
         self.device = device
         self.version = version
         self.buildid = buildid

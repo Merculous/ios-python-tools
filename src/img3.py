@@ -56,8 +56,6 @@ Decryption is done using the modulus at cert + 0xA15
 
 class IMG3:
     def __init__(self, file):
-        super().__init__()
-
         with open(file, 'rb') as f:
             self.data = f.read()
             self.info = {

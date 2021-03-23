@@ -3,10 +3,8 @@ from urllib.request import urlopen
 from .template import Template
 
 
-class Wiki(object):
+class Wiki:
     def __init__(self, device: str, buildid: str, codename: str):
-        super().__init__()
-
         self.device = device
         self.buildid = buildid
         self.codename = codename
