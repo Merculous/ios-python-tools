@@ -10,9 +10,14 @@ except ImportError:
     raise
 
 tss_url = 'https://gs.apple.com/TSS/controller?action=2'
-tss_headers = {'User-Agent': 'InetURL/1.0', 'Proxy-Connection': 'Keep-Alive', 'Pragma': 'no-cache',
-               'Content-type': 'text/xml; charset="utf-8"'}  # See https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
 
+# See https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
+tss_headers = {
+    'User-Agent': 'InetURL/1.0',
+    'Proxy-Connection': 'Keep-Alive',
+    'Pragma': 'no-cache',
+    'Content-type': 'text/xml; charset="utf-8"'
+}
 
 # TODO Add support for OTA saving
 

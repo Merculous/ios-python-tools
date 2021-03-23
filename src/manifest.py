@@ -154,9 +154,7 @@ class TSSManifest:
 
     # See 'Notes' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
     def createTSSTestVersionManifest(self, path: str):
-        testVersionManifest = dict(
-            ApSecurityDomain=1
-        )
+        testVersionManifest = {ApSecurityDomain=1}
 
         with open(path, 'wb+') as v:
             plistlib.dump(testVersionManifest, v, fmt=plistlib.FMT_XML)
@@ -253,7 +251,7 @@ class TSSManifest:
                 else:
                     print(
                         device, 'either does not have a known BbGoldCertId and/or you have not supplied a BbSNUM. Skipping BBTicket...')
-                    for key in list(data):
+                    for key in data:
                         if key == 'BasebandFirmware' or key[0:2] == 'Bb':
                             del data[key]
 

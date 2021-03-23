@@ -4,7 +4,7 @@ class Template:
 
     def parse(self) -> list:
         data = self.template.split('{{keys')[1].split('}}')[0].splitlines()
-        new_list = list(filter(None, data))  # Remove all ''
+        new_list = filter(None, data)  # Remove all ''
         info = []
         for stuff in new_list:
             new_str = stuff.replace('|', '').replace('=', '').split()
