@@ -10,7 +10,7 @@ class IPSW:
         try:
             is_zipfile(ipsw)
         except OSError:
-            print('{} is not a zip file!'.format(ipsw))
+            print(f'{ipsw} is not a zip file!')
             raise
         else:
             self.ipsw = ipsw

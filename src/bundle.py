@@ -10,15 +10,15 @@ class Bundle:
         try:
             os.path.isdir(bundle)
         except IOError:
-            print('{} must be a directory!'.format(bundle))
+            print(f'{bundle} must be a directory!')
             raise
         else:
             self.bundle = bundle
 
         try:
-            os.path.exists('{}/Info.plist'.format(self.bundle))
+            os.path.exists(f'{self.bundle}/Info.plist')
         except FileNotFoundError:
-            print('Info.plist does not exist in {}!'.format(self.bundle))
+            print(f'Info.plist does not exist in {self.bundle}!')
             raise
 
     def getInfo(self):
@@ -40,7 +40,7 @@ class Bundle:
             'Ramdisk': []
         }
 
-        with open('{}/Info.plist'.format(self.bundle), 'rb') as f:
+        with open(f'{self.bundle}/Info.plist', 'rb') as f:
             data = plistlib.load(f)
 
             # Add our info from the plist to my dict cause easier reading
@@ -71,11 +71,11 @@ class Bundle:
             return info
 
     def checkForBundle(self, device, version, buildid):
-        path = '{}_{}_{}.bundle'.format(device, version, buildid)
+        path = f'{device}_{version}_{buildid}.bundle'
         if path in os.listdir('FirmwareBundles'):
             if os.listdir('FirmwareBundles'):
-                print('{} exists!'.format(path))
+                print(f'{path} exists!')
             else:
-                print('{} exists but is empty!'.format(path))
+                print(f'{path} exists but is empty!')
         else:
-            print('{} does not exist!'.format(path))
+            print(f'{path} does not exist!')

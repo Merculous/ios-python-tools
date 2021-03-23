@@ -103,7 +103,7 @@ class IMG3:
                     }
                     size = version_info['stringsize']
                     version_info['string'] = struct.unpack(
-                        '{}s'.format(size), version['data'][4:4+size])[0].decode()
+                        f'{size}s', version['data'][4:4+size])[0].decode()
                     self.info['version'] = version_info
 
             # Add kbag values
