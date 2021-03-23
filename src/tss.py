@@ -3,11 +3,8 @@ import plistlib
 import shutil
 from urllib.request import Request, urlopen
 
-try:
-    from .ipswapi import API
-    from .manifest import TSSManifest
-except ImportError:
-    raise
+from .ipswapi import API
+from .manifest import TSSManifest
 
 tss_url = 'https://gs.apple.com/TSS/controller?action=2'
 

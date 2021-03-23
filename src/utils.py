@@ -2,10 +2,7 @@ import sys
 from random import choice, seed
 from string import ascii_letters, digits
 
-try:
-    import progressbar
-except ImportError:
-    raise
+import progressbar
 
 """
 
