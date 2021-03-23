@@ -12,11 +12,23 @@ This project was inspired by Matteyeux with his ios-tools repo, this will be a s
     After this, running "iospytools" will print the help menu,
     also by entering "iospytools -h" or "iospytools --help".
 
-    Use the help menu to dictate which commands are necessary to use one of the features, which will all be added when I feel its ready for regular usage. Mainly for uploading to pypi.
+    Use the help menu to dictate which commands are necessary to use one of the features.
 
 ### Features
 
-    s0n
+    iospytools -d device -e ecid --shsh (save shsh blobs)
+
+    iospytools -d device -i ios --codename (print codename of an iOS)
+    iospytools -d device -i ios --convert (convert an iOS to a buildid)
+    iospytools -d device -i ios --download (download an ipsw or OTA file)
+    iospytools -d device -i ios --download --path file (download a file from an ipsw or OTA file)
+    iospytools -d device -i ios --keys (get keys from theiphonewiki)
+    iospytools -d device -i ios --url (print the url of an ios)
+
+    iospytools -d device --signed (get all signed versions for a device)
+
+    iospytools --signed (get all signed versions)
+
 
 ### TODO
 
