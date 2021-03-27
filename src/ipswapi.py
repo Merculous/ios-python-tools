@@ -1,4 +1,3 @@
-
 import json
 import os
 from urllib.request import urlopen, urlretrieve
@@ -176,7 +175,7 @@ class API:
         url = self.getArchiveURL()
 
         with RemoteZip(url) as f:
-            stuff = f.name[]
+            stuff = f.namelist()
 
             for i in range(len(stuff)):
                 if path in stuff[i]:
