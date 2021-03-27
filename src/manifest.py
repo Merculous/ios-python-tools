@@ -248,7 +248,7 @@ class TSSManifest:
                 else:
                     print(
                         device, 'either does not have a known BbGoldCertId and/or you have not supplied a BbSNUM. Skipping BBTicket...')
-                    for key in data:
+                    for key in list(data):
                         if key == 'BasebandFirmware' or key[0:2] == 'Bb':
                             del data[key]
 
