@@ -1,9 +1,6 @@
 import plistlib
 
-try:
-    from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
-except ImportError:
-    pass
+from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
 
 
 class Manifest:
@@ -154,7 +151,7 @@ class TSSManifest:
 
     # See 'Notes' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
     def createTSSTestVersionManifest(self, path: str):
-        testVersionManifest = {ApSecurityDomain=1}
+        testVersionManifest = {'ApSecurityDomain': 1}
 
         with open(path, 'wb+') as v:
             plistlib.dump(testVersionManifest, v, fmt=plistlib.FMT_XML)
