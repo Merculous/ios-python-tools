@@ -35,6 +35,13 @@ def main() -> None:
     )
 
     parser.add_argument(
+        '-o',
+        nargs=1,
+        type=str,
+        metavar='output'
+    )
+
+    parser.add_argument(
         '--codename',
         action='store_true',
         help='Get the codename of an iOS (Used with -d and -i)'
@@ -63,7 +70,7 @@ def main() -> None:
         nargs=1,
         type=str,
         metavar='path',
-        help='Download a file (used with --download)'
+        help='Download a file (used with --download and -o to specify a folder)'
     )
 
     parser.add_argument(
@@ -115,7 +122,10 @@ def main() -> None:
                 a.downloadArchive()
 
             elif args.download and args.path:
-                a.readFromRemoteArchive(args.path[0], True)
+                if not args.o:
+                    a.readFromRemoteArchive(args.path[0], True)
+                else:
+                    a.readFromRemoteArchive(args.path[0], True, args.o[0])
 
             if args.keys:
                 keys = a.getKeys()
