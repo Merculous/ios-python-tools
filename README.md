@@ -2,7 +2,7 @@ This project was inspired by Matteyeux with his ios-tools repo, this will be a s
 
 ### Prerequisites
 
-    Python >= 3.6
+    Python >= 3.9
 
 ## How to install
     1. python3 -m venv venv

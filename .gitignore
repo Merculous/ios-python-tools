@@ -14,3 +14,4 @@ dist
 build
 .shsh
 iospytools
+*.lock
