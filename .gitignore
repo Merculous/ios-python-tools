@@ -15,3 +15,5 @@ build
 .shsh
 iospytools
 *.lock
+*.zip
+Pipfile*

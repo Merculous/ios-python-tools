@@ -4,7 +4,7 @@ from .template import Template
 
 
 class Wiki:
-    def __init__(self, device: str, buildid: str, codename: str):
+    def __init__(self, device: str, buildid: str, codename: str) -> None:
         self.device = device
         self.buildid = buildid
         self.codename = codename
