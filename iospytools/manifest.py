@@ -153,8 +153,8 @@ class TSSManifest:
     def createTSSTestVersionManifest(self, path: str):
         testVersionManifest = {'ApSecurityDomain': 1}
 
-        with open(path, 'wb+') as v:
-            plistlib.dump(testVersionManifest, v, fmt=plistlib.FMT_XML)
+        with open(path, 'w') as v:
+            plistlib.dump(testVersionManifest, v)
 
     # See 'Sending data (request)' in https://www.theiphonewiki.com/wiki/SHSH_Protocol#Communication
     def initFromBuildManifest(self, device: str, tss_manifest_path: str, build_manifest_path: str, ecid: str, apnonce='', sepnonce='', bbsnum=''):

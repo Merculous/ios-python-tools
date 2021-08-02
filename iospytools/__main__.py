@@ -3,8 +3,8 @@
 import sys
 from argparse import ArgumentParser
 
-from src.ipswapi import API
-from src.tss import TSS
+from .ipswapi import API
+from .tss import TSS
 
 
 def main() -> None:
@@ -99,7 +99,11 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.test:
-        pass
+        t = API()
+        devices = t.getAllDevices()
+
+        for device in devices:
+            print(device)
 
     elif args.d:
 

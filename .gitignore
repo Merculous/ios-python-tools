@@ -2,8 +2,8 @@
 __pycache__
 venv
 .vscode
-shsh
-BuildManifest.plist
+*shsh
+*.plist
 *.code-workspace
 IPSW
 *.ipsw
@@ -12,8 +12,7 @@ IPSW
 *.egg-info
 dist
 build
-.shsh
-iospytools
 *.lock
 *.zip
 Pipfile*
+*.toml

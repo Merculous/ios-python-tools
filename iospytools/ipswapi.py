@@ -1,6 +1,7 @@
 import json
 import os
 from urllib.request import urlopen, urlretrieve
+from typing import Generator
 
 import enquiries
 from remotezip import RemoteZip
