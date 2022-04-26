@@ -12,7 +12,5 @@ IPSW
 *.egg-info
 dist
 build
-*.lock
 *.zip
-Pipfile*
 *.toml
