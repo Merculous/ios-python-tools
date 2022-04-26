@@ -1,36 +1,21 @@
 
-import time
-from urllib.error import HTTPError
-from urllib.request import Request, urlopen, urlretrieve
+import aiohttp
+import asyncio
 
 from .utils import showProgress
 
 
-def requestFromURL(url: str, read: bool):
-    req = Request(url)
-    try:
-        response = urlopen(req, timeout=5.0)
-    except HTTPError as e:
-        if e.code == 404:
+async def getURLData(session, url: str) -> str:
+    async with session.get(url) as r:
+        if r.status == 404:
             print('Server returned no response... are you blacklisted?')
-        elif e.code == 429:
+        elif r.status == 429: # We shouldn't hit this, but for sanity...
             print('Server is asking us to slow down...')
-            wait = int(e.headers['Retry-After'])
+            wait = int(r.headers['Retry-After'])
             print(f'Waiting {wait} seconds...')
-            time.sleep(wait)
-            print('Done sleeping! Trying again...')
-            requestFromURL(url, read)
+            asyncio.sleep(wait)
+            getURLData(session, url)
+        elif r.status == 200:
+            return await r.text()
         else:
-            print(f'Server error: {e.code}')
-    else:
-        # Remove TSS response header
-        if not read:
-            return response
-        else:
-            return response.read()
-
-
-def downloadFromURL(url: str):
-    name = url.split('/')[-1]
-    print(f'Downloading {name} at {url}...')
-    urlretrieve(url, name, showProgress)
+            print(f'Server error: {r.code}')

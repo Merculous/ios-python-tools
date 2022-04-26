@@ -2,7 +2,7 @@ import sys
 from random import choice, seed
 from string import ascii_letters, digits
 
-import progressbar
+from progressbar import ProgressBar
 
 """
 
@@ -23,7 +23,7 @@ pbar = None
 def showProgress(block_num, block_size, total_size):
     global pbar
     if pbar is None:
-        pbar = progressbar.ProgressBar(maxval=total_size)
+        pbar = ProgressBar(maxval=total_size)
         pbar.start()
     downloaded = block_num * block_size
     if downloaded < total_size:

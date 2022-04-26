@@ -5,10 +5,12 @@ This project was inspired by Matteyeux with his ios-tools repo, this will be a s
     Python >= 3.9
 
 ## How to install
+
     1. python3 -m venv venv
     2. source venv/bin/activate
-    3. pip install .
-    
+    3. pip install pipenv
+    4. pipenv install
+
     After this, running "iospytools" will print the help menu,
     also by entering "iospytools -h" or "iospytools --help".
 
@@ -16,19 +18,7 @@ This project was inspired by Matteyeux with his ios-tools repo, this will be a s
 
 ### Features
 
-    iospytools -d device -e ecid --shsh (save shsh blobs)
-
-    iospytools -d device -i ios --codename (print codename of an iOS)
-    iospytools -d device -i ios --convert (convert an iOS to a buildid)
-    iospytools -d device -i ios --download (download an ipsw or OTA file)
-    iospytools -d device -i ios --download --path file (download a file from an ipsw or OTA file)
-    iospytools -d device -i ios --keys (get keys from theiphonewiki)
-    iospytools -d device -i ios --url (print the url of an ios)
-
-    iospytools -d device --signed (get all signed versions for a device)
-
-    iospytools --signed (get all signed versions)
-
+    s0n
 
 ### TODO
 
