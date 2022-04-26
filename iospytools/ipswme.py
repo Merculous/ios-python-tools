@@ -26,6 +26,10 @@ class IPSWAPI:
                 ident = device['identifier']
                 if self.device == ident:
                     url = f'{self.base_url}/device/{self.device}'
+                    if self.ota:
+                        url = f'{url}?type=ota'
+                    else:
+                        url = f'{url}?type=ipsw'
                     data = await getURLData(self.session, url)
                     return json.loads(data)
         else:
@@ -35,10 +39,12 @@ class IPSWAPI:
         if self.device and self.version:
             info = await self.getDeviceInfo()
             firmwares = info['firmwares']
+            matches = []
             for firmware in firmwares:
                 iOS = firmware['version']
                 buildid = firmware['buildid']
                 if self.version == iOS:
-                    return buildid
+                    matches.append(buildid)
+            return matches
         else:
             raise ValueError('No iOS version wass passed!')
