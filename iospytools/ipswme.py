@@ -37,6 +37,15 @@ class IPSWAPI:
         else:
             raise ValueError('No device was passed!')
 
+    async def getDeviceFirmware(self) -> dict:
+        if self.device and self.version:
+            buildid = await self.iOSToBuildid()
+            url = f'{self.base_url}/{self.device}/{buildid}'
+            data = await getURLData(self.session, url)
+            return json.loads(data)
+        else:
+            raise ValueError('No device or iOS version was passed!')
+
     async def iOSToBuildid(self) -> str:
         if self.device and self.version:
             info = await self.getDeviceInfo()
@@ -48,7 +57,9 @@ class IPSWAPI:
                 if self.version == iOS:
                     if buildid not in matches:
                         matches.append(buildid)
-            return matches
+            prompt = 'Please select which version you\'d like to use.'
+            choice = choose(prompt, matches)
+            return choice
         else:
             raise ValueError('No device or iOS version was passed!')
 
@@ -57,16 +68,9 @@ class IPSWAPI:
             info = await self.getDeviceInfo()
             firmwares = info['firmwares']
             buildids = await self.iOSToBuildid()
-            if len(buildids) == 1:
-                for firmware in firmwares:
-                    if firmware['buildid'] == buildids[0]:
-                        return firmware['url']
-            else:
-                prompt = 'Please select which version you\'d like to use.'
-                choice = choose(prompt, buildids)
-                for firmware in firmwares:
-                    if firmware['buildid'] == choice:
-                        return firmware['url']
+            for firmware in firmwares:
+                if firmware['buildid'] == buildids[0]:
+                    return firmware['url']
 
     async def getSignedVersions(self) -> list:
         if self.device:
@@ -78,5 +82,6 @@ class IPSWAPI:
                     tmp = (firmware['version'], firmware['buildid'])
                     if tmp not in signed:
                         signed.append(tmp)
+            return signed
         else:
             raise ValueError('No device was passed!')

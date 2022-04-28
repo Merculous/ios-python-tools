@@ -7,6 +7,9 @@ name = "pypi"
 remotezip = "*"
 progressbar = "*"
 aiohttp = "*"
+enquiries = "*"
+autopep8 = "*"
+flake8 = "*"
 
 [dev-packages]
 
