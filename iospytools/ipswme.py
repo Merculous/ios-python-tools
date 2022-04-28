@@ -40,7 +40,11 @@ class IPSWAPI:
     async def getDeviceFirmware(self) -> dict:
         if self.device and self.version:
             buildid = await self.iOSToBuildid()
-            url = f'{self.base_url}/{self.device}/{buildid}'
+            url = ''
+            if self.ota:
+                url = f'{self.base_url}/ota/{self.device}/{buildid}'
+            else:
+                url = f'{self.base_url}/ipsw/{self.device}/{buildid}'
             data = await getURLData(self.session, url)
             return json.loads(data)
         else:
@@ -57,9 +61,12 @@ class IPSWAPI:
                 if self.version == iOS:
                     if buildid not in matches:
                         matches.append(buildid)
-            prompt = 'Please select which version you\'d like to use.'
-            choice = choose(prompt, matches)
-            return choice
+            if len(matches) >= 2:
+                prompt = 'Please select which version you\'d like to use.'
+                choice = choose(prompt, matches)
+                return choice
+            else:
+                return matches[0]
         else:
             raise ValueError('No device or iOS version was passed!')
 

@@ -24,8 +24,9 @@ async def main(args: tuple) -> None:
     parser.add_argument('-d', help='device', nargs='?', const=True)
     parser.add_argument('-i', help='info', action='store_true')
     parser.add_argument('-s', help='signed', action='store_true')
-    parser.add_argument('-v', help='version', nargs='?', const=True)
     parser.add_argument('-o', help='ota', action='store_true')
+    parser.add_argument('-v', help='version', nargs='?', const=True)
+    parser.add_argument('-w', help='wiki', action='store_true')
     pargs = parser.parse_args()
 
     if argc == 1:
@@ -60,7 +61,22 @@ async def main(args: tuple) -> None:
                         print(f'SHA256: {hash}')
                         print(f'Signed: {signed}')
                         print('\n')
-                elif pargs.v:  # -d <input> -i -v
-                    pass
+                elif pargs.v:  # -d <input> -i -v <input>
+                    api.device = pargs.d
+                    api.version = pargs.v
+                    firmware = await api.getDeviceFirmware()
+                    iOS = firmware['version']
+                    buildid = firmware['buildid']
+                    url = firmware['url']
+                    filesize = firmware['filesize']
+                    hash = firmware['sha256sum']
+                    signed = firmware['signed']
+                    print(f'iOS: {iOS}')
+                    print(f'BuildID: {buildid}')
+                    print(f'URL: {url}')
+                    print(f'Filesize: {filesize}')
+                    print(f'SHA256: {hash}')
+                    print(f'Signed: {signed}')
+
 
 asyncio.run(main(tuple(sys.argv)))
