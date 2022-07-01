@@ -28,7 +28,6 @@ class IPSWAPI:
         else:
             raise ValueError('No device was passed!')
 
-    # TODO Add 'ipsw' or 'ota' to ensure we know where each buildid came from
 
     async def iOSToBuildid(self):
         if self.version:
@@ -113,3 +112,45 @@ class IPSWAPI:
             if value['buildid'] == buildid:
                 return value['url']
 
+    async def getSignedVersionsForDevice(self):
+        if self.device:
+            signed = {'ipsw': {}, 'ota': {}}
+
+            self.restore_type = 'ipsw'
+            ipsw_data = await self.getDeviceInfo()
+            self.restore_type = 'ota'
+            ota_data = await self.getDeviceInfo()
+            self.restore_type = None
+
+            for data in ipsw_data['firmwares']:
+                version = data['version']
+                buildid = data['buildid']
+                is_signed = data['signed']
+
+                if is_signed:
+                    signed['ipsw'][version] = buildid
+                
+            for data in ota_data['firmwares']:
+                version = data['version']
+                buildid = data['buildid']
+                is_signed = data['signed']
+
+                if is_signed:
+                    signed['ota'][version] = buildid
+
+            return signed
+
+        else:
+            raise ValueError('No device was passed!')
+
+
+    async def getAllSignedVersions(self):
+        devices = await self.getAllDevices()
+        signed = {}
+        for device in devices:
+            identifier = device['identifier']
+            self.device = identifier
+            signed_versions = await self.getSignedVersionsForDevice()
+            signed[identifier] = signed_versions
+        
+        return signed
