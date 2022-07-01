@@ -1,22 +1,38 @@
-def getDifferences(orig, new):
-    with open(orig, 'rb') as o:
-        o_data = o.read()
 
-    with open(new, 'rb') as n:
-        n_data = n.read()
+import itertools
 
-    stuff = []
+class DIFF:
+    def __init__(self, file1, file2):
+        self.file1 = file1
+        self.file2 = file2
 
-    for i, n_value in enumerate(n_data):
-        if n_value != o_data[i]:
-            data = (hex(o_data[i]), hex(n_value), i)
-            stuff.append(data)
+    def diff(self):
+        differences = {}
 
-    o_str = ''
+        with open(self.file1, 'rb') as f:
+            data1 = f.read()
 
-    for x in stuff:
-        tmp = x[0].split('0x')[1]  # FIXME
-        o_str += tmp
+        with open(self.file2, 'rb') as ff:
+            data2 = ff.read()
 
-        if len(o_str) == 8:
-            oof = ''
+        x = 0
+
+        for i, ii in itertools.zip_longest(data1, data2):
+            if i is None:
+                i = 0
+
+            if ii is None:
+                ii = 0
+
+            i = hex(i)
+            ii = hex(ii)
+
+            if i != ii:
+                differences[hex(x)] = (i, ii)
+
+            x += 1
+
+        return differences
+
+    def patch(self):
+        pass
