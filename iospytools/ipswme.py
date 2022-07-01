@@ -1,94 +1,115 @@
 
 import json
 
-from enquiries import choose
-
 from .remote import getURLData
+from .utils import choose
 
 
 class IPSWAPI:
-    base_url = 'https://api.ipsw.me/v4'
+    base_url = 'https://api.ipsw.me/v4/'
 
-    def __init__(self, session, device=None, version=None, ota=None, beta=None) -> None:
+    def __init__(self, session, device=None, version=None, restore_type=None):
         self.session = session
         self.device = device
         self.version = version
-        self.ota = ota
-        self.beta = beta
+        self.restore_type = restore_type
 
-    async def getAllDevices(self) -> dict:
-        url = f'{self.base_url}/devices'
-        data = await getURLData(self.session, url)
-        return json.loads(data)
+    async def getAllDevices(self):
+        url = self.base_url + 'devices'
+        return json.loads(await getURLData(self.session, url))
 
-    async def getDeviceInfo(self) -> dict:
+    async def getDeviceInfo(self):
         if self.device:
-            devices = await self.getAllDevices()
-            for device in devices:
-                ident = device['identifier']
-                if self.device == ident:
-                    url = f'{self.base_url}/device/{self.device}'
-                    if self.ota:
-                        url = f'{url}?type=ota'
-                    else:
-                        url = f'{url}?type=ipsw'
-                    data = await getURLData(self.session, url)
-                    return json.loads(data)
+            if self.restore_type == 'ota' or self.restore_type == 'ipsw':
+                url = self.base_url + 'device/' + self.device + f'?type={self.restore_type}'
+                return json.loads(await getURLData(self.session, url))
+            else:
+                raise ValueError('No restore type was passed!')
         else:
             raise ValueError('No device was passed!')
 
-    async def getDeviceFirmware(self) -> dict:
-        if self.device and self.version:
-            buildid = await self.iOSToBuildid()
-            url = ''
-            if self.ota:
-                url = f'{self.base_url}/ota/{self.device}/{buildid}'
+    # TODO Add 'ipsw' or 'ota' to ensure we know where each buildid came from
+
+    async def iOSToBuildid(self):
+        if self.version:
+            self.restore_type = 'ipsw'
+            ipsw_firmwares = await self.getDeviceInfo()
+            self.restore_type = 'ota'
+            ota_firmwares = await self.getDeviceInfo()
+            self.restore_type = None
+
+            firmwares = {'ipsw': {}, 'ota': {}}
+
+            for data in ipsw_firmwares['firmwares']:
+                ipsw_version = data['version']
+                ipsw_buildid = data['buildid']
+
+                if ipsw_version not in firmwares['ipsw']:
+                    firmwares['ipsw'][ipsw_version] = []
+
+                if ipsw_buildid not in firmwares['ipsw'][ipsw_version]:
+                    firmwares['ipsw'][ipsw_version].append(ipsw_buildid)
+
+            for data in ota_firmwares['firmwares']:
+                ota_version = data['version']
+                ota_buildid = data['buildid']
+
+                if ota_version not in firmwares['ota']:
+                    firmwares['ota'][ota_version] = []
+
+                if ota_buildid not in firmwares['ota'][ota_version]:
+                    firmwares['ota'][ota_version].append(ota_buildid)
+
+            buildids = []
+
+            if self.version in firmwares['ipsw']:
+                buildid = firmwares['ipsw'][self.version]
+                buildid.append('ipsw')
+                if buildid not in buildids:
+                    buildids.append(buildid)
+
+            if self.version in firmwares['ota']:
+                buildid = firmwares['ota'][self.version]
+                buildid.append('ota')
+                if buildid not in buildids:
+                    buildids.append(buildid)
+
+            # TODO Return either 'ipsw' or 'ota' from user specified 'self.restore_type'
+
+            if buildids:
+                return buildids
             else:
-                url = f'{self.base_url}/ipsw/{self.device}/{buildid}'
-            data = await getURLData(self.session, url)
-            return json.loads(data)
-        else:
-            raise ValueError('No device or iOS version was passed!')
+                ValueError('Something went wrong grabbing buildids!')
 
-    async def iOSToBuildid(self) -> str:
-        if self.device and self.version:
-            info = await self.getDeviceInfo()
-            firmwares = info['firmwares']
-            matches = []
-            for firmware in firmwares:
-                iOS = firmware['version']
-                buildid = firmware['buildid']
-                if self.version == iOS:
-                    if buildid not in matches:
-                        matches.append(buildid)
-            if len(matches) >= 2:
-                prompt = 'Please select which version you\'d like to use.'
-                choice = choose(prompt, matches)
-                return choice
+        else:
+            raise ValueError('No version was passed!')
+
+    async def getArchiveURL(self):
+        buildids = await self.iOSToBuildid()
+        restore_types = ('ipsw', 'ota')
+        
+        if len(buildids) == 1:
+            buildid = buildids[0][0]
+            choice = restore_types[0]
+        else:
+            choice = await choose('Please select which restore type you\'d like to use\n', restore_types)
+            print(f'User selected: {choice}')
+
+            if choice == restore_types[0]:
+                buildid = buildids[0][0]
             else:
-                return matches[0]
-        else:
-            raise ValueError('No device or iOS version was passed!')
+                choices = buildids[1][:-1]
+           
+                if len(choices) == 1:
+                    print('TODO ADD CODE HERE')
+                else:
+                    buildid = await choose('Please select which buildid you\'d like to use\n', choices)
+                    print(f'User selected: {buildid}')
 
-    async def getArchiveURL(self) -> str:
-        if self.device and self.version:
-            info = await self.getDeviceInfo()
-            firmwares = info['firmwares']
-            buildids = await self.iOSToBuildid()
-            for firmware in firmwares:
-                if firmware['buildid'] == buildids[0]:
-                    return firmware['url']
+        self.restore_type = choice
+        data = await self.getDeviceInfo()
 
-    async def getSignedVersions(self) -> list:
-        if self.device:
-            info = await self.getDeviceInfo()
-            firmwares = info['firmwares']
-            signed = []
-            for firmware in firmwares:
-                if firmware['signed']:
-                    tmp = (firmware['version'], firmware['buildid'])
-                    if tmp not in signed:
-                        signed.append(tmp)
-            return signed
-        else:
-            raise ValueError('No device was passed!')
+        for value in data['firmwares']:
+            if value['buildid'] == buildid:
+                return value['url']
+

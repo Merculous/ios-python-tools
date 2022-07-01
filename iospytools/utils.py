@@ -1,3 +1,4 @@
+import asyncio
 import sys
 from random import choice, seed
 from string import ascii_letters, digits
@@ -19,6 +20,12 @@ Basically just 'tools'.
 
 pbar = None
 
+async def choose(prompt, choices):
+    for i, line in enumerate(choices):
+        print(f'{i}: {line}')
+
+    choice = input(prompt)
+    return choices[int(choice)]
 
 def showProgress(block_num, block_size, total_size):
     global pbar
