@@ -1,7 +1,7 @@
 
 import json
 
-from .remote import getURLData
+from .remote import downloadFile, getURLData
 from .utils import choose
 
 
@@ -154,3 +154,7 @@ class IPSWAPI:
             signed[identifier] = signed_versions
         
         return signed
+
+    async def downloadArchive(self):
+        url = await self.getArchiveURL()
+        await downloadFile(self.session, url)
