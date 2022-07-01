@@ -1,7 +1,6 @@
 
 import asyncio
 
-
 async def getURLData(session, url: str) -> str:
     async with session.get(url) as r:
         if r.status == 404:
@@ -16,3 +15,12 @@ async def getURLData(session, url: str) -> str:
             return await r.text()
         else:
             print(f'Server error: {r.code}')
+
+
+async def downloadFile(session, url: str):
+    filename = url.split('/')[-1:][0]
+    async with session.get(url) as r:
+        if r.status == 200:
+            print(f'Downloading {filename}...')
+            with open(filename, 'wb') as f:
+                f.write(await r.read())
