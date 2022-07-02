@@ -1,30 +1,21 @@
+
 import plistlib
 
 from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
 
+def parseManifest(data: bytes, chipid: str) -> dict:
+    info = {}
+    data = plistlib.loads(data)
 
-class Manifest:
-    def __init__(self, manifest: bytes):
-        self.manifest = plistlib.loads(manifest)
+    info['version'] = data['ProductVersion']
+    info['buildid'] = data['ProductBuildVersion']
 
-    def getInfo(self):
-        info = {
-            'device': self.manifest['SupportedProductTypes'][0],
-            'ios': self.manifest['ProductVersion'],
-            'buildid': self.manifest['ProductBuildVersion'],
-            'chipid': self.manifest['BuildIdentities'][0]['ApChipID'],
-            'codename': self.manifest['BuildIdentities'][0]['Info']['BuildTrain'],
-            'deviceclass': self.manifest['BuildIdentities'][0]['Info']['DeviceClass'],
-            'paths': []
-        }
+    for thing in data['BuildIdentities']:
+        if thing['ApChipID'] == chipid:
+            info['codename'] = thing['Info']['BuildTrain']
+            break
 
-        for path in self.manifest['BuildIdentities'][0]['Manifest'].items():
-            name = path[0]
-            filepath = path[1]['Info']['Path']
-            info['paths'].append({name: filepath})
-
-        return info
-
+    return info
 
 class TSSManifest:
     # Thanks tihmstar! http://blog.tihmstar.net/2017/01/basebandgoldcertid-not-found-please.html

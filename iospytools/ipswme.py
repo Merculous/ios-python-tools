@@ -1,6 +1,7 @@
 
 import json
 
+from .manifest import parseManifest
 from .remote import downloadFile, getURLData
 from .utils import choose
 
@@ -162,8 +163,24 @@ class IPSWAPI:
         url = await self.getArchiveURL()
         await downloadFile(self.session, url)
 
+    async def listArchiveContents(self):
+        url = await self.getArchiveURL()
+        with RemoteZip(url) as f:
+            contents = f.filelist
+            for thing in contents:
+                print(thing.filename)
+
     async def readFromArchive(self, path):
         url = await self.getArchiveURL()
         with RemoteZip(url) as f:
             data = f.read(path)
             return data
+
+    async def getChipID(self):
+        data = await self.getDeviceInfo()
+        return hex(data['cpid'])
+
+    async def getCodename(self):
+        data = await self.readFromArchive('BuildManifest.plist')
+        info = parseManifest(data, await self.getChipID())
+        return info['codename']
