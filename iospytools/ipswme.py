@@ -4,6 +4,9 @@ import json
 from .remote import downloadFile, getURLData
 from .utils import choose
 
+from remotezip import RemoteZip
+
+
 
 class IPSWAPI:
     base_url = 'https://api.ipsw.me/v4/'
@@ -158,3 +161,9 @@ class IPSWAPI:
     async def downloadArchive(self):
         url = await self.getArchiveURL()
         await downloadFile(self.session, url)
+
+    async def readFromArchive(self, path):
+        url = await self.getArchiveURL()
+        with RemoteZip(url) as f:
+            data = f.read(path)
+            return data
