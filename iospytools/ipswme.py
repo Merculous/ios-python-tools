@@ -1,12 +1,11 @@
 
 import json
 
+from remotezip import RemoteZip
+
 from .manifest import parseManifest
 from .remote import downloadFile, getURLData
 from .utils import choose
-
-from remotezip import RemoteZip
-
 
 
 class IPSWAPI:
@@ -24,11 +23,15 @@ class IPSWAPI:
 
     async def getDeviceInfo(self):
         if self.device:
-            if self.restore_type == 'ota' or self.restore_type == 'ipsw':
-                url = self.base_url + 'device/' + self.device + f'?type={self.restore_type}'
-                return json.loads(await getURLData(self.session, url))
+            if self.restore_type is None: # TODO This should work?
+                self.restore_type = 'ipsw'
+            elif self.restore_type == 'ota' or self.restore_type == 'ipsw':
+                pass # IDK what to do here
             else:
                 raise ValueError('No restore type was passed!')
+                
+            url = self.base_url + 'device/' + self.device + f'?type={self.restore_type}'
+            return json.loads(await getURLData(self.session, url))
         else:
             raise ValueError('No device was passed!')
 
@@ -176,11 +179,15 @@ class IPSWAPI:
             data = f.read(path)
             return data
 
+    async def getBoardConfig(self):
+        data = await self.getDeviceInfo()
+        return data['boardconfig']
+
     async def getChipID(self):
         data = await self.getDeviceInfo()
         return hex(data['cpid'])
 
     async def getCodename(self):
         data = await self.readFromArchive('BuildManifest.plist')
-        info = parseManifest(data, await self.getChipID())
+        info = parseManifest(data, await self.getChipID(), await self.getBoardConfig())
         return info['codename']

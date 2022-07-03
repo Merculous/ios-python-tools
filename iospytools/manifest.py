@@ -1,9 +1,10 @@
 
 import plistlib
+import re
 
 from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
 
-def parseManifest(data: bytes, chipid: str) -> dict:
+def parseManifest(data: bytes, chipid: str, boardconfig: str) -> dict:
     info = {}
     data = plistlib.loads(data)
 
@@ -12,8 +13,15 @@ def parseManifest(data: bytes, chipid: str) -> dict:
 
     for thing in data['BuildIdentities']:
         if thing['ApChipID'] == chipid:
-            info['codename'] = thing['Info']['BuildTrain']
-            break
+            if re.match(boardconfig.lower(), thing['Info']['DeviceClass']):
+                info['codename'] = thing['Info']['BuildTrain']
+                info['restore_type'] = thing['Info']['RestoreBehavior']
+                info['Paths'] = {}
+
+                for filename in thing['Manifest']:
+                    info['Paths'][filename] = thing['Manifest'][filename]['Info']['Path']
+
+                break
 
     return info
 
