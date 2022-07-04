@@ -3,6 +3,7 @@ import json
 
 from remotezip import RemoteZip
 
+from .iphonewiki import WIKI
 from .manifest import parseManifest
 from .remote import downloadFile, getURLData
 from .utils import choose
@@ -70,54 +71,67 @@ class IPSWAPI:
 
             if self.version in firmwares['ipsw']:
                 buildid = firmwares['ipsw'][self.version]
-                buildid.append('ipsw')
                 if buildid not in buildids:
                     buildids.append(buildid)
 
             if self.version in firmwares['ota']:
                 buildid = firmwares['ota'][self.version]
-                buildid.append('ota')
                 if buildid not in buildids:
                     buildids.append(buildid)
 
-            # TODO Return either 'ipsw' or 'ota' from user specified 'self.restore_type'
-
             if buildids:
-                return buildids
+                if len(buildids) == 1:
+                    if len(buildids[0]) == 1: # 1 ipsw value
+                        return buildids[0][0]
+                    else: # 2 ipsw values
+                        choice = await choose('Please select a buildid...\n', buildids[0])
+                        print(f'User selected: {choice}')
+                        return choice
+                elif len(buildids) == 2: # ipsw and ota values
+                    restore_types = ('ipsw', 'ota')
+                    selected_type = await choose('Please selected a restore type...\n', restore_types)
+                    print(f'User selected: {selected_type}')
+                    if selected_type == restore_types[0]: # ipsw
+                        values = buildids[0]
+                        if len(values) == 1:
+                            return (values[0], restore_types[0])
+                        else:
+                            choice = await choose('Please select a buildid...\n', values)
+                            print(f'User selcted: {choice}')
+                            return (choice, restore_types[0])
+                    elif selected_type == restore_types[1]: # ota
+                        values = buildids[1]
+                        if len(values) == 1:
+                            return (values[0], restore_types[1])
+                        else:
+                            choice = await choose('Please select a buildid...\n', values)
+                            print(f'User selected: {choice}')
+                            return (choice, restore_types[1])
+                else:
+                    print('Somehow we got here???')
+     
             else:
                 ValueError('Something went wrong grabbing buildids!')
-
         else:
             raise ValueError('No version was passed!')
 
     async def getArchiveURL(self):
-        buildids = await self.iOSToBuildid()
-        restore_types = ('ipsw', 'ota')
-        
-        if len(buildids) == 1:
-            buildid = buildids[0][0]
-            choice = restore_types[0]
-        else:
-            choice = await choose('Please select which restore type you\'d like to use\n', restore_types)
-            print(f'User selected: {choice}')
-
-            if choice == restore_types[0]:
-                buildid = buildids[0][0]
-            else:
-                choices = buildids[1][:-1]
-           
-                if len(choices) == 1:
-                    print('TODO ADD CODE HERE')
-                else:
-                    buildid = await choose('Please select which buildid you\'d like to use\n', choices)
-                    print(f'User selected: {buildid}')
-
-        self.restore_type = choice
+        buildid = await self.iOSToBuildid()
+        self.restore_type = buildid[1]
         data = await self.getDeviceInfo()
 
+        url = None
+
         for value in data['firmwares']:
-            if value['buildid'] == buildid:
-                return value['url']
+            if value['buildid'] == buildid[0]:
+                url = value['url']
+                break
+
+        if url:
+            return url
+        else:
+            raise ValueError('No url was found!')
+        
 
     async def getSignedVersionsForDevice(self):
         if self.device:
@@ -175,9 +189,12 @@ class IPSWAPI:
 
     async def readFromArchive(self, path):
         url = await self.getArchiveURL()
-        with RemoteZip(url) as f:
-            data = f.read(path)
-            return data
+        if url:
+            with RemoteZip(url) as f:
+                data = f.read(path)
+                return data
+        else:
+            raise ValueError('No url was found!')
 
     async def getBoardConfig(self):
         data = await self.getDeviceInfo()
@@ -191,3 +208,16 @@ class IPSWAPI:
         data = await self.readFromArchive('BuildManifest.plist')
         info = parseManifest(data, await self.getChipID(), await self.getBoardConfig())
         return info['codename']
+
+    async def getKeysFromWiki(self):
+        test = await self.iOSToBuildid()
+
+        if isinstance(test, str):
+            buildid = test
+            restore = 'ipsw'
+        elif isinstance(test, tuple):
+            buildid = test[0]
+            restore = test[1]
+
+        w = WIKI(self.session, await self.getCodename(), buildid, self.device, restore)
+        await w.readFirmwareKeysPage()
