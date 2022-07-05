@@ -24,15 +24,11 @@ class IPSWAPI:
 
     async def getDeviceInfo(self):
         if self.device:
-            if self.restore_type is None: # TODO This should work?
-                self.restore_type = 'ipsw'
-            elif self.restore_type == 'ota' or self.restore_type == 'ipsw':
-                pass # IDK what to do here
+            if self.restore_type == 'ota' or self.restore_type == 'ipsw':
+                url = self.base_url + 'device/' + self.device + f'?type={self.restore_type}'
+                return json.loads(await getURLData(self.session, url))
             else:
                 raise ValueError('No restore type was passed!')
-                
-            url = self.base_url + 'device/' + self.device + f'?type={self.restore_type}'
-            return json.loads(await getURLData(self.session, url))
         else:
             raise ValueError('No device was passed!')
 
@@ -117,20 +113,21 @@ class IPSWAPI:
 
     async def getArchiveURL(self):
         buildid = await self.iOSToBuildid()
-        self.restore_type = buildid[1]
-        data = await self.getDeviceInfo()
+        
+        if isinstance(buildid, str):
+            build = buildid
+            self.restore_type = 'ipsw'
+            data = await self.getDeviceInfo()
 
-        url = None
+        elif isinstance(buildid, tuple):
+            build = buildid[0]
+            self.restore_type = buildid[1]
+            data = await self.getDeviceInfo()
 
+        
         for value in data['firmwares']:
-            if value['buildid'] == buildid[0]:
-                url = value['url']
-                break
-
-        if url:
-            return url
-        else:
-            raise ValueError('No url was found!')
+            if value['buildid'] == build:
+                return value['url']
         
 
     async def getSignedVersionsForDevice(self):
