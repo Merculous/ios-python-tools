@@ -1,52 +1,36 @@
 
-import re
-from .remote import downloadFromURL, requestFromURL
+import asyncio
+
+from .remote import getURLData
+
+class WIKI:
+    base_url = 'https://www.theiphonewiki.com'
+
+    def __init__(self, session, codename, buildid, identifier):
+        self.session = session
+        self.codename = codename
+        self.buildid = buildid
+        self.identifier = identifier
 
 
-class Wiki:
-    def __init__(self) -> None:
-        self.info = {}
+    async def readFirmwareKeysPage(self):
+        url = self.base_url + f'/w/index.php?title={self.codename}_{self.buildid}_({self.identifier})&action=raw'
+        data = await getURLData(self.session, url)
+        return data
 
-    def readModels(self):
-        url = 'https://www.theiphonewiki.com/w/index.php?title=Models&action=edit'
-        return requestFromURL(url, True).decode().splitlines()
 
-    def extractTemplate(self, text: list):
-        template = {}
+    async def parseTemplate(self):
+        data = await self.readFirmwareKeysPage()
+        data = data.splitlines()
 
-        devices = (
-            re.compile(r'apple tv', re.IGNORECASE),
-            re.compile(r'apple watch', re.IGNORECASE),
-            re.compile(r'ipad', re.IGNORECASE),
-            re.compile(r'ipod', re.IGNORECASE),
-            re.compile(r'iphone', re.IGNORECASE)
-        )
+        info = {}
 
-        count = 0
+        for line in data:
+            if line.startswith(' | '):
+                line = line.replace(' | ', '').split('=')
+                key = line[0].strip()
+                value = line[1].strip()
 
-        for line in text:
+                info[key] = value
 
-            if line.startswith('== ') and line.endswith(' =='):
-                for device in devices:
-                    if device.search(line):
-                        section = line[5:-5].split('|')
-                        template[section[1]] = {
-                            'title': section[0],
-                            'start': count
-                        }
-
-            # FIXME Below is ugly
-
-            if line == '|}':
-                if template:
-                    template[section[1]]['end'] = count + 1
-
-                    template[section[1]]['length'] = template[section[1]
-                                                              ]['end'] - template[section[1]]['start']
-
-                    template[section[1]]['data'] = text[template[section[1]]
-                                                        ['start']:template[section[1]]['end']]
-
-            count += 1
-
-        return template
+        return info

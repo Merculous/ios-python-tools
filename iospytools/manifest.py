@@ -1,10 +1,11 @@
 
+import asyncio
 import plistlib
 import re
 
 from .utils import getDeviceType, getMajorDeviceRevision, getMinorDeviceRevision, fastTokenHex
 
-def parseManifest(data: bytes, chipid: str, boardconfig: str) -> dict:
+async def parseManifest(data: bytes, chipid: str, boardconfig: str) -> dict:
     info = {}
     data = plistlib.loads(data)
 

@@ -183,9 +183,7 @@ class IPSWAPI:
     async def listArchiveContents(self):
         url = await self.getArchiveURL()
         with RemoteZip(url) as f:
-            contents = f.filelist
-            for thing in contents:
-                print(thing.filename)
+            return (url, f.filelist)
 
     async def readFromArchive(self, path):
         url = await self.getArchiveURL()
@@ -196,6 +194,14 @@ class IPSWAPI:
         else:
             raise ValueError('No url was found!')
 
+    async def readFromBuildManifest(self):
+        contents = await self.listArchiveContents()
+        for line in contents[1]:
+            if 'BuildManifest.plist' in line.filename:
+                with RemoteZip(contents[0]) as f:
+                    data = f.read(line.filename)
+                    return data
+
     async def getBoardConfig(self):
         data = await self.getDeviceInfo()
         return data['boardconfig']
@@ -205,19 +211,12 @@ class IPSWAPI:
         return hex(data['cpid'])
 
     async def getCodename(self):
-        data = await self.readFromArchive('BuildManifest.plist')
-        info = parseManifest(data, await self.getChipID(), await self.getBoardConfig())
+        data = await self.readFromBuildManifest()
+        info = await parseManifest(data, await self.getChipID(), await self.getBoardConfig())
         return info['codename']
 
     async def getKeysFromWiki(self):
-        test = await self.iOSToBuildid()
-
-        if isinstance(test, str):
-            buildid = test
-            restore = 'ipsw'
-        elif isinstance(test, tuple):
-            buildid = test[0]
-            restore = test[1]
-
-        w = WIKI(self.session, await self.getCodename(), buildid, self.device, restore)
-        await w.readFirmwareKeysPage()
+        info = await parseManifest(await self.readFromBuildManifest(), await self.getChipID(), await self.getBoardConfig())
+        w = WIKI(self.session, info['codename'], info['buildid'], self.device)
+        keys = await w.parseTemplate()
+        return keys
